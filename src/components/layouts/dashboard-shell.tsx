@@ -28,7 +28,7 @@ export function DashboardShell({ children, userName }: DashboardShellProps) {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main content area */}
-      <div className="flex flex-1 flex-col relative z-10">
+      <div className="flex flex-1 flex-col min-w-0 relative z-10">
         {/* Header */}
         <Header
           onMenuClick={() => setSidebarOpen(true)}
