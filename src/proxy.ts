@@ -48,10 +48,10 @@ function getLocaleFromPath(pathname: string): string {
   return match ? match[1] : "en";
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, origin } = request.nextUrl;
 
-  // Skip middleware for API routes, static files, and Next.js internals
+  // Skip proxy for API routes, static files, and Next.js internals
   if (
     pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||
