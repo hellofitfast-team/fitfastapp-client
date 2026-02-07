@@ -24,7 +24,7 @@ export function useNotifications() {
 
     setPermission(Notification.permission);
 
-    // Check OneSignal subscription state if available
+    // Check subscription state: try OneSignal, fall back to permission check
     async function checkSubscription() {
       try {
         const OneSignal = (await import("react-onesignal")).default;
@@ -45,16 +45,18 @@ export function useNotifications() {
     setLoading(true);
 
     try {
-      const OneSignal = (await import("react-onesignal")).default;
-      await OneSignal.Notifications.requestPermission();
-      const optedIn = OneSignal.User.PushSubscription.optedIn;
-      setIsSubscribed(optedIn ?? false);
-      setPermission(Notification.permission);
-    } catch {
-      // Fall back to native API if OneSignal isn't initialized
       const result = await Notification.requestPermission();
       setPermission(result);
       setIsSubscribed(result === "granted");
+
+      // Best-effort OneSignal sync
+      if (result === "granted") {
+        import("react-onesignal")
+          .then((mod) => mod.default.User.PushSubscription.optIn())
+          .catch(() => {});
+      }
+    } catch {
+      // Permission request itself failed
     } finally {
       setLoading(false);
     }
@@ -65,28 +67,30 @@ export function useNotifications() {
     setLoading(true);
 
     try {
-      const OneSignal = (await import("react-onesignal")).default;
       if (isSubscribed) {
-        // Opt out
-        await OneSignal.User.PushSubscription.optOut();
+        // Opt out: update UI immediately, try OneSignal in background
         setIsSubscribed(false);
+        import("react-onesignal")
+          .then((mod) => mod.default.User.PushSubscription.optOut())
+          .catch(() => {});
       } else {
-        // Opt in (request permission if needed)
-        if (Notification.permission === "default") {
-          await OneSignal.Notifications.requestPermission();
+        // Opt in: request permission via native API first
+        let perm = Notification.permission;
+        if (perm === "default") {
+          perm = await Notification.requestPermission();
+          setPermission(perm);
         }
-        await OneSignal.User.PushSubscription.optIn();
-        const optedIn = OneSignal.User.PushSubscription.optedIn;
-        setIsSubscribed(optedIn ?? false);
-        setPermission(Notification.permission);
+
+        if (perm === "granted") {
+          setIsSubscribed(true);
+          // Best-effort OneSignal sync
+          import("react-onesignal")
+            .then((mod) => mod.default.User.PushSubscription.optIn())
+            .catch(() => {});
+        }
       }
     } catch {
-      // Fall back to native API
-      if (!isSubscribed) {
-        const result = await Notification.requestPermission();
-        setPermission(result);
-        setIsSubscribed(result === "granted");
-      }
+      // Shouldn't happen with native API, but guard just in case
     } finally {
       setLoading(false);
     }
