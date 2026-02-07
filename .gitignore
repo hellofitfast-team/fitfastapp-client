@@ -53,6 +53,14 @@ next-env.d.ts
 
 # Claude Code
 .claude/
+CLAUDE.md
+
+# Development-only (tests, scripts, docs)
+/e2e/
+/scripts/
+/docs/
+playwright.config.ts
+vitest.config.ts
 
 # temporary screenshots/test artifacts
 screenshots-for-fix/
