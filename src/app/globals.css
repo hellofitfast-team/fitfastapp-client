@@ -1,0 +1,228 @@
+/* Cairo font is loaded via HTML <link> tag in layout.tsx to avoid @import ordering issues with Tailwind v4 */
+
+@import "tailwindcss";
+
+/* FitFast Brutalist Theme Configuration */
+@theme inline {
+  /* Brutalist Color Palette */
+  --color-cream: #FFFEF5;
+  --color-black: #000000;
+  --color-orange: #FF3B00;
+  --color-green: #00FF94;
+
+  /* Neutral Colors */
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+  --color-neutral-950: #0a0a0a;
+
+  /* Semantic Colors */
+  --color-success-500: #00FF94;
+  --color-success-600: #00CC76;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-error-500: #FF3B00;
+  --color-error-600: #CC2F00;
+
+  /* Background/Foreground - BRUTALIST DEFAULTS */
+  --color-background: #FFFEF5;
+  --color-foreground: #000000;
+  --color-card: #FFFEF5;
+  --color-card-foreground: #000000;
+  --color-popover: #FFFEF5;
+  --color-popover-foreground: #000000;
+  --color-muted: var(--color-neutral-100);
+  --color-muted-foreground: var(--color-neutral-600);
+  --color-border: #000000;
+  --color-input: #000000;
+  --color-ring: #FF3B00;
+
+  /* Fonts - Cairo for Arabic, System fonts for English, Outfit for admin headings */
+  --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-arabic: "Cairo", ui-sans-serif, system-ui, sans-serif;
+  --font-outfit: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
+
+  /* Border Radius - BRUTALIST: No rounded corners */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+  --radius-full: 0;
+}
+
+/* IMPORTANT: Override dark mode - Brutalist design is always the same */
+/* We do NOT want system dark mode to change our design */
+@media (prefers-color-scheme: dark) {
+  @theme inline {
+    /* Keep the same brutalist colors regardless of system preference */
+    --color-background: #FFFEF5;
+    --color-foreground: #000000;
+    --color-card: #FFFEF5;
+    --color-card-foreground: #000000;
+    --color-popover: #FFFEF5;
+    --color-popover-foreground: #000000;
+    --color-muted: var(--color-neutral-100);
+    --color-muted-foreground: var(--color-neutral-600);
+    --color-border: #000000;
+    --color-input: #000000;
+  }
+}
+
+/* Base Styles — MUST be in @layer base so Tailwind utilities can override */
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color-scheme: light; /* Force light color scheme */
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Form elements should have black text by default (client-facing pages) */
+  input, textarea, select, button {
+    color: #000000;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: var(--color-neutral-400);
+  }
+}
+
+@layer base {
+  /* RTL Support & Arabic Typography */
+  [dir="rtl"] {
+    text-align: right;
+    font-family: var(--font-arabic);
+  }
+
+  /* Arabic-specific typography improvements */
+  [dir="rtl"] * {
+    font-family: var(--font-arabic);
+    letter-spacing: 0 !important; /* Arabic doesn't use letter-spacing */
+  }
+
+  /* Ensure Arabic text is always readable - minimum sizes */
+  [dir="rtl"] .font-mono {
+    font-family: var(--font-arabic);
+    font-weight: 600;
+  }
+
+  /* Arabic labels and small text need larger sizes */
+  [dir="rtl"] .text-xs {
+    font-size: 0.875rem; /* 14px instead of 12px */
+    line-height: 1.4;
+  }
+
+  [dir="rtl"] .text-\[8px\],
+  [dir="rtl"] .text-\[10px\] {
+    font-size: 0.75rem; /* 12px minimum */
+    line-height: 1.4;
+  }
+
+  /* Tracking/letter-spacing doesn't work well with Arabic */
+  [dir="rtl"] .tracking-tight,
+  [dir="rtl"] .tracking-wide,
+  [dir="rtl"] .tracking-wider,
+  [dir="rtl"] .tracking-widest,
+  [dir="rtl"] .tracking-\[0\.2em\],
+  [dir="rtl"] .tracking-\[0\.15em\] {
+    letter-spacing: 0;
+  }
+}
+
+@layer base {
+  /* Focus Styles - BRUTALIST */
+  :focus-visible {
+    outline: 4px solid var(--color-ring);
+    outline-offset: 0;
+  }
+
+  /* Custom Scrollbar - BRUTALIST */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-cream);
+    border-left: 4px solid #000000;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #000000;
+    border: none;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-orange);
+  }
+}
+
+/* Animation Classes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-slide-in {
+  animation: slideInFromBottom 0.3s ease-out;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
