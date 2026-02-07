@@ -16,6 +16,7 @@ import {
   X,
   LucideIcon,
 } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 // NavItem component with proper hover states
@@ -116,9 +117,13 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
         {/* Mobile header */}
         <div className="flex h-16 items-center justify-between border-b-4 border-black px-4 lg:hidden">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center bg-black">
-              <span className="text-lg font-black" style={{ color: '#00FF94' }}>FF</span>
-            </div>
+            <Image
+              src="/icons/icon-512x512.png"
+              alt="FitFast"
+              width={40}
+              height={40}
+              className="h-10 w-10 rounded"
+            />
             <span className="font-black text-xl tracking-tight">FITFAST</span>
           </div>
           <CloseButton onClick={onClose} />
@@ -127,9 +132,13 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
         {/* Desktop logo - h-16 matches header height exactly */}
         <div className="hidden h-16 border-b-4 border-black lg:flex">
           <div className="flex h-full items-center gap-3 px-4">
-            <div className="flex h-10 w-10 items-center justify-center bg-black">
-              <span className="text-lg font-black" style={{ color: '#00FF94' }}>FF</span>
-            </div>
+            <Image
+              src="/icons/icon-512x512.png"
+              alt="FitFast"
+              width={40}
+              height={40}
+              className="h-10 w-10 rounded"
+            />
             <span className="font-black text-xl tracking-tight">FITFAST</span>
           </div>
         </div>

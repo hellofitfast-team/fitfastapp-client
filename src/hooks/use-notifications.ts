@@ -60,5 +60,37 @@ export function useNotifications() {
     }
   }, [isSupported]);
 
-  return { isSupported, permission, isSubscribed, requestPermission, loading };
+  const toggleSubscription = useCallback(async () => {
+    if (!isSupported) return;
+    setLoading(true);
+
+    try {
+      const OneSignal = (await import("react-onesignal")).default;
+      if (isSubscribed) {
+        // Opt out
+        await OneSignal.User.PushSubscription.optOut();
+        setIsSubscribed(false);
+      } else {
+        // Opt in (request permission if needed)
+        if (Notification.permission === "default") {
+          await OneSignal.Notifications.requestPermission();
+        }
+        await OneSignal.User.PushSubscription.optIn();
+        const optedIn = OneSignal.User.PushSubscription.optedIn;
+        setIsSubscribed(optedIn ?? false);
+        setPermission(Notification.permission);
+      }
+    } catch {
+      // Fall back to native API
+      if (!isSubscribed) {
+        const result = await Notification.requestPermission();
+        setPermission(result);
+        setIsSubscribed(result === "granted");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [isSupported, isSubscribed]);
+
+  return { isSupported, permission, isSubscribed, requestPermission, toggleSubscription, loading };
 }

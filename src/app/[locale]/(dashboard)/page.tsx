@@ -1,19 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
-  UtensilsCrossed,
-  Dumbbell,
   ClipboardCheck,
   TrendingUp,
-  CheckCircle2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useDashboardData } from "@/hooks/use-dashboard";
 
-// StatCard component with proper hover states
+// StatCard component with CSS-only hover states
 function StatCard({
   label,
   value,
@@ -27,48 +23,35 @@ function StatCard({
   hoverBg: "black" | "orange";
   className?: string;
 }) {
-  const [isHovered, setIsHovered] = useState(false);
+  const isOrange = hoverBg === "orange";
 
   return (
     <div
-      className={`border-e-4 border-black p-6 transition-colors cursor-pointer ${className}`}
-      style={{
-        backgroundColor: isHovered ? (hoverBg === "black" ? "#000000" : "#FF3B00") : undefined,
-        color: isHovered ? "#FFFEF5" : undefined
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className={`group border-e-4 border-black p-6 transition-colors cursor-pointer ${
+        isOrange ? "hover:bg-[#FF3B00]" : "hover:bg-black"
+      } hover:text-[#FFFEF5] ${className}`}
     >
       <p
-        className="font-mono text-xs tracking-[0.3em] mb-2"
-        style={{ color: isHovered && hoverBg === "black" ? "#00FF94" : undefined }}
+        className={`font-mono text-xs tracking-[0.3em] mb-2 transition-colors ${
+          isOrange ? "" : "group-hover:text-[#00FF94]"
+        }`}
       >
         {label}
       </p>
       <p className="text-4xl md:text-5xl font-black">
         {value}
         {suffix && (
-          <span style={{ color: isHovered ? "#FFFEF5" : "#a3a3a3" }}>{suffix}</span>
+          <span className="text-neutral-400 group-hover:text-[#FFFEF5] transition-colors">{suffix}</span>
         )}
       </p>
     </div>
   );
 }
 
-// ViewPlanButton with hover state
+// ViewPlanButton with CSS-only hover
 function ViewPlanButton({ label }: { label: string }) {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
-    <div
-      className="p-6 border-b-4 lg:border-b-0 border-black transition-colors cursor-pointer"
-      style={{
-        backgroundColor: isHovered ? "#000000" : undefined,
-        color: isHovered ? "#FFFEF5" : undefined
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="p-6 border-b-4 lg:border-b-0 border-black transition-colors cursor-pointer hover:bg-black hover:text-[#FFFEF5]">
       <span className="font-black text-lg">{label}</span>
     </div>
   );
@@ -79,7 +62,6 @@ export default function DashboardPage() {
   const locale = useLocale();
   const { user } = useAuth();
   const { dashboardData, isLoading, error } = useDashboardData(user?.id);
-  const [hoveredMeal, setHoveredMeal] = useState<number | null>(null);
 
   // Static UI content
   const motivational = locale === "ar" ? {
@@ -130,7 +112,7 @@ export default function DashboardPage() {
   const userName = dashboardData.profile?.full_name || (locale === "ar" ? "مستخدم" : "USER");
 
   return (
-    <div className="text-black">
+    <div className="text-black overflow-x-hidden">
       {/* Top Banner */}
       <div className="py-2 px-4 overflow-hidden" style={{ backgroundColor: "#000000", color: "#FFFEF5" }}>
         <div className="animate-marquee whitespace-nowrap font-mono text-xs tracking-widest">
@@ -204,16 +186,14 @@ export default function DashboardPage() {
             {dashboardData.todaysMeals.map((meal) => (
               <div
                 key={meal.id}
-                className={`border-b-4 border-black flex transition-all duration-300 cursor-pointer ${
-                  meal.done ? "bg-neutral-100" : ""
+                className={`group border-b-4 border-black flex transition-colors cursor-pointer ${
+                  meal.done ? "bg-neutral-100" : "hover:bg-[#FF3B00] hover:text-white"
                 }`}
-                style={!meal.done && hoveredMeal === meal.id ? { backgroundColor: "#FF3B00", color: "#FFFFFF" } : undefined}
-                onMouseEnter={() => setHoveredMeal(meal.id)}
-                onMouseLeave={() => setHoveredMeal(null)}
               >
                 <div
-                  className="w-20 md:w-24 border-e-4 border-black p-4 flex items-center justify-center font-mono text-sm"
-                  style={meal.done ? { backgroundColor: "#000000", color: "#00FF94" } : undefined}
+                  className={`w-20 md:w-24 border-e-4 border-black p-4 flex items-center justify-center font-mono text-sm ${
+                    meal.done ? "bg-black text-[#00FF94]" : ""
+                  }`}
                 >
                   {meal.time}
                 </div>
@@ -226,13 +206,13 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-4">
                     <span className="font-mono text-sm hidden sm:inline">{meal.calories} {locale === "ar" ? "سعرة" : "KCAL"}</span>
                     <div
-                      className="w-8 h-8 border-4"
-                      style={{
-                        borderColor: meal.done ? "#000000" : (hoveredMeal === meal.id ? "#FFFFFF" : "#000000"),
-                        backgroundColor: meal.done ? "#000000" : undefined
-                      }}
+                      className={`w-8 h-8 border-4 transition-colors ${
+                        meal.done
+                          ? "border-black bg-black"
+                          : "border-black group-hover:border-white"
+                      }`}
                     >
-                      {meal.done && <span className="block w-full h-full" style={{ backgroundColor: "#00FF94" }} />}
+                      {meal.done && <span className="block w-full h-full bg-[#00FF94]" />}
                     </div>
                   </div>
                 </div>

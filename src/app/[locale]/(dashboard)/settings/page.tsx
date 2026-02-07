@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/client";
 export default function SettingsPage() {
   const t = useTranslations("settings");
   const { profile, signOut, user, refetch } = useAuth();
-  const { isSupported, isSubscribed, permission, requestPermission, loading: notifLoading } = useNotifications();
+  const { isSupported, isSubscribed, permission, toggleSubscription, loading: notifLoading } = useNotifications();
   const [fullName, setFullName] = useState(profile?.full_name || "");
   const [phone, setPhone] = useState(profile?.phone || "");
   const [language, setLanguage] = useState<string>(profile?.language || "en");
@@ -168,12 +168,8 @@ export default function SettingsPage() {
               </p>
             </div>
             <button
-              onClick={() => {
-                if (!isSubscribed && permission !== "denied") {
-                  requestPermission();
-                }
-              }}
-              disabled={!isSupported || permission === "denied" || notifLoading}
+              onClick={() => toggleSubscription()}
+              disabled={!isSupported || (permission === "denied" && !isSubscribed) || notifLoading}
               className={`relative h-8 w-16 border-4 border-black transition-colors ${
                 isSubscribed ? "bg-[#00FF94]" : "bg-neutral-200"
               } ${(!isSupported || permission === "denied") ? "opacity-50 cursor-not-allowed" : ""}`}
