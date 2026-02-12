@@ -1,16 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { validateRequestBody } from "@/lib/api-validation";
+import { OcrRequestSchema, OcrResultSchema } from "@/lib/api-validation/admin";
+import * as Sentry from "@sentry/nextjs";
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const VISION_MODEL = "qwen/qwen2.5-vl-72b-instruct"; // Qwen VL for OCR
-
-interface OcrResult {
-  amount?: string;
-  sender_name?: string;
-  reference_number?: string;
-  date?: string;
-  bank?: string;
-}
 
 /**
  * POST /api/admin/ocr
@@ -43,18 +38,12 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { imageBase64, imageUrl, signupId } = body as {
-    imageBase64?: string;
-    imageUrl?: string;
-    signupId?: string;
-  };
-
-  if (!imageBase64 && !imageUrl) {
-    return NextResponse.json(
-      { error: "Provide imageBase64 or imageUrl" },
-      { status: 400 }
-    );
-  }
+  const validation = validateRequestBody(body, OcrRequestSchema, {
+    userId: user.id,
+    feature: "ocr-input",
+  });
+  if (!validation.success) return validation.response;
+  const { imageBase64, imageUrl, signupId } = validation.data;
 
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
@@ -104,7 +93,10 @@ export async function POST(request: Request) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("OpenRouter OCR error:", errorText);
+      Sentry.captureException(new Error("OpenRouter OCR API error"), {
+        tags: { feature: "ocr-api" },
+        extra: { coachId: user.id, signupId, errorText },
+      });
       return NextResponse.json(
         { error: "OCR extraction failed", details: errorText },
         { status: 502 }
@@ -115,19 +107,44 @@ export async function POST(request: Request) {
     const rawContent = data.choices?.[0]?.message?.content ?? "";
 
     // Parse the JSON from the model response (strip markdown fences if present)
-    let ocrResult: OcrResult;
+    let rawOcrResult;
     try {
       const cleaned = rawContent
         .replace(/```json\s*/g, "")
         .replace(/```\s*/g, "")
         .trim();
-      ocrResult = JSON.parse(cleaned);
+      rawOcrResult = JSON.parse(cleaned);
     } catch {
       return NextResponse.json(
         { error: "Failed to parse OCR response", raw: rawContent },
         { status: 422 }
       );
     }
+
+    // ADMIN-02: Validate OCR extracted data before database save
+    const ocrValidation = OcrResultSchema.safeParse(rawOcrResult);
+    if (!ocrValidation.success) {
+      Sentry.captureException(new Error("OCR validation failed"), {
+        tags: { feature: "ocr-validation" },
+        extra: {
+          coachId: user.id,
+          signupId,
+          rawOcrResult,
+          errors: ocrValidation.error.issues,
+        },
+      });
+      return NextResponse.json(
+        {
+          error: "OCR extracted data is invalid",
+          details: ocrValidation.error.issues,
+          raw: rawOcrResult,
+        },
+        { status: 422 }
+      );
+    }
+
+    // Use validated data
+    const ocrResult = ocrValidation.data;
 
     // If signupId provided, update the pending_signups row
     if (signupId) {
@@ -143,7 +160,10 @@ export async function POST(request: Request) {
       usage: data.usage ?? null,
     });
   } catch (err) {
-    console.error("OCR extraction error:", err);
+    Sentry.captureException(err, {
+      tags: { feature: "ocr-extraction" },
+      extra: { coachId: user.id, signupId },
+    });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
