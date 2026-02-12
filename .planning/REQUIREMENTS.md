@@ -89,34 +89,34 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| THEME-01 | — | Pending |
-| THEME-02 | — | Pending |
-| THEME-03 | — | Pending |
-| RELY-01 | — | Pending |
-| RELY-02 | — | Pending |
-| RELY-03 | — | Pending |
-| RELY-04 | — | Pending |
-| RELY-05 | — | Pending |
-| UX-01 | — | Pending |
-| UX-02 | — | Pending |
-| UX-03 | — | Pending |
-| UX-04 | — | Pending |
-| PERF-01 | — | Pending |
-| PERF-02 | — | Pending |
-| PERF-03 | — | Pending |
-| RTL-01 | — | Pending |
-| RTL-02 | — | Pending |
-| RTL-03 | — | Pending |
-| RTL-04 | — | Pending |
-| ADMIN-01 | — | Pending |
-| ADMIN-02 | — | Pending |
-| ADMIN-03 | — | Pending |
+| THEME-01 | Phase 1 | Pending |
+| THEME-02 | Phase 1 | Pending |
+| THEME-03 | Phase 1 | Pending |
+| RELY-01 | Phase 3, Phase 4 | Pending |
+| RELY-02 | Phase 4 | Pending |
+| RELY-03 | Phase 5 | Pending |
+| RELY-04 | Phase 4 | Pending |
+| RELY-05 | Phase 5 | Pending |
+| UX-01 | Phase 6 | Pending |
+| UX-02 | Phase 6 | Pending |
+| UX-03 | Phase 6 | Pending |
+| UX-04 | Phase 6 | Pending |
+| PERF-01 | Phase 5 | Pending |
+| PERF-02 | Phase 7 | Pending |
+| PERF-03 | Phase 7 | Pending |
+| RTL-01 | Phase 10 | Pending |
+| RTL-02 | Phase 10 | Pending |
+| RTL-03 | Phase 10 | Pending |
+| RTL-04 | Phase 10 | Pending |
+| ADMIN-01 | Phase 9 | Pending |
+| ADMIN-02 | Phase 5 | Pending |
+| ADMIN-03 | Phase 9 | Pending |
 
 **Coverage:**
 - v1 requirements: 22 total
-- Mapped to phases: 0
-- Unmapped: 22 (pending roadmap creation)
+- Mapped to phases: 22
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-12*
-*Last updated: 2026-02-12 after initial definition*
+*Last updated: 2026-02-12 after roadmap creation*
