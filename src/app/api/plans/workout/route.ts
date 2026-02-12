@@ -2,8 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateWorkoutPlan } from "@/lib/ai/workout-plan-generator";
 import { getOneSignalClient } from "@/lib/onesignal";
+import {
+  getProfileById,
+  getAssessmentByUserId,
+  getCheckInById,
+  saveWorkoutPlan,
+} from "@/lib/supabase/queries";
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST(request: NextRequest) {
+  let userId: string | undefined;
+
   try {
     const supabase = await createClient();
 
@@ -11,6 +20,8 @@ export async function POST(request: NextRequest) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
+
+    userId = user?.id;
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -20,55 +31,23 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { checkInId, planDuration = 14 } = body;
 
-    // Fetch user profile
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
+    // Fetch user profile using extracted query
+    const profile = await getProfileById(supabase, user.id);
 
-    if (profileError || !profile) {
-      return NextResponse.json(
-        { error: "Profile not found" },
-        { status: 404 }
-      );
-    }
+    // Fetch initial assessment using extracted query
+    const assessment = await getAssessmentByUserId(supabase, user.id);
 
-    // Fetch initial assessment
-    const { data: assessment, error: assessmentError } = await supabase
-      .from("initial_assessments")
-      .select("*")
-      .eq("user_id", user.id)
-      .single();
-
-    if (assessmentError || !assessment) {
-      return NextResponse.json(
-        { error: "Assessment not found" },
-        { status: 404 }
-      );
-    }
-
-    // Fetch check-in if provided
-    let checkIn: any = null;
-    if (checkInId) {
-      const { data: checkInData } = await supabase
-        .from("check_ins")
-        .select("*")
-        .eq("id", checkInId)
-        .single();
-      checkIn = checkInData;
-    }
-
-    // Type assertions for generated types
-    const typedProfile = profile as any;
-    const typedAssessment = assessment as any;
+    // Fetch check-in if provided using extracted query
+    const checkIn = checkInId
+      ? await getCheckInById(supabase, checkInId)
+      : null;
 
     // Generate workout plan using AI
     const generatedPlan = await generateWorkoutPlan({
-      profile: typedProfile,
-      assessment: typedAssessment,
+      profile: profile as any,
+      assessment: assessment as any,
       checkIn: checkIn || undefined,
-      language: typedProfile.language,
+      language: profile.language,
       planDuration,
     });
 
@@ -77,27 +56,15 @@ export async function POST(request: NextRequest) {
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + planDuration);
 
-    // Save to database
-    const { data: savedPlan, error: saveError } = await supabase
-      .from("workout_plans")
-      .insert({
-        user_id: user.id,
-        check_in_id: checkInId || null,
-        plan_data: generatedPlan as any,
-        language: typedProfile.language,
-        start_date: startDate.toISOString().split("T")[0],
-        end_date: endDate.toISOString().split("T")[0],
-      } as any)
-      .select()
-      .single();
-
-    if (saveError) {
-      console.error("Error saving workout plan:", saveError);
-      return NextResponse.json(
-        { error: "Failed to save workout plan" },
-        { status: 500 }
-      );
-    }
+    // Save to database using extracted query
+    const savedPlan = await saveWorkoutPlan(supabase, {
+      userId: user.id,
+      checkInId: checkInId || null,
+      planData: generatedPlan,
+      language: profile.language,
+      startDate: startDate.toISOString().split("T")[0],
+      endDate: endDate.toISOString().split("T")[0],
+    });
 
     // Send push notification (fire-and-forget)
     try {
@@ -107,8 +74,12 @@ export async function POST(request: NextRequest) {
         "Your new workout plan is ready. Let's crush it!",
         { url: "/workout-plan" }
       );
-    } catch {
-      // Never block response on notification failure
+    } catch (notifError) {
+      Sentry.captureException(notifError, {
+        level: "warning",
+        tags: { feature: "notification" },
+        extra: { userId: user.id, action: "workout-plan-notification" },
+      });
     }
 
     return NextResponse.json({
@@ -116,7 +87,14 @@ export async function POST(request: NextRequest) {
       workoutPlan: savedPlan,
     });
   } catch (error) {
-    console.error("Workout plan generation error:", error);
+    Sentry.captureException(error, {
+      tags: { feature: "workout-plan-generation" },
+      extra: {
+        userId,
+        action: "generate-workout-plan",
+        timestamp: new Date().toISOString(),
+      },
+    });
     return NextResponse.json(
       { error: "Failed to generate workout plan" },
       { status: 500 }
