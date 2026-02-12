@@ -63,11 +63,11 @@ export default function MagicLinkPage() {
 
   if (emailSent) {
     return (
-      <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+      <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         {/* Success Header */}
-        <div className="border-b-4 border-black bg-[#00FF94] p-6 text-center">
+        <div className="border-b-4 border-black bg-success-500 p-6 text-center">
           <div className="inline-flex h-16 w-16 items-center justify-center bg-black mb-4">
-            <CheckCircle2 className="h-8 w-8 text-[#00FF94]" />
+            <CheckCircle2 className="h-8 w-8 text-success-500" />
           </div>
           <h1 className="text-3xl font-black text-black tracking-tight">
             {t("emailSent").toUpperCase()}
@@ -89,7 +89,7 @@ export default function MagicLinkPage() {
           </div>
 
           <Link href="/login" className="block">
-            <button className="w-full h-14 border-4 border-black bg-[#FFFEF5] font-black text-lg uppercase tracking-wide hover:bg-black hover:text-[#FFFEF5] transition-colors flex items-center justify-center gap-3">
+            <button className="w-full h-14 border-4 border-black bg-cream font-black text-lg uppercase tracking-wide hover:bg-black hover:text-cream transition-colors flex items-center justify-center gap-3">
               <ArrowLeft className="h-5 w-5" />
               {tCommon("back").toUpperCase()} TO {t("login").toUpperCase()}
             </button>
@@ -100,16 +100,16 @@ export default function MagicLinkPage() {
   }
 
   return (
-    <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+    <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
       {/* Header */}
       <div className="border-b-4 border-black bg-black p-6 text-center">
-        <div className="inline-flex h-16 w-16 items-center justify-center bg-[#00FF94] mb-4">
+        <div className="inline-flex h-16 w-16 items-center justify-center bg-primary mb-4">
           <Zap className="h-8 w-8 text-black" />
         </div>
-        <h1 className="text-3xl font-black text-[#FFFEF5] tracking-tight">
+        <h1 className="text-3xl font-black text-cream tracking-tight">
           {t("magicLink").toUpperCase()}
         </h1>
-        <p className="font-mono text-xs tracking-[0.2em] text-[#00FF94] mt-2">
+        <p className="font-mono text-xs tracking-[0.2em] text-primary mt-2">
           {t("magicLinkDescription").toUpperCase()}
         </p>
       </div>
@@ -118,8 +118,8 @@ export default function MagicLinkPage() {
       <div className="p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {error && (
-            <div className="border-4 border-[#FF3B00] bg-[#FF3B00]/10 p-4">
-              <p className="font-bold text-[#FF3B00] text-sm uppercase">{error}</p>
+            <div className="border-4 border-error-500 bg-error-500/10 p-4">
+              <p className="font-bold text-error-500 text-sm uppercase">{error}</p>
             </div>
           )}
 
@@ -136,20 +136,20 @@ export default function MagicLinkPage() {
                 type="email"
                 placeholder="YOU@EXAMPLE.COM"
                 autoComplete="email"
-                className="w-full h-14 pl-16 pr-4 border-4 border-black bg-[#FFFEF5] font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
+                className="w-full h-14 pl-16 pr-4 border-4 border-black bg-cream font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
                 {...register("email")}
                 disabled={isLoading}
               />
             </div>
             {errors.email && (
-              <p className="mt-2 font-mono text-xs text-[#FF3B00] uppercase">{errors.email.message}</p>
+              <p className="mt-2 font-mono text-xs text-error-500 uppercase">{errors.email.message}</p>
             )}
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full h-14 bg-[#FF3B00] text-white font-black text-lg uppercase tracking-wide hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3"
+            className="w-full h-14 bg-primary text-white font-black text-lg uppercase tracking-wide hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3"
           >
             {isLoading ? (
               <span className="animate-pulse">{t("sendingMagicLink").toUpperCase()}...</span>
@@ -164,7 +164,7 @@ export default function MagicLinkPage() {
 
         <div className="mt-6">
           <Link href="/login">
-            <button className="w-full h-12 border-4 border-black bg-[#FFFEF5] font-bold text-sm uppercase tracking-wide hover:bg-black hover:text-[#FFFEF5] transition-colors flex items-center justify-center gap-2">
+            <button className="w-full h-12 border-4 border-black bg-cream font-bold text-sm uppercase tracking-wide hover:bg-black hover:text-cream transition-colors flex items-center justify-center gap-2">
               <ArrowLeft className="h-4 w-4" />
               {tCommon("back").toUpperCase()} TO {t("login").toUpperCase()}
             </button>

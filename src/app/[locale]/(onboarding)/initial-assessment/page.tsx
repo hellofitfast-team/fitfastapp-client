@@ -126,14 +126,14 @@ function BrutalistMultiSelect({
             disabled={disabled || (hasNoneOption && selected.includes("none") && option.id !== "none")}
             className={`flex items-center gap-3 border-2 border-black p-4 text-left text-sm font-bold transition-colors -mt-0.5 -ml-0.5 first:mt-0 first:ml-0 ${
               selected.includes(option.id)
-                ? "bg-black text-[#00FF94]"
-                : "bg-[#FFFEF5] text-black hover:bg-neutral-100"
+                ? "bg-black text-primary"
+                : "bg-cream text-black hover:bg-neutral-100"
             } ${disabled || (hasNoneOption && selected.includes("none") && option.id !== "none") ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
           >
             <div
               className={`flex h-6 w-6 shrink-0 items-center justify-center border-2 border-black ${
                 selected.includes(option.id)
-                  ? "bg-[#00FF94]"
+                  ? "bg-primary"
                   : "bg-white"
               }`}
             >
@@ -152,7 +152,7 @@ function BrutalistMultiSelect({
           value={otherValue}
           onChange={(e) => onOtherChange(e.target.value)}
           disabled={disabled}
-          className="w-full h-12 px-4 border-4 border-black bg-[#FFFEF5] font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
+          className="w-full h-12 px-4 border-4 border-black bg-cream font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
         />
       )}
     </div>
@@ -304,8 +304,8 @@ export default function InitialAssessmentPage() {
   if (authLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="border-4 border-black bg-[#FFFEF5] p-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <div className="w-12 h-12 border-4 border-black border-t-[#00FF94] animate-spin mx-auto mb-4" />
+        <div className="border-4 border-black bg-cream p-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <div className="w-12 h-12 border-4 border-black border-t-primary animate-spin mx-auto mb-4" />
           <p className="font-bold text-sm uppercase tracking-wide text-center">{tCommon("loading").toUpperCase()}</p>
         </div>
       </div>
@@ -316,28 +316,28 @@ export default function InitialAssessmentPage() {
     <div className="max-w-3xl mx-auto space-y-6 pb-12">
       {/* Header */}
       <div className="text-center border-4 border-black bg-black p-6">
-        <h1 className="text-3xl md:text-4xl font-black text-[#FFFEF5] tracking-tight">
+        <h1 className="text-3xl md:text-4xl font-black text-cream tracking-tight">
           {t("title").toUpperCase()}
         </h1>
-        <p className="mt-2 font-mono text-xs tracking-[0.2em] text-[#00FF94]">
+        <p className="mt-2 font-mono text-xs tracking-[0.2em] text-primary">
           {t("subtitle").toUpperCase()}
         </p>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-6">
         {error && (
-          <div className="border-4 border-[#FF3B00] bg-[#FF3B00]/10 p-4">
-            <p className="font-bold text-[#FF3B00] text-sm uppercase">{error}</p>
+          <div className="border-4 border-error-500 bg-error-500/10 p-4">
+            <p className="font-bold text-error-500 text-sm uppercase">{error}</p>
           </div>
         )}
 
         {/* Fitness Goals */}
         <div className="border-4 border-black">
-          <div className="border-b-4 border-black bg-[#FF3B00] p-4">
+          <div className="border-b-4 border-black bg-primary p-4">
             <h2 className="font-black text-xl text-white">FITNESS GOALS</h2>
             <p className="font-mono text-xs text-white/80 mt-1">SELECT ALL THAT APPLY</p>
           </div>
-          <div className="p-4 bg-[#FFFEF5]">
+          <div className="p-4 bg-cream">
             <BrutalistMultiSelect
               options={FITNESS_GOALS}
               selected={selectedGoals}
@@ -352,9 +352,9 @@ export default function InitialAssessmentPage() {
         {/* Basic Info */}
         <div className="border-4 border-black">
           <div className="border-b-4 border-black bg-black p-4">
-            <h2 className="font-black text-xl text-[#FFFEF5]">BASIC INFORMATION</h2>
+            <h2 className="font-black text-xl text-cream">BASIC INFORMATION</h2>
           </div>
-          <div className="p-4 bg-[#FFFEF5]">
+          <div className="p-4 bg-cream">
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="block font-bold text-sm uppercase tracking-wide mb-2">
@@ -368,7 +368,7 @@ export default function InitialAssessmentPage() {
                     value={currentWeight}
                     onChange={(e) => setCurrentWeight(e.target.value)}
                     disabled={isLoading}
-                    className="flex-1 h-12 px-4 border-4 border-black bg-[#FFFEF5] font-mono text-lg placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
+                    className="flex-1 h-12 px-4 border-4 border-black bg-cream font-mono text-lg placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
                   />
                   <span className="font-black text-lg">{tUnits("kg").toUpperCase()}</span>
                 </div>
@@ -384,7 +384,7 @@ export default function InitialAssessmentPage() {
                     value={height}
                     onChange={(e) => setHeight(e.target.value)}
                     disabled={isLoading}
-                    className="flex-1 h-12 px-4 border-4 border-black bg-[#FFFEF5] font-mono text-lg placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
+                    className="flex-1 h-12 px-4 border-4 border-black bg-cream font-mono text-lg placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
                   />
                   <span className="font-black text-lg">{tUnits("cm").toUpperCase()}</span>
                 </div>
@@ -396,7 +396,7 @@ export default function InitialAssessmentPage() {
         {/* Experience Level */}
         <div className="border-4 border-black">
           <div className="border-b-4 border-black bg-black p-4">
-            <h2 className="font-black text-xl text-[#FFFEF5]">EXPERIENCE LEVEL</h2>
+            <h2 className="font-black text-xl text-cream">EXPERIENCE LEVEL</h2>
           </div>
           <div className="grid grid-cols-3">
             {(["beginner", "intermediate", "advanced"] as const).map((level, index) => (
@@ -409,8 +409,8 @@ export default function InitialAssessmentPage() {
                   index < 2 ? "border-r-4 border-black" : ""
                 } ${
                   experienceLevel === level
-                    ? "bg-[#00FF94] text-black"
-                    : "bg-[#FFFEF5] text-black hover:bg-neutral-100"
+                    ? "bg-primary text-black"
+                    : "bg-cream text-black hover:bg-neutral-100"
                 } ${isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
               >
                 <span className="block font-black text-lg uppercase">{level}</span>
@@ -427,15 +427,15 @@ export default function InitialAssessmentPage() {
         {/* Equipment */}
         <div className="border-4 border-black">
           <div className="border-b-4 border-black bg-black p-4">
-            <h2 className="font-black text-xl text-[#FFFEF5]">AVAILABLE EQUIPMENT</h2>
+            <h2 className="font-black text-xl text-cream">AVAILABLE EQUIPMENT</h2>
           </div>
-          <div className="p-4 bg-[#FFFEF5] space-y-3">
+          <div className="p-4 bg-cream space-y-3">
             <div className="relative">
               <select
                 value={equipment}
                 onChange={(e) => setEquipment(e.target.value)}
                 disabled={isLoading}
-                className="w-full h-14 px-4 pr-12 border-4 border-black bg-[#FFFEF5] font-bold text-sm uppercase appearance-none focus:outline-none focus:bg-white transition-colors cursor-pointer"
+                className="w-full h-14 px-4 pr-12 border-4 border-black bg-cream font-bold text-sm uppercase appearance-none focus:outline-none focus:bg-white transition-colors cursor-pointer"
               >
                 <option value="">SELECT YOUR EQUIPMENT ACCESS</option>
                 {EQUIPMENT_OPTIONS.map((option) => (
@@ -453,7 +453,7 @@ export default function InitialAssessmentPage() {
                 value={equipmentOther}
                 onChange={(e) => setEquipmentOther(e.target.value)}
                 disabled={isLoading}
-                className="w-full h-12 px-4 border-4 border-black bg-[#FFFEF5] font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
+                className="w-full h-12 px-4 border-4 border-black bg-cream font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
               />
             )}
           </div>
@@ -461,11 +461,11 @@ export default function InitialAssessmentPage() {
 
         {/* Schedule */}
         <div className="border-4 border-black">
-          <div className="border-b-4 border-black bg-[#FF3B00] p-4">
+          <div className="border-b-4 border-black bg-primary p-4">
             <h2 className="font-black text-xl text-white">WEEKLY SCHEDULE</h2>
             <p className="font-mono text-xs text-white/80 mt-1">SELECT YOUR WORKOUT DAYS</p>
           </div>
-          <div className="p-4 bg-[#FFFEF5]">
+          <div className="p-4 bg-cream">
             <div className="flex gap-0">
               {DAYS.map((day, index) => (
                 <button
@@ -481,8 +481,8 @@ export default function InitialAssessmentPage() {
                   disabled={isLoading}
                   className={`flex-1 h-16 flex items-center justify-center border-4 border-black font-black text-lg transition-colors -ml-1 first:ml-0 ${
                     selectedDays.includes(day.id)
-                      ? "bg-black text-[#00FF94]"
-                      : "bg-[#FFFEF5] text-black hover:bg-neutral-100"
+                      ? "bg-black text-primary"
+                      : "bg-cream text-black hover:bg-neutral-100"
                   } ${isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                 >
                   {day.label}
@@ -504,10 +504,10 @@ export default function InitialAssessmentPage() {
         {/* Food Preferences */}
         <div className="border-4 border-black">
           <div className="border-b-4 border-black bg-black p-4">
-            <h2 className="font-black text-xl text-[#FFFEF5]">FOOD PREFERENCES</h2>
-            <p className="font-mono text-xs text-[#00FF94] mt-1">SELECT YOUR PREFERRED CUISINE STYLES</p>
+            <h2 className="font-black text-xl text-cream">FOOD PREFERENCES</h2>
+            <p className="font-mono text-xs text-primary mt-1">SELECT YOUR PREFERRED CUISINE STYLES</p>
           </div>
-          <div className="p-4 bg-[#FFFEF5]">
+          <div className="p-4 bg-cream">
             <BrutalistMultiSelect
               options={FOOD_PREFERENCES}
               selected={selectedFoodPrefs}
@@ -522,9 +522,9 @@ export default function InitialAssessmentPage() {
         {/* Allergies */}
         <div className="border-4 border-black">
           <div className="border-b-4 border-black bg-black p-4">
-            <h2 className="font-black text-xl text-[#FFFEF5]">FOOD ALLERGIES</h2>
+            <h2 className="font-black text-xl text-cream">FOOD ALLERGIES</h2>
           </div>
-          <div className="p-4 bg-[#FFFEF5]">
+          <div className="p-4 bg-cream">
             <BrutalistMultiSelect
               options={COMMON_ALLERGIES}
               selected={selectedAllergies}
@@ -541,9 +541,9 @@ export default function InitialAssessmentPage() {
         {/* Dietary Restrictions */}
         <div className="border-4 border-black">
           <div className="border-b-4 border-black bg-black p-4">
-            <h2 className="font-black text-xl text-[#FFFEF5]">DIETARY RESTRICTIONS</h2>
+            <h2 className="font-black text-xl text-cream">DIETARY RESTRICTIONS</h2>
           </div>
-          <div className="p-4 bg-[#FFFEF5]">
+          <div className="p-4 bg-cream">
             <BrutalistMultiSelect
               options={DIETARY_RESTRICTIONS}
               selected={selectedRestrictions}
@@ -562,7 +562,7 @@ export default function InitialAssessmentPage() {
             <h2 className="font-black text-xl text-black">MEDICAL NOTES</h2>
             <p className="font-mono text-xs text-neutral-500 mt-1">OPTIONAL: INJURIES, CONDITIONS, OR LIMITATIONS</p>
           </div>
-          <div className="bg-[#FFFEF5]">
+          <div className="bg-cream">
             <textarea
               className="w-full min-h-[120px] p-4 border-0 bg-transparent font-mono text-sm placeholder:text-neutral-400 focus:outline-none resize-none"
               placeholder="E.G., KNEE INJURY, BACK PAIN, DIABETES, HIGH BLOOD PRESSURE..."
@@ -577,7 +577,7 @@ export default function InitialAssessmentPage() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full h-16 bg-[#FF3B00] text-white font-black text-xl uppercase tracking-wide hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+          className="w-full h-16 bg-primary text-white font-black text-xl uppercase tracking-wide hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
         >
           {isLoading ? (
             <span className="animate-pulse">CREATING YOUR PLAN...</span>

@@ -95,9 +95,9 @@ export default function SetPasswordPage() {
   // Loading state
   if (isValidSession === null) {
     return (
-      <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+      <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <div className="p-12 flex flex-col items-center justify-center">
-          <div className="w-12 h-12 border-4 border-black border-t-[#00FF94] animate-spin mb-4" />
+          <div className="w-12 h-12 border-4 border-black border-t-primary animate-spin mb-4" />
           <p className="font-bold text-sm uppercase tracking-wide">{tCommon("loading").toUpperCase()}</p>
         </div>
       </div>
@@ -107,10 +107,10 @@ export default function SetPasswordPage() {
   // Session expired error
   if (isValidSession === false) {
     return (
-      <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-        <div className="border-b-4 border-black bg-[#FF3B00] p-6 text-center">
+      <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <div className="border-b-4 border-black bg-error-500 p-6 text-center">
           <div className="inline-flex h-16 w-16 items-center justify-center bg-white mb-4">
-            <AlertCircle className="h-8 w-8 text-[#FF3B00]" />
+            <AlertCircle className="h-8 w-8 text-error-500" />
           </div>
           <h1 className="text-3xl font-black text-white tracking-tight">
             SESSION EXPIRED
@@ -122,7 +122,7 @@ export default function SetPasswordPage() {
         <div className="p-6">
           <button
             onClick={() => router.push("/magic-link")}
-            className="w-full h-14 bg-black text-[#FFFEF5] font-black text-lg uppercase tracking-wide hover:bg-[#FF3B00] transition-colors"
+            className="w-full h-14 bg-black text-cream font-black text-lg uppercase tracking-wide hover:bg-primary transition-colors"
           >
             REQUEST NEW MAGIC LINK
           </button>
@@ -134,10 +134,10 @@ export default function SetPasswordPage() {
   // Password set success
   if (passwordSet) {
     return (
-      <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-        <div className="border-b-4 border-black bg-[#00FF94] p-6 text-center">
+      <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <div className="border-b-4 border-black bg-success-500 p-6 text-center">
           <div className="inline-flex h-16 w-16 items-center justify-center bg-black mb-4">
-            <CheckCircle2 className="h-8 w-8 text-[#00FF94]" />
+            <CheckCircle2 className="h-8 w-8 text-success-500" />
           </div>
           <h1 className="text-3xl font-black text-black tracking-tight">
             {t("passwordSet").toUpperCase()}
@@ -147,7 +147,7 @@ export default function SetPasswordPage() {
           </p>
         </div>
         <div className="p-6 flex justify-center">
-          <div className="w-8 h-8 border-4 border-black border-t-[#00FF94] animate-spin" />
+          <div className="w-8 h-8 border-4 border-black border-t-success-500 animate-spin" />
         </div>
       </div>
     );
@@ -169,16 +169,16 @@ export default function SetPasswordPage() {
   const strength = getPasswordStrength();
 
   return (
-    <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+    <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
       {/* Header */}
       <div className="border-b-4 border-black bg-black p-6 text-center">
-        <div className="inline-flex h-16 w-16 items-center justify-center bg-[#00FF94] mb-4">
+        <div className="inline-flex h-16 w-16 items-center justify-center bg-primary mb-4">
           <Lock className="h-8 w-8 text-black" />
         </div>
-        <h1 className="text-3xl font-black text-[#FFFEF5] tracking-tight">
+        <h1 className="text-3xl font-black text-cream tracking-tight">
           {t("setPassword").toUpperCase()}
         </h1>
-        <p className="font-mono text-xs tracking-[0.2em] text-[#00FF94] mt-2">
+        <p className="font-mono text-xs tracking-[0.2em] text-primary mt-2">
           {t("createPasswordDescription").toUpperCase()}
         </p>
       </div>
@@ -187,8 +187,8 @@ export default function SetPasswordPage() {
       <div className="p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {error && (
-            <div className="border-4 border-[#FF3B00] bg-[#FF3B00]/10 p-4">
-              <p className="font-bold text-[#FF3B00] text-sm uppercase">{error}</p>
+            <div className="border-4 border-error-500 bg-error-500/10 p-4">
+              <p className="font-bold text-error-500 text-sm uppercase">{error}</p>
             </div>
           )}
 
@@ -205,7 +205,7 @@ export default function SetPasswordPage() {
                 type="password"
                 placeholder="••••••••"
                 autoComplete="new-password"
-                className="w-full h-14 pl-16 pr-4 border-4 border-black bg-[#FFFEF5] font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
+                className="w-full h-14 pl-16 pr-4 border-4 border-black bg-cream font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
                 {...register("password")}
                 disabled={isLoading}
               />
@@ -214,19 +214,19 @@ export default function SetPasswordPage() {
               {t("passwordRequirements")}
             </p>
             {errors.password && (
-              <p className="mt-2 font-mono text-xs text-[#FF3B00] uppercase">{errors.password.message}</p>
+              <p className="mt-2 font-mono text-xs text-error-500 uppercase">{errors.password.message}</p>
             )}
 
             {/* Password strength indicator */}
             {password && password.length > 0 && (
               <div className="mt-3 space-y-2">
                 <div className="flex gap-1">
-                  <div className={`h-2 flex-1 border-2 border-black ${strength.level >= 1 ? "bg-[#FF3B00]" : "bg-neutral-200"}`} />
+                  <div className={`h-2 flex-1 border-2 border-black ${strength.level >= 1 ? "bg-error-500" : "bg-neutral-200"}`} />
                   <div className={`h-2 flex-1 border-2 border-black ${strength.level >= 2 ? "bg-orange-400" : "bg-neutral-200"}`} />
-                  <div className={`h-2 flex-1 border-2 border-black ${strength.level >= 3 ? "bg-[#00FF94]" : "bg-neutral-200"}`} />
+                  <div className={`h-2 flex-1 border-2 border-black ${strength.level >= 3 ? "bg-success-500" : "bg-neutral-200"}`} />
                 </div>
                 <p className="font-mono text-xs uppercase">
-                  STRENGTH: <span className={strength.level === 3 ? "text-[#00AA00]" : strength.level === 2 ? "text-orange-500" : "text-[#FF3B00]"}>{strength.text}</span>
+                  STRENGTH: <span className={strength.level === 3 ? "text-success-500" : strength.level === 2 ? "text-orange-500" : "text-error-500"}>{strength.text}</span>
                 </p>
               </div>
             )}
@@ -245,20 +245,20 @@ export default function SetPasswordPage() {
                 type="password"
                 placeholder="••••••••"
                 autoComplete="new-password"
-                className="w-full h-14 pl-16 pr-4 border-4 border-black bg-[#FFFEF5] font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
+                className="w-full h-14 pl-16 pr-4 border-4 border-black bg-cream font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
                 {...register("confirmPassword")}
                 disabled={isLoading}
               />
             </div>
             {errors.confirmPassword && (
-              <p className="mt-2 font-mono text-xs text-[#FF3B00] uppercase">{errors.confirmPassword.message}</p>
+              <p className="mt-2 font-mono text-xs text-error-500 uppercase">{errors.confirmPassword.message}</p>
             )}
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full h-14 bg-black text-[#FFFEF5] font-black text-lg uppercase tracking-wide hover:bg-[#FF3B00] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3"
+            className="w-full h-14 bg-black text-cream font-black text-lg uppercase tracking-wide hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3"
           >
             {isLoading ? (
               <span className="animate-pulse">{t("updatingPassword").toUpperCase()}...</span>

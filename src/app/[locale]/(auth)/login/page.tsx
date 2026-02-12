@@ -79,16 +79,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+    <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
       {/* Header */}
       <div className="border-b-4 border-black bg-black p-6 text-center">
-        <div className="inline-flex h-16 w-16 items-center justify-center bg-[#00FF94] mb-4">
+        <div className="inline-flex h-16 w-16 items-center justify-center bg-primary mb-4">
           <span className="text-2xl font-black text-black">FF</span>
         </div>
-        <h1 className="text-3xl font-black tracking-tight" style={{ color: '#FFFEF5' }}>
+        <h1 className="text-3xl font-black tracking-tight text-cream">
           {t("signIn").toUpperCase()}
         </h1>
-        <p className="font-mono text-xs tracking-[0.2em] mt-2" style={{ color: '#00FF94' }}>
+        <p className="font-mono text-xs tracking-[0.2em] mt-2 text-primary">
           {t("signInDescription").toUpperCase()}
         </p>
       </div>
@@ -97,8 +97,8 @@ export default function LoginPage() {
       <div className="p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {error && (
-            <div className="border-4 border-[#FF3B00] bg-[#FF3B00]/10 p-4">
-              <p className="font-bold text-sm uppercase" style={{ color: '#FF3B00' }}>{error}</p>
+            <div className="border-4 border-error-500 bg-error-500/10 p-4">
+              <p className="font-bold text-sm uppercase text-error-500">{error}</p>
             </div>
           )}
 
@@ -114,13 +114,13 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 placeholder="YOU@EXAMPLE.COM"
-                className="w-full h-14 pl-16 pr-4 border-4 border-black bg-[#FFFEF5] font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
+                className="w-full h-14 pl-16 pr-4 border-4 border-black bg-cream font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
                 {...register("email")}
                 disabled={isLoading}
               />
             </div>
             {errors.email && (
-              <p className="mt-2 font-mono text-xs uppercase" style={{ color: '#FF3B00' }}>{errors.email.message}</p>
+              <p className="mt-2 font-mono text-xs uppercase text-error-500">{errors.email.message}</p>
             )}
           </div>
 
@@ -131,8 +131,7 @@ export default function LoginPage() {
               </label>
               <Link
                 href="/magic-link"
-                className="font-mono text-xs hover:underline uppercase"
-                style={{ color: '#FF3B00' }}
+                className="font-mono text-xs hover:underline uppercase text-primary"
               >
                 {t("forgotPassword")}
               </Link>
@@ -145,20 +144,20 @@ export default function LoginPage() {
                 id="password"
                 type="password"
                 placeholder="••••••••"
-                className="w-full h-14 pl-16 pr-4 border-4 border-black bg-[#FFFEF5] font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
+                className="w-full h-14 pl-16 pr-4 border-4 border-black bg-cream font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
                 {...register("password")}
                 disabled={isLoading}
               />
             </div>
             {errors.password && (
-              <p className="mt-2 font-mono text-xs uppercase" style={{ color: '#FF3B00' }}>{errors.password.message}</p>
+              <p className="mt-2 font-mono text-xs uppercase text-error-500">{errors.password.message}</p>
             )}
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full h-14 bg-black hover:bg-[#FF3B00] text-white font-black text-lg uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3"
+            className="w-full h-14 bg-black hover:bg-primary text-white font-black text-lg uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3"
           >
             {isLoading ? (
               <span className="animate-pulse">{t("signingIn").toUpperCase()}...</span>
@@ -177,7 +176,7 @@ export default function LoginPage() {
             <div className="w-full border-t-4 border-black" />
           </div>
           <div className="relative flex justify-center">
-            <span className="bg-[#FFFEF5] px-4 font-bold text-sm uppercase">
+            <span className="bg-cream px-4 font-bold text-sm uppercase">
               {t("or")}
             </span>
           </div>
@@ -186,7 +185,7 @@ export default function LoginPage() {
         {/* Magic Link Button */}
         <Link href="/magic-link" className="block">
           <button
-            className="w-full h-14 border-4 border-black bg-[#FFFEF5] hover:bg-black text-black hover:text-[#00FF94] font-black text-lg uppercase tracking-wide transition-colors flex items-center justify-center gap-3"
+            className="w-full h-14 border-4 border-black bg-cream hover:bg-black text-black hover:text-primary font-black text-lg uppercase tracking-wide transition-colors flex items-center justify-center gap-3"
           >
             <Zap className="h-5 w-5" />
             {t("magicLink").toUpperCase()}

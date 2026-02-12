@@ -17,7 +17,7 @@ export function LocaleSwitcher() {
   return (
     <button
       onClick={switchLocale}
-      className="flex h-10 w-10 items-center justify-center border-4 border-black bg-[#FFFEF5] font-mono text-xs font-bold hover:bg-black hover:text-[#00FF94] transition-colors"
+      className="flex h-10 w-10 items-center justify-center border-4 border-black bg-cream font-mono text-xs font-bold hover:bg-black hover:text-primary transition-colors"
     >
       {currentLocale === "en" ? "AR" : "EN"}
     </button>

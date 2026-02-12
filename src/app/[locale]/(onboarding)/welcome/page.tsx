@@ -46,13 +46,13 @@ function WelcomeContent() {
     <div className="space-y-8">
       {/* Hero */}
       <div className="text-center border-4 border-black bg-black p-8">
-        <div className="inline-flex h-20 w-20 items-center justify-center bg-[#00FF94] mb-6">
+        <div className="inline-flex h-20 w-20 items-center justify-center bg-primary mb-6">
           <span className="text-4xl font-black text-black">FF</span>
         </div>
-        <h1 className="text-4xl md:text-5xl font-black text-[#FFFEF5] tracking-tight">
+        <h1 className="text-4xl md:text-5xl font-black text-cream tracking-tight">
           {t("title").toUpperCase()}
         </h1>
-        <p className="mt-4 font-mono text-sm tracking-[0.2em] text-[#00FF94]">
+        <p className="mt-4 font-mono text-sm tracking-[0.2em] text-primary">
           {t("subtitle").toUpperCase()}
         </p>
       </div>
@@ -62,10 +62,10 @@ function WelcomeContent() {
         {features.map((feature, index) => (
           <div
             key={index}
-            className="border-4 border-black p-6 hover:bg-black hover:text-[#FFFEF5] transition-colors group -mt-1 sm:-mt-0 sm:-ml-1 first:mt-0 first:ml-0"
+            className="border-4 border-black p-6 hover:bg-black hover:text-cream transition-colors group -mt-1 sm:-mt-0 sm:-ml-1 first:mt-0 first:ml-0"
           >
             <div className="flex items-start gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center bg-[#FF3B00] group-hover:bg-[#00FF94]">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center bg-primary group-hover:bg-primary-light">
                 <feature.icon className="h-6 w-6 text-white group-hover:text-black" />
               </div>
               <div>
@@ -84,7 +84,7 @@ function WelcomeContent() {
       {/* CTA */}
       <div className="text-center space-y-6">
         <Link href="/initial-assessment">
-          <button className="inline-flex items-center gap-3 h-16 px-12 bg-[#FF3B00] text-white font-black text-xl uppercase tracking-wide hover:bg-black transition-colors">
+          <button className="inline-flex items-center gap-3 h-16 px-12 bg-primary text-white font-black text-xl uppercase tracking-wide hover:bg-black transition-colors">
             {t("getStarted").toUpperCase()}
             <ArrowRight className="h-6 w-6" />
           </button>
@@ -100,7 +100,7 @@ function WelcomeContent() {
         <p className="text-2xl font-black leading-tight">
           YOUR JOURNEY TO A
           <br />
-          <span className="text-[#FF3B00]">BETTER YOU</span>
+          <span className="text-primary">BETTER YOU</span>
           <br />
           STARTS NOW
         </p>

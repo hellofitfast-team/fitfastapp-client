@@ -8,7 +8,7 @@ export default async function OnboardingLayout({
   const tBrand = await getTranslations("brand");
 
   return (
-    <div className="min-h-screen bg-[#FFFEF5] text-black selection:bg-black selection:text-[#FFFEF5]">
+    <div className="min-h-screen bg-cream text-black selection:bg-black selection:text-cream">
       {/* Noise texture overlay */}
       <div
         className="fixed inset-0 pointer-events-none opacity-[0.03] z-0"
@@ -18,18 +18,18 @@ export default async function OnboardingLayout({
       />
 
       {/* Top Banner */}
-      <div className="bg-black text-[#FFFEF5] py-2 px-4 overflow-hidden relative z-10">
+      <div className="bg-black text-cream py-2 px-4 overflow-hidden relative z-10">
         <div className="animate-marquee whitespace-nowrap font-mono text-xs tracking-widest">
           {`${tBrand("marquee")} • ${tBrand("marquee")} •`}
         </div>
       </div>
 
       {/* Header */}
-      <header className="relative z-10 border-b-4 border-black bg-[#FFFEF5]">
+      <header className="relative z-10 border-b-4 border-black bg-cream">
         <div className="max-w-4xl mx-auto flex h-16 items-center justify-center px-6">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center bg-black">
-              <span className="text-xl font-black text-[#00FF94]">FF</span>
+              <span className="text-xl font-black text-primary">FF</span>
             </div>
             <h1 className="text-2xl font-black tracking-tight text-black">
               {tBrand("name").toUpperCase()}
@@ -44,12 +44,12 @@ export default async function OnboardingLayout({
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t-4 border-black bg-black text-[#FFFEF5] py-6 mt-8">
+      <footer className="relative z-10 border-t-4 border-black bg-black text-cream py-6 mt-8">
         <div className="max-w-4xl mx-auto px-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <p className="font-mono text-xs tracking-[0.3em]">
             &copy; {new Date().getFullYear()} {tBrand("name").toUpperCase()}™
           </p>
-          <p className="font-mono text-xs tracking-[0.2em] text-[#00FF94]">
+          <p className="font-mono text-xs tracking-[0.2em] text-primary">
             {tBrand("tagline").toUpperCase()}
           </p>
         </div>
