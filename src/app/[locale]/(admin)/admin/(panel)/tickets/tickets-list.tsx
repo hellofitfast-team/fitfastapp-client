@@ -32,7 +32,7 @@ const statusIcons: Record<string, typeof Clock> = {
 };
 
 const statusStyles: Record<string, string> = {
-  open: "text-amber-600 bg-amber-50 border-amber-200",
+  open: "text-primary bg-primary/10 border-primary/20",
   coach_responded: "text-emerald-600 bg-emerald-50 border-emerald-200",
   closed: "text-stone-500 bg-stone-100 border-stone-200",
 };
@@ -156,8 +156,8 @@ export function TicketsList({ tickets }: { tickets: Ticket[] }) {
                 )}
 
                 {ticket.coach_response && (
-                  <div className="border-s-2 border-amber-300 ps-4 bg-amber-50/50 rounded-e-lg py-2 pe-3">
-                    <p className="text-xs font-medium text-amber-600 mb-1">
+                  <div className="border-s-2 border-primary/30 ps-4 bg-primary/5 rounded-e-lg py-2 pe-3">
+                    <p className="text-xs font-medium text-primary mb-1">
                       Coach Response
                     </p>
                     <p className="text-sm text-stone-700">{ticket.coach_response}</p>
@@ -171,7 +171,7 @@ export function TicketsList({ tickets }: { tickets: Ticket[] }) {
                       onChange={(e) => setResponse(e.target.value)}
                       placeholder="Type your response..."
                       rows={3}
-                      className="w-full rounded-xl border border-stone-200 bg-stone-50 p-3 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all resize-none"
+                      className="w-full rounded-xl border border-stone-200 bg-stone-50 p-3 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
                     />
                     <div className="flex gap-2">
                       <button
@@ -181,7 +181,7 @@ export function TicketsList({ tickets }: { tickets: Ticket[] }) {
                           respondingId === ticket.id ||
                           !response.trim()
                         }
-                        className="flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-xs font-medium text-white hover:bg-amber-700 transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white hover:bg-primary/90 transition-colors disabled:opacity-50"
                       >
                         <Send className="h-3 w-3" />
                         {t("respond")}

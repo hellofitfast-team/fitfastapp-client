@@ -39,7 +39,7 @@ function NavItem({
         className={cn(
           "flex items-center gap-3 rounded-lg mx-3 px-3 py-2.5 text-sm font-medium transition-colors",
           isActive
-            ? "bg-amber-600/10 text-amber-500"
+            ? "bg-primary/10 text-primary"
             : "text-stone-400 hover:bg-white/5 hover:text-stone-200"
         )}
       >
@@ -110,7 +110,7 @@ export function AdminSidebar({
         {/* Logo area */}
         <div className="flex h-16 items-center justify-between px-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-600">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
               <Dumbbell className="h-4 w-4 text-white" />
             </div>
             <div>

@@ -47,7 +47,7 @@ export function AdminHeader({ onMenuClick, coachName }: AdminHeaderProps) {
         {/* Right - Actions */}
         <div className="flex items-center gap-2">
           {coachName && (
-            <span className="hidden text-sm font-semibold text-amber-700 sm:block">
+            <span className="hidden text-sm font-semibold text-primary sm:block">
               {coachName}
             </span>
           )}

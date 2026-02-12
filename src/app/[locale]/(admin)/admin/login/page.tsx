@@ -87,14 +87,14 @@ export default function AdminLoginPage() {
       style={{ fontFamily: "var(--font-outfit)" }}
     >
       {/* Subtle background pattern - decorative admin branding */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #92400e 1px, transparent 0)", backgroundSize: "32px 32px" }} />
+      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #4169E1 1px, transparent 0)", backgroundSize: "32px 32px" }} />
 
       <div className="relative w-full max-w-md">
         {/* Card */}
         <div className="rounded-2xl border border-stone-200 bg-white shadow-xl shadow-stone-200/50">
           {/* Header */}
           <div className="px-8 pt-10 pb-2 text-center">
-            <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl bg-amber-600 mb-5 shadow-lg shadow-amber-600/20">
+            <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl bg-primary mb-5 shadow-lg shadow-primary/20">
               <Dumbbell className="h-7 w-7 text-white" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-stone-900">
@@ -129,7 +129,7 @@ export default function AdminLoginPage() {
                     id="email"
                     type="email"
                     placeholder="coach@fitfast.app"
-                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-stone-200 bg-stone-50 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-stone-200 bg-stone-50 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                     {...register("email")}
                     disabled={isLoading}
                   />
@@ -156,7 +156,7 @@ export default function AdminLoginPage() {
                     id="password"
                     type="password"
                     placeholder="••••••••"
-                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-stone-200 bg-stone-50 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-stone-200 bg-stone-50 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                     {...register("password")}
                     disabled={isLoading}
                   />
@@ -171,7 +171,7 @@ export default function AdminLoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-11 rounded-xl bg-amber-600 text-white font-semibold text-sm hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 shadow-lg shadow-amber-600/20"
+                className="w-full h-11 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
               >
                 {isLoading ? (
                   <span className="animate-pulse">{t("signingIn")}...</span>

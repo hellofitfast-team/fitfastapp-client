@@ -86,13 +86,13 @@ function StatCard({
           className={`flex h-10 w-10 items-center justify-center rounded-lg ${
             accent
               ? "bg-red-100 text-red-600"
-              : "bg-amber-50 text-amber-600"
+              : "bg-primary/10 text-primary"
           }`}
         >
           <Icon className="h-5 w-5" />
         </div>
       </div>
-      <div className="mt-3 flex items-center gap-1 text-xs font-medium text-stone-400 group-hover:text-amber-600 transition-colors">
+      <div className="mt-3 flex items-center gap-1 text-xs font-medium text-stone-400 group-hover:text-primary transition-colors">
         View <ArrowRight className="h-3 w-3" />
       </div>
     </Link>
@@ -155,7 +155,7 @@ export default async function AdminDashboardPage() {
             </h2>
             <Link
               href="/admin/signups"
-              className="text-xs font-medium text-amber-600 hover:text-amber-700 transition-colors"
+              className="text-xs font-medium text-primary hover:text-primary transition-colors"
             >
               {t("viewAll")}
             </Link>
@@ -179,7 +179,7 @@ export default async function AdminDashboardPage() {
             </h2>
             <Link
               href="/admin/tickets"
-              className="text-xs font-medium text-amber-600 hover:text-amber-700 transition-colors"
+              className="text-xs font-medium text-primary hover:text-primary transition-colors"
             >
               {t("viewAll")}
             </Link>

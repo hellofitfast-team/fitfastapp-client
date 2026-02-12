@@ -18,7 +18,7 @@ interface Client {
 
 const statusStyles: Record<string, string> = {
   active: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  pending_approval: "bg-amber-50 text-amber-700 border-amber-200",
+  pending_approval: "bg-primary/10 text-primary border-primary/20",
   inactive: "bg-stone-100 text-stone-500 border-stone-200",
   expired: "bg-red-50 text-red-700 border-red-200",
 };
@@ -51,7 +51,7 @@ export function ClientsList({ clients }: { clients: Client[] }) {
           placeholder={t("search")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full h-11 ps-10 pe-4 rounded-xl border border-stone-200 bg-white text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+          className="w-full h-11 ps-10 pe-4 rounded-xl border border-stone-200 bg-white text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
         />
       </div>
 
@@ -99,7 +99,7 @@ export function ClientsList({ clients }: { clients: Client[] }) {
                     )}
                   </td>
                   <td className="px-4 py-4">
-                    <span className="text-xs font-semibold text-amber-600">
+                    <span className="text-xs font-semibold text-primary">
                       {client.plan_tier
                         ? tierLabels[client.plan_tier] || client.plan_tier
                         : "—"}
@@ -122,7 +122,7 @@ export function ClientsList({ clients }: { clients: Client[] }) {
                   <td className="px-4 py-4">
                     <Link
                       href={`/admin/clients/${client.id}`}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-stone-200 text-stone-400 hover:border-amber-300 hover:text-amber-600 transition-colors"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-stone-200 text-stone-400 hover:border-primary/30 hover:text-primary transition-colors"
                     >
                       <ArrowRight className="h-4 w-4" />
                     </Link>

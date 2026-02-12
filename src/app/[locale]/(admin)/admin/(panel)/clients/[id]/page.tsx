@@ -53,7 +53,7 @@ export default async function ClientDetailPage({
       <div className="flex items-center gap-4">
         <Link
           href="/admin/clients"
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200 text-stone-500 hover:border-amber-300 hover:text-amber-600 transition-colors"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200 text-stone-500 hover:border-primary/30 hover:text-primary transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
@@ -72,7 +72,7 @@ export default async function ClientDetailPage({
         {/* Profile */}
         <div className="rounded-xl border border-stone-200 bg-white p-5">
           <div className="flex items-center gap-2 mb-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <User className="h-4 w-4" />
             </div>
             <h2 className="font-semibold text-sm text-stone-900">
@@ -104,7 +104,7 @@ export default async function ClientDetailPage({
         {/* Plan dates */}
         <div className="rounded-xl border border-stone-200 bg-white p-5">
           <div className="flex items-center gap-2 mb-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <Calendar className="h-4 w-4" />
             </div>
             <h2 className="font-semibold text-sm text-stone-900">
@@ -131,7 +131,7 @@ export default async function ClientDetailPage({
             {profile.plan_end_date && (
               <div className="flex justify-between">
                 <dt className="text-stone-500">Remaining</dt>
-                <dd className="font-medium text-amber-600">
+                <dd className="font-medium text-primary">
                   {Math.max(
                     0,
                     Math.ceil(
@@ -150,7 +150,7 @@ export default async function ClientDetailPage({
         {/* Assessment summary */}
         <div className="rounded-xl border border-stone-200 bg-white p-5">
           <div className="flex items-center gap-2 mb-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <TrendingUp className="h-4 w-4" />
             </div>
             <h2 className="font-semibold text-sm text-stone-900">
@@ -191,7 +191,7 @@ export default async function ClientDetailPage({
       {/* Recent check-ins */}
       <div className="rounded-xl border border-stone-200 bg-white p-5">
         <div className="flex items-center gap-2 mb-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
             <ClipboardCheck className="h-4 w-4" />
           </div>
           <h2 className="font-semibold text-sm text-stone-900">

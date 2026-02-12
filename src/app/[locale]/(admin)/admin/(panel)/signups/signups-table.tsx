@@ -43,7 +43,7 @@ const tierLabels: Record<string, string> = {
 };
 
 const statusStyles: Record<string, string> = {
-  pending: "bg-amber-50 text-amber-700 border-amber-200",
+  pending: "bg-primary/10 text-primary border-primary/20",
   approved: "bg-emerald-50 text-emerald-700 border-emerald-200",
   rejected: "bg-red-50 text-red-700 border-red-200",
 };
@@ -163,7 +163,7 @@ export function SignupsTable({ signups }: { signups: Signup[] }) {
 
                     {/* Plan */}
                     <div className="px-4 py-4">
-                      <span className="text-xs font-semibold text-amber-600">
+                      <span className="text-xs font-semibold text-primary">
                         {signup.plan_tier
                           ? tierLabels[signup.plan_tier] || signup.plan_tier
                           : "—"}
@@ -204,7 +204,7 @@ export function SignupsTable({ signups }: { signups: Signup[] }) {
                           }
                           className={`flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-colors ${
                             isExpanded
-                              ? "border-amber-300 bg-amber-50 text-amber-700"
+                              ? "border-primary/30 bg-primary/10 text-primary"
                               : "border-stone-200 text-stone-500 hover:border-stone-300 hover:text-stone-700"
                           }`}
                         >
@@ -258,7 +258,7 @@ export function SignupsTable({ signups }: { signups: Signup[] }) {
                               href={signup.payment_screenshot_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="group relative block w-64 rounded-lg border border-stone-200 hover:border-amber-300 transition-colors overflow-hidden"
+                              className="group relative block w-64 rounded-lg border border-stone-200 hover:border-primary/30 transition-colors overflow-hidden"
                             >
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
@@ -297,7 +297,7 @@ export function SignupsTable({ signups }: { signups: Signup[] }) {
                                   key={key}
                                   className="flex items-baseline gap-3 border-b border-stone-100 pb-2"
                                 >
-                                  <span className="shrink-0 text-[10px] font-medium uppercase tracking-wide text-amber-600 w-16">
+                                  <span className="shrink-0 text-[10px] font-medium uppercase tracking-wide text-primary w-16">
                                     {ocrFieldLabels[key] || key}
                                   </span>
                                   <span className="text-sm text-stone-900">

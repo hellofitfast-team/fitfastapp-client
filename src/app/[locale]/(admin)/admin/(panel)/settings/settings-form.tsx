@@ -73,7 +73,7 @@ export function AdminSettingsForm({ config }: AdminSettingsFormProps) {
       {/* Check-in frequency */}
       <div className="rounded-xl border border-stone-200 bg-white p-6">
         <div className="flex items-center gap-2 mb-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
             <Calendar className="h-4 w-4" />
           </div>
           <h2 className="font-semibold text-sm text-stone-900">
@@ -87,7 +87,7 @@ export function AdminSettingsForm({ config }: AdminSettingsFormProps) {
             max="30"
             value={checkInDays}
             onChange={(e) => setCheckInDays(e.target.value)}
-            className="w-24 h-11 rounded-xl border border-stone-200 bg-stone-50 px-3 text-lg font-bold text-amber-600 text-center focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+            className="w-24 h-11 rounded-xl border border-stone-200 bg-stone-50 px-3 text-lg font-bold text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           />
           <span className="text-sm text-stone-500">
             days between check-ins
@@ -98,7 +98,7 @@ export function AdminSettingsForm({ config }: AdminSettingsFormProps) {
       {/* Plan Pricing */}
       <div className="rounded-xl border border-stone-200 bg-white p-6">
         <div className="flex items-center gap-2 mb-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
             <Tag className="h-4 w-4" />
           </div>
           <h2 className="font-semibold text-sm text-stone-900">
@@ -121,7 +121,7 @@ export function AdminSettingsForm({ config }: AdminSettingsFormProps) {
                   min="0"
                   value={tier.value}
                   onChange={(e) => tier.setter(e.target.value)}
-                  className="w-full h-11 rounded-xl border border-stone-200 bg-stone-50 px-4 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                  className="w-full h-11 rounded-xl border border-stone-200 bg-stone-50 px-4 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                 />
                 <span className="shrink-0 text-xs font-medium text-stone-400">
                   EGP
@@ -135,7 +135,7 @@ export function AdminSettingsForm({ config }: AdminSettingsFormProps) {
       {/* InstaPay settings */}
       <div className="rounded-xl border border-stone-200 bg-white p-6">
         <div className="flex items-center gap-2 mb-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
             <CreditCard className="h-4 w-4" />
           </div>
           <h2 className="font-semibold text-sm text-stone-900">
@@ -152,7 +152,7 @@ export function AdminSettingsForm({ config }: AdminSettingsFormProps) {
               value={instapayName}
               onChange={(e) => setInstapayName(e.target.value)}
               placeholder="Your InstaPay name..."
-              className="w-full h-11 rounded-xl border border-stone-200 bg-stone-50 px-4 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+              className="w-full h-11 rounded-xl border border-stone-200 bg-stone-50 px-4 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
             />
           </div>
           <div>
@@ -164,7 +164,7 @@ export function AdminSettingsForm({ config }: AdminSettingsFormProps) {
               value={instapayNumber}
               onChange={(e) => setInstapayNumber(e.target.value)}
               placeholder="01XXXXXXXXX"
-              className="w-full h-11 rounded-xl border border-stone-200 bg-stone-50 px-4 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+              className="w-full h-11 rounded-xl border border-stone-200 bg-stone-50 px-4 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
             />
           </div>
         </div>
@@ -174,7 +174,7 @@ export function AdminSettingsForm({ config }: AdminSettingsFormProps) {
       <button
         onClick={handleSave}
         disabled={isPending}
-        className="flex items-center gap-2 rounded-lg bg-amber-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-amber-700 transition-colors disabled:opacity-50 shadow-lg shadow-amber-600/20"
+        className="flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-primary/90 transition-colors disabled:opacity-50 shadow-lg shadow-primary/20"
       >
         <Save className="h-4 w-4" />
         {saved ? t("saved") : isPending ? t("saving") : t("save")}
