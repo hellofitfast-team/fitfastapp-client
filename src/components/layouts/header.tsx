@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link, useRouter, usePathname } from "@/i18n/navigation";
 import { useParams } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -27,6 +28,12 @@ export function Header({ onMenuClick, userName }: HeaderProps) {
   const switchLocale = () => {
     const newLocale = currentLocale === "en" ? "ar" : "en";
     router.replace(pathname, { locale: newLocale });
+  };
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.replace("/login");
   };
 
   return (
@@ -91,7 +98,10 @@ export function Header({ onMenuClick, userName }: HeaderProps) {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-black h-[2px] m-0" />
-              <DropdownMenuItem className="flex items-center gap-2 px-4 py-3 font-bold uppercase text-sm text-primary hover:bg-primary hover:text-white cursor-pointer rounded-none">
+              <DropdownMenuItem
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-3 font-bold uppercase text-sm text-primary hover:bg-primary hover:text-white cursor-pointer rounded-none"
+              >
                 <LogOut className="h-4 w-4" />
                 {t("auth.logout")}
               </DropdownMenuItem>
