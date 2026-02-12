@@ -12,6 +12,14 @@ import {
 import { Weight } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+// Theme colors for charts - must match globals.css
+const CHART_COLORS = {
+  primary: "#4169E1",      // --color-primary (Royal Blue)
+  cream: "#FFFEF5",        // --color-cream
+  black: "#000000",        // --color-black
+  success: "#00FF94",      // --color-success-500
+} as const;
+
 interface WeightChartDatum {
   date: string;
   weight: number | null;
@@ -62,18 +70,18 @@ export default function ProgressCharts({
           {weightChartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={weightChartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#000" strokeOpacity={0.1} />
-                <XAxis dataKey="date" stroke="#000" fontSize={12} tickLine={false} />
-                <YAxis stroke="#000" fontSize={12} tickLine={false} domain={["dataMin - 2", "dataMax + 2"]} />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.black} strokeOpacity={0.1} />
+                <XAxis dataKey="date" stroke={CHART_COLORS.black} fontSize={12} tickLine={false} />
+                <YAxis stroke={CHART_COLORS.black} fontSize={12} tickLine={false} domain={["dataMin - 2", "dataMax + 2"]} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#FFFEF5",
-                    border: "4px solid #000",
+                    backgroundColor: CHART_COLORS.cream,
+                    border: `4px solid ${CHART_COLORS.black}`,
                     borderRadius: "0",
                     fontWeight: "bold",
                   }}
                 />
-                <Line type="monotone" dataKey="weight" stroke="#4169E1" strokeWidth={4} dot={{ fill: "#4169E1", r: 6, strokeWidth: 2, stroke: "#000" }} activeDot={{ r: 8 }} />
+                <Line type="monotone" dataKey="weight" stroke={CHART_COLORS.primary} strokeWidth={4} dot={{ fill: CHART_COLORS.primary, r: 6, strokeWidth: 2, stroke: CHART_COLORS.black }} activeDot={{ r: 8 }} />
               </LineChart>
             </ResponsiveContainer>
           ) : (
