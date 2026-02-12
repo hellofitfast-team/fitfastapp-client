@@ -62,6 +62,10 @@ Recent decisions affecting current work:
 - [Phase 02-02]: Centralized CHART_COLORS constant for Recharts SVG compatibility
 - [Phase 03-02]: Use standard Tailwind red colors (red-50, red-200, etc.) for ErrorBoundary default UI instead of semantic error-* classes
 - [Phase 03-02]: Zod schemas export inferred types as drop-in replacements for existing GeneratedMealPlan/GeneratedWorkoutPlan interfaces
+- [Phase 04-01]: Skip retry on 4xx client errors (400, 401, 403, 422) - these are not transient failures
+- [Phase 04-01]: Retry on 5xx server errors and network failures - these may succeed on retry
+- [Phase 04-01]: 30-second timeout prevents indefinite hangs on slow API responses
+- [Phase 04-01]: Wrap ValidationError in AIGenerationError for consistent error type upstream
 
 ### Pending Todos
 
