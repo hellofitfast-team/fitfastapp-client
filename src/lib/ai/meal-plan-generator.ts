@@ -1,5 +1,8 @@
 import { getOpenRouterClient } from "./openrouter";
 import type { InitialAssessment, Profile, CheckIn } from "@/types/database";
+import { validateMealPlanResponse, type ValidatedMealPlan } from "@/lib/validation";
+import { AIGenerationError, ValidationError } from "@/lib/errors";
+import * as Sentry from "@sentry/nextjs";
 
 export interface MealPlanGenerationParams {
   profile: Profile;
@@ -9,6 +12,7 @@ export interface MealPlanGenerationParams {
   planDuration?: number; // days
 }
 
+/** @deprecated Use ValidatedMealPlan from @/lib/validation instead */
 export interface GeneratedMealPlan {
   weeklyPlan: {
     [day: string]: {
@@ -43,7 +47,7 @@ export interface GeneratedMealPlan {
 
 export async function generateMealPlan(
   params: MealPlanGenerationParams
-): Promise<GeneratedMealPlan> {
+): Promise<ValidatedMealPlan> {
   const { profile, assessment, checkIn, language, planDuration = 7 } = params;
 
   const isArabic = language === "ar";
@@ -131,17 +135,34 @@ Return a JSON object with this exact structure:
       max_tokens: 6000,
     });
 
-    // Parse the JSON response
-    const cleanedResponse = response
-      .replace(/```json\n?/g, "")
-      .replace(/```\n?/g, "")
-      .trim();
-
-    const mealPlan: GeneratedMealPlan = JSON.parse(cleanedResponse);
-
-    return mealPlan;
+    // Validate with Zod (handles JSON cleaning, parsing, and schema validation)
+    const validatedPlan = validateMealPlanResponse(response);
+    return validatedPlan;
   } catch (error) {
-    console.error("Meal plan generation error:", error);
-    throw new Error("Failed to generate meal plan");
+    Sentry.captureException(error, {
+      tags: {
+        feature: "meal-plan-generation",
+        language,
+      },
+      extra: {
+        userId: profile.id,
+        planDuration,
+        hasCheckIn: !!checkIn,
+        action: "generate-meal-plan",
+        timestamp: new Date().toISOString(),
+      },
+    });
+
+    // Wrap ValidationError in AIGenerationError for consistent error type
+    if (error instanceof ValidationError) {
+      throw new AIGenerationError(
+        `AI generated invalid meal plan: ${error.message}`,
+        "openrouter",
+        error
+      );
+    }
+
+    // RetryError, AIGenerationError bubble up as-is
+    throw error;
   }
 }
