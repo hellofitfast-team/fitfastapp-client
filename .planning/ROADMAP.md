@@ -61,11 +61,12 @@ Plans:
   3. Contrast ratios verified with Chrome DevTools for all interactive elements
   4. Cross-browser testing confirms consistent appearance (Chrome, Safari, Firefox)
 
-**Plans**: TBD (estimated 5-8 plans)
+**Plans:** 3 plans
 
 Plans:
-- [ ] 02-01: TBD after planning
-- [ ] 02-02: TBD after planning
+- [ ] 02-01-PLAN.md — Fix inline style hex values and hover anti-patterns in dashboard pages
+- [ ] 02-02-PLAN.md — Fix remaining hardcoded hex in UI components, loading skeletons, charts, auth
+- [ ] 02-03-PLAN.md — Automated verification sweep + cross-browser/RTL manual testing checkpoint
 
 ### Phase 3: Hardening Foundation
 **Goal**: Reusable validation schemas, retry utilities, and error infrastructure established for all hardening work
@@ -237,7 +238,7 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Theme Core | 3/3 | ✓ Complete | 2026-02-12 |
-| 2. Theme Audit | 0/TBD | Not started | - |
+| 2. Theme Audit | 0/3 | Planned | - |
 | 3. Foundation | 0/2 | Planned | - |
 | 4. Service Layer | 0/TBD | Not started | - |
 | 5. API Routes | 0/TBD | Not started | - |
@@ -249,4 +250,4 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-12 (Phase 3 planned)*
+*Last updated: 2026-02-12 (Phase 2 planned)*
