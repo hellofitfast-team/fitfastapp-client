@@ -124,11 +124,13 @@ Plans:
   6. All API errors logged with full context and sent to Sentry
   7. Non-critical operations (notifications) use fire-and-forget pattern
 
-**Plans**: TBD (estimated 8-12 plans)
+**Plans:** 4 plans
 
 Plans:
-- [ ] 05-01: TBD after planning
-- [ ] 05-02: TBD after planning
+- [ ] 05-01-PLAN.md — Validation helper (validateRequestBody) + Zod schemas for all API routes
+- [ ] 05-02-PLAN.md — Apply validation to plan generation, ticket, and auth routes + Sentry
+- [ ] 05-03-PLAN.md — Apply validation to admin routes (OCR input+output, approve-signup, notifications)
+- [ ] 05-04-PLAN.md — Apply validation to notification routes + check-in RELY-05 plan generation warning
 
 ### Phase 6: UX Polish
 **Goal**: Consistent, professional user experience across all pages with proper loading, error, and empty states
@@ -241,7 +243,7 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 | 2. Theme Audit | 3/3 | ✓ Complete | 2026-02-12 |
 | 3. Foundation | 2/2 | ✓ Complete | 2026-02-12 |
 | 4. Service Layer | 2/2 | ✓ Complete | 2026-02-12 |
-| 5. API Routes | 0/TBD | Not started | - |
+| 5. API Routes | 0/4 | Not started | - |
 | 6. UX Polish | 0/TBD | Not started | - |
 | 7. Performance | 0/TBD | Not started | - |
 | 8. Refactoring | 0/TBD | Not started | - |
@@ -250,4 +252,4 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-12 (Phase 4 complete)*
+*Last updated: 2026-02-13 (Phase 5 planned)*
