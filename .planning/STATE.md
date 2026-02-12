@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 ## Current Position
 
 Phase: 5 of 10 (Hardening API Routes)
-Plan: 1 of TBD in current phase
+Plan: 4 of TBD in current phase
 Status: In progress
-Last activity: 2026-02-13 — Completed Phase 5 Plan 01 (API Validation Infrastructure)
+Last activity: 2026-02-13 — Completed Phase 5 Plan 04 (Notification Validation and Plan Generation Feedback)
 
 Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 5.3 minutes
-- Total execution time: 1.08 hours
+- Total plans completed: 13
+- Average duration: 4.9 minutes
+- Total execution time: 1.13 hours
 
 **By Phase:**
 
@@ -31,15 +31,17 @@ Progress: [████████░░] 80%
 | 02 | 3 | 1058s (17.6m) | 353s |
 | 03 | 2 | 377s (6.3m) | 189s |
 | 04 | 2 | 604s (10.1m) | 302s |
-| 05 | 1 | 92s (1.5m) | 92s |
+| 05 | 4 | 489s (8.2m) | 122s |
 | extra | 2 | — | — (logout fix + admin rebrand) |
 
 **Recent Trend:**
-- Last plan: 05-01 (92s, 2 tasks, 6 files)
-- Previous: 04-02 (211s, 2 tasks, 7 files)
-- Trend: Efficient infrastructure creation, API validation foundation complete
+- Last plan: 05-04 (188s, 2 tasks, 5 files)
+- Previous: 05-03 (209s, 2 tasks, 3 files)
+- Trend: Consistent API hardening velocity, notification validation complete
 
 *Updated after each plan completion*
+| Phase 05 P04 | 188 | 2 tasks | 5 files |
+| Phase 05 P03 | 209 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -67,6 +69,8 @@ Recent decisions affecting current work:
 - [Phase 04-01]: Retry on 5xx server errors and network failures - these may succeed on retry
 - [Phase 04-01]: 30-second timeout prevents indefinite hangs on slow API responses
 - [Phase 04-01]: Wrap ValidationError in AIGenerationError for consistent error type upstream
+- [Phase 05-04]: Show planGenerationWarning (user-friendly) instead of planGenerationFailed (error) to reduce user anxiety when plans are delayed
+- [Phase 05-04]: Log both meal and workout plan failures separately to Sentry for granular error tracking
 
 ### Pending Todos
 
@@ -81,10 +85,10 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-13T00:20:00Z
-Stopped at: Completed 05-01-PLAN.md (API Validation Infrastructure)
+Last session: 2026-02-12T22:22:49Z
+Stopped at: Completed 05-04-PLAN.md (Notification Validation and Plan Generation Feedback)
 Resume file: None
 
 ---
 *State initialized: 2026-02-12*
-*Last updated: 2026-02-13T00:20:24Z*
+*Last updated: 2026-02-12T22:25:58Z*
