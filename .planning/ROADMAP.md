@@ -81,11 +81,11 @@ Plans:
   4. Custom error types defined for domain errors (ValidationError, RetryError, etc.)
   5. All foundation utilities have TypeScript types and JSDoc comments
 
-**Plans**: TBD (estimated 6-10 plans)
+**Plans:** 2 plans
 
 Plans:
-- [ ] 03-01: TBD after planning
-- [ ] 03-02: TBD after planning
+- [ ] 03-01-PLAN.md — Custom error classes (AppError, ValidationError, RetryError, AIGenerationError) + exponential backoff retry utility
+- [ ] 03-02-PLAN.md — Zod validation schemas for meal/workout plans + reusable ErrorBoundary component
 
 ### Phase 4: Hardening Service Layer
 **Goal**: AI generation and Supabase queries reliable with retry logic and validation
@@ -238,7 +238,7 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 |-------|----------------|--------|-----------|
 | 1. Theme Core | 3/3 | ✓ Complete | 2026-02-12 |
 | 2. Theme Audit | 0/TBD | Not started | - |
-| 3. Foundation | 0/TBD | Not started | - |
+| 3. Foundation | 0/2 | Planned | - |
 | 4. Service Layer | 0/TBD | Not started | - |
 | 5. API Routes | 0/TBD | Not started | - |
 | 6. UX Polish | 0/TBD | Not started | - |
@@ -249,4 +249,4 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-12 (Phase 1 complete)*
+*Last updated: 2026-02-12 (Phase 3 planned)*
