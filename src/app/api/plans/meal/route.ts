@@ -9,6 +9,7 @@ import {
   saveMealPlan,
 } from "@/lib/supabase/queries";
 import * as Sentry from "@sentry/nextjs";
+import { validateRequestBody, GeneratePlanSchema } from "@/lib/api-validation";
 
 export async function POST(request: NextRequest) {
   let userId: string | undefined;
@@ -29,7 +30,12 @@ export async function POST(request: NextRequest) {
 
     // Get request body
     const body = await request.json();
-    const { checkInId, planDuration = 14 } = body;
+    const validation = validateRequestBody(body, GeneratePlanSchema, {
+      userId: user.id,
+      feature: "meal-plan-generation",
+    });
+    if (!validation.success) return validation.response;
+    const { checkInId, planDuration } = validation.data;
 
     // Fetch user profile using extracted query
     const profile = await getProfileById(supabase, user.id);

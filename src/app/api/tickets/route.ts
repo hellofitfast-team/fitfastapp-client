@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import type { InsertTables } from "@/types/database";
+import { validateRequestBody, CreateTicketSchema } from "@/lib/api-validation";
+import * as Sentry from "@sentry/nextjs";
 
 // GET /api/tickets - Fetch all tickets for the authenticated user
 export async function GET(request: NextRequest) {
@@ -28,7 +30,10 @@ export async function GET(request: NextRequest) {
       .order("created_at", { ascending: false });
 
     if (ticketsError) {
-      console.error("Error fetching tickets:", ticketsError);
+      Sentry.captureException(ticketsError, {
+        tags: { feature: "tickets" },
+        extra: { userId: user.id, action: "fetch-tickets" },
+      });
       return NextResponse.json(
         { error: "Failed to fetch tickets" },
         { status: 500 }
@@ -37,7 +42,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ tickets: tickets || [] });
   } catch (error) {
-    console.error("Unexpected error in GET /api/tickets:", error);
+    Sentry.captureException(error, {
+      tags: { feature: "tickets" },
+      extra: { action: "fetch-tickets" },
+    });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -65,15 +73,12 @@ export async function POST(request: NextRequest) {
 
     // Parse the request body
     const body = await request.json();
-    const { subject, category, description, screenshot_url } = body;
-
-    // Validate required fields
-    if (!subject || !category) {
-      return NextResponse.json(
-        { error: "Subject and category are required" },
-        { status: 400 }
-      );
-    }
+    const validation = validateRequestBody(body, CreateTicketSchema, {
+      userId: user.id,
+      feature: "ticket-creation",
+    });
+    if (!validation.success) return validation.response;
+    const { subject, category, description, screenshot_url } = validation.data;
 
     // Create the ticket
     const ticketData: InsertTables<"tickets"> = {
@@ -92,7 +97,10 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertError) {
-      console.error("Error creating ticket:", insertError);
+      Sentry.captureException(insertError, {
+        tags: { feature: "tickets" },
+        extra: { userId: user.id, action: "create-ticket" },
+      });
       return NextResponse.json(
         { error: "Failed to create ticket" },
         { status: 500 }
@@ -101,7 +109,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ticket }, { status: 201 });
   } catch (error) {
-    console.error("Unexpected error in POST /api/tickets:", error);
+    Sentry.captureException(error, {
+      tags: { feature: "tickets" },
+      extra: { action: "create-ticket" },
+    });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
