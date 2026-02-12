@@ -66,19 +66,19 @@ export default function SettingsPage() {
     <div className="mx-auto max-w-2xl space-y-6">
       {/* Header */}
       <div className="border-4 border-black bg-black p-6">
-        <h1 className="text-3xl font-black text-[#FFFEF5] tracking-tight">
+        <h1 className="text-3xl font-black text-cream tracking-tight">
           {t("title").toUpperCase()}
         </h1>
-        <p className="mt-2 font-mono text-xs tracking-[0.2em] text-[#00FF94]">
+        <p className="mt-2 font-mono text-xs tracking-[0.2em] text-primary">
           {t("subtitle").toUpperCase()}
         </p>
       </div>
 
       {/* Profile Settings */}
-      <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-        <div className="border-b-4 border-black bg-[#FF3B00] p-4 flex items-center gap-3">
+      <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <div className="border-b-4 border-black bg-primary p-4 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center bg-black">
-            <User className="h-5 w-5 text-[#FFFEF5]" />
+            <User className="h-5 w-5 text-cream" />
           </div>
           <h2 className="font-black text-xl text-white tracking-tight">
             {t("profile").toUpperCase()}
@@ -94,7 +94,7 @@ export default function SettingsPage() {
               placeholder="John Doe"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full h-12 px-4 border-4 border-black bg-[#FFFEF5] font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
+              className="w-full h-12 px-4 border-4 border-black bg-cream font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
             />
           </div>
           <div>
@@ -106,7 +106,7 @@ export default function SettingsPage() {
               placeholder="01xxxxxxxxx"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full h-12 px-4 border-4 border-black bg-[#FFFEF5] font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
+              className="w-full h-12 px-4 border-4 border-black bg-cream font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
             />
           </div>
           <div>
@@ -117,7 +117,7 @@ export default function SettingsPage() {
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
-                className="w-full h-12 px-4 pr-10 border-4 border-black bg-[#FFFEF5] font-bold text-sm uppercase appearance-none cursor-pointer focus:outline-none focus:bg-white transition-colors"
+                className="w-full h-12 px-4 pr-10 border-4 border-black bg-cream font-bold text-sm uppercase appearance-none cursor-pointer focus:outline-none focus:bg-white transition-colors"
               >
                 <option value="en">ENGLISH</option>
                 <option value="ar">العربية</option>
@@ -138,7 +138,7 @@ export default function SettingsPage() {
               setIsSaving(false);
             }}
             disabled={isSaving}
-            className="w-full h-12 bg-black text-white font-black text-sm uppercase tracking-wide hover:bg-[#FF3B00] transition-colors disabled:opacity-50"
+            className="w-full h-12 bg-black text-white font-black text-sm uppercase tracking-wide hover:bg-primary transition-colors disabled:opacity-50"
           >
             {isSaving ? "SAVING..." : t("saveChanges").toUpperCase()}
           </button>
@@ -146,12 +146,12 @@ export default function SettingsPage() {
       </div>
 
       {/* Notifications */}
-      <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+      <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <div className="border-b-4 border-black bg-black p-4 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center bg-[#00FF94]">
+          <div className="flex h-10 w-10 items-center justify-center bg-primary">
             <Bell className="h-5 w-5 text-black" />
           </div>
-          <h2 className="font-black text-xl text-[#FFFEF5] tracking-tight">
+          <h2 className="font-black text-xl text-cream tracking-tight">
             {t("notifications").toUpperCase()}
           </h2>
         </div>
@@ -171,7 +171,7 @@ export default function SettingsPage() {
               onClick={() => toggleSubscription()}
               disabled={!isSupported || (permission === "denied" && !isSubscribed) || notifLoading}
               className={`relative h-8 w-16 border-4 border-black transition-colors ${
-                isSubscribed ? "bg-[#00FF94]" : "bg-neutral-200"
+                isSubscribed ? "bg-primary" : "bg-neutral-200"
               } ${(!isSupported || permission === "denied") ? "opacity-50 cursor-not-allowed" : ""}`}
               role="switch"
               aria-checked={isSubscribed}
@@ -199,29 +199,29 @@ export default function SettingsPage() {
                   body: JSON.stringify({ reminder_time: newTime }),
                 }).catch(() => {});
               }}
-              className="h-12 px-4 border-4 border-black bg-[#FFFEF5] font-mono text-sm focus:outline-none focus:bg-white transition-colors"
+              className="h-12 px-4 border-4 border-black bg-cream font-mono text-sm focus:outline-none focus:bg-white transition-colors"
             />
           </div>
         </div>
       </div>
 
       {/* Account */}
-      <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+      <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <div className="border-b-4 border-black bg-black p-4 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center bg-[#FF3B00]">
+          <div className="flex h-10 w-10 items-center justify-center bg-primary">
             <Shield className="h-5 w-5 text-white" />
           </div>
-          <h2 className="font-black text-xl text-[#FFFEF5] tracking-tight">
+          <h2 className="font-black text-xl text-cream tracking-tight">
             {t("account").toUpperCase()}
           </h2>
         </div>
         <div className="p-6 space-y-4">
-          <button className="w-full h-12 border-4 border-black bg-[#FFFEF5] font-black text-sm uppercase tracking-wide hover:bg-black hover:text-[#FFFEF5] transition-colors">
+          <button className="w-full h-12 border-4 border-black bg-cream font-black text-sm uppercase tracking-wide hover:bg-black hover:text-cream transition-colors">
             {t("changePassword").toUpperCase()}
           </button>
           <button
             onClick={() => signOut()}
-            className="w-full h-12 border-4 border-[#FF3B00] bg-[#FF3B00]/10 font-black text-sm uppercase tracking-wide text-[#FF3B00] hover:bg-[#FF3B00] hover:text-white transition-colors flex items-center justify-center gap-2"
+            className="w-full h-12 border-4 border-error-500 bg-error-500/10 font-black text-sm uppercase tracking-wide text-error-500 hover:bg-error-500 hover:text-white transition-colors flex items-center justify-center gap-2"
           >
             <LogOut className="h-4 w-4" />
             {t("signOut").toUpperCase()}
@@ -230,10 +230,10 @@ export default function SettingsPage() {
       </div>
 
       {/* Plan Details */}
-      <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-        <div className="border-b-4 border-black bg-[#00FF94] p-4 flex items-center gap-3">
+      <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <div className="border-b-4 border-black bg-primary p-4 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center bg-black">
-            <CreditCard className="h-5 w-5 text-[#00FF94]" />
+            <CreditCard className="h-5 w-5 text-primary" />
           </div>
           <h2 className="font-black text-xl text-black tracking-tight">
             {t("planDetails").toUpperCase()}
@@ -261,7 +261,7 @@ export default function SettingsPage() {
               <span className="font-mono text-xs uppercase tracking-wide text-neutral-500">
                 {t("status").toUpperCase()}
               </span>
-              <span className="inline-flex items-center border-4 border-[#00FF94] bg-[#00FF94]/10 px-3 py-1 font-black text-xs uppercase text-black">
+              <span className="inline-flex items-center border-4 border-primary bg-primary/10 px-3 py-1 font-black text-xs uppercase text-black">
                 {profile?.status?.toUpperCase() || t("active").toUpperCase()}
               </span>
             </div>
@@ -270,9 +270,9 @@ export default function SettingsPage() {
                 {t("daysRemaining")}
               </p>
               <p className="text-4xl font-black">{daysRemaining}</p>
-              <div className="mt-3 h-4 border-2 border-black bg-[#FFFEF5]">
+              <div className="mt-3 h-4 border-2 border-black bg-cream">
                 <div
-                  className="h-full bg-[#00FF94]"
+                  className="h-full bg-primary"
                   style={{ width: `${progressPercentage.toFixed(1)}%` }}
                 />
               </div>

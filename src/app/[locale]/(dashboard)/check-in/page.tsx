@@ -259,8 +259,8 @@ export default function CheckInPage() {
       {/* Submission Overlay */}
       {isSubmitting && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
-          <div className="border-4 border-black bg-[#FFFEF5] p-8 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-            <Loader2 className="mx-auto h-12 w-12 animate-spin mb-4" style={{ color: '#FF3B00' }} />
+          <div className="border-4 border-black bg-cream p-8 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <Loader2 className="mx-auto h-12 w-12 animate-spin mb-4 text-primary" />
             <p className="font-black text-xl">{t("submitting").toUpperCase()}</p>
             <p className="font-bold text-sm text-neutral-500 mt-2">
               {t("newPlanGenerated").toUpperCase()}
@@ -271,34 +271,34 @@ export default function CheckInPage() {
 
       {/* Header */}
       <div className="border-4 border-black bg-black p-6">
-        <h1 className="text-3xl font-black tracking-tight" style={{ color: '#FFFEF5' }}>{t("title").toUpperCase()}</h1>
-        <p className="mt-2 font-mono text-xs tracking-[0.2em]" style={{ color: '#00FF94' }}>{t("subtitle").toUpperCase()}</p>
+        <h1 className="text-3xl font-black tracking-tight text-cream">{t("title").toUpperCase()}</h1>
+        <p className="mt-2 font-mono text-xs tracking-[0.2em] text-primary">{t("subtitle").toUpperCase()}</p>
       </div>
 
       {/* Check-in Locked Notice */}
       {isLoadingLockStatus ? (
-        <div className="border-4 border-black bg-[#FFFEF5] p-12 text-center">
+        <div className="border-4 border-black bg-cream p-12 text-center">
           <Loader2 className="mx-auto h-12 w-12 animate-spin text-neutral-400 mb-4" />
           <p className="font-black text-lg uppercase">Loading...</p>
         </div>
       ) : isCheckInLocked && nextCheckInDate ? (
-        <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <div className="border-b-4 border-black bg-[#FF3B00] p-4 flex items-center gap-3">
+        <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <div className="border-b-4 border-black bg-primary p-4 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center bg-black">
-              <Lock className="h-5 w-5" style={{ color: '#FF3B00' }} />
+              <Lock className="h-5 w-5 text-primary" />
             </div>
             <h2 className="font-black text-xl text-white tracking-tight">
               {t("checkInLocked", { default: "CHECK-IN LOCKED" }).toUpperCase()}
             </h2>
           </div>
           <div className="p-12 text-center">
-            <div className="inline-flex h-20 w-20 items-center justify-center bg-[#FF3B00] mb-6">
+            <div className="inline-flex h-20 w-20 items-center justify-center bg-primary mb-6">
               <Calendar className="h-10 w-10 text-white" />
             </div>
             <h3 className="text-2xl font-black tracking-tight">
               {t("nextCheckInAvailable", { default: "NEXT CHECK-IN AVAILABLE" }).toUpperCase()}
             </h3>
-            <p className="mt-4 text-5xl font-black" style={{ color: '#FF3B00' }}>
+            <p className="mt-4 text-5xl font-black text-primary">
               {daysUntilNextCheckIn} {t("days", { default: "DAYS" }).toUpperCase()}
             </p>
             <p className="mt-4 font-mono text-sm text-neutral-500">
@@ -323,21 +323,21 @@ export default function CheckInPage() {
         <>
 
       {/* Progress Steps */}
-      <div className="border-4 border-black bg-[#FFFEF5]">
+      <div className="border-4 border-black bg-cream">
         <div className="flex">
           {STEPS.map((step) => (
             <div
               key={step.id}
               className={`flex-1 p-3 border-e-4 last:border-e-0 border-black text-center transition-colors ${
                 currentStep > step.id
-                  ? "bg-[#00FF94]"
+                  ? "bg-success-500"
                   : currentStep === step.id
-                  ? "bg-[#FF3B00]"
+                  ? "bg-primary"
                   : "bg-neutral-100"
               }`}
             >
               <div className={`h-8 w-8 mx-auto flex items-center justify-center border-4 border-black ${
-                currentStep > step.id ? "bg-black text-[#00FF94]" : currentStep === step.id ? "bg-black text-[#FF3B00]" : "bg-white text-neutral-400"
+                currentStep > step.id ? "bg-black text-success-500" : currentStep === step.id ? "bg-black text-primary" : "bg-white text-neutral-400"
               }`}>
                 {currentStep > step.id ? <Check className="h-4 w-4" /> : <span className="text-xs font-black">{step.id}</span>}
               </div>
@@ -354,9 +354,9 @@ export default function CheckInPage() {
         {/* Step 1: Weight & Measurements */}
         {currentStep === 1 && (
           <div className="space-y-4">
-            <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-              <div className="border-b-4 border-black bg-[#FF3B00] p-4 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center bg-black"><Weight className="h-5 w-5 text-[#FF3B00]" /></div>
+            <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+              <div className="border-b-4 border-black bg-primary p-4 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center bg-black"><Weight className="h-5 w-5 text-primary" /></div>
                 <h2 className="font-black text-xl text-white">{t("weight").toUpperCase()}</h2>
               </div>
               <div className="p-6">
@@ -365,16 +365,16 @@ export default function CheckInPage() {
                     type="number"
                     step="0.1"
                     placeholder="75.5"
-                    className="w-32 h-14 px-4 border-4 border-black bg-[#FFFEF5] font-black text-2xl text-center focus:outline-none focus:bg-white transition-colors"
+                    className="w-32 h-14 px-4 border-4 border-black bg-cream font-black text-2xl text-center focus:outline-none focus:bg-white transition-colors"
                     {...register("weight")}
                   />
                   <span className="font-black text-xl">{tUnits("kg").toUpperCase()}</span>
                 </div>
-                {errors.weight && <p className="mt-2 font-mono text-xs text-[#FF3B00]">{errors.weight.message}</p>}
+                {errors.weight && <p className="mt-2 font-mono text-xs text-error-500">{errors.weight.message}</p>}
               </div>
             </div>
 
-            <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
               <div className="border-b-4 border-black bg-neutral-100 p-4">
                 <h2 className="font-black text-lg">{t("measurements").toUpperCase()} ({t("optional").toUpperCase()})</h2>
                 <p className="font-bold text-sm text-neutral-500">{t("allIn").toUpperCase()} {tUnits("cm").toUpperCase()}</p>
@@ -389,7 +389,7 @@ export default function CheckInPage() {
                 ].map((m) => (
                   <div key={m.key}>
                     <label className="block font-bold text-xs uppercase mb-2">{m.label}</label>
-                    <input type="number" step="0.5" placeholder="0" className="w-full h-12 px-4 border-4 border-black bg-[#FFFEF5] font-mono text-sm focus:outline-none focus:bg-white" {...register(m.key)} />
+                    <input type="number" step="0.5" placeholder="0" className="w-full h-12 px-4 border-4 border-black bg-cream font-mono text-sm focus:outline-none focus:bg-white" {...register(m.key)} />
                   </div>
                 ))}
               </div>
@@ -400,24 +400,24 @@ export default function CheckInPage() {
         {/* Step 2: Fitness Metrics */}
         {currentStep === 2 && (
           <div className="space-y-4">
-            <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-              <div className="border-b-4 border-black bg-[#00FF94] p-4 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center bg-black"><Dumbbell className="h-5 w-5 text-[#00FF94]" /></div>
+            <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+              <div className="border-b-4 border-black bg-primary p-4 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center bg-black"><Dumbbell className="h-5 w-5 text-primary" /></div>
                 <h2 className="font-black text-xl text-black">{t("performance").toUpperCase()}</h2>
               </div>
               <div className="p-6">
                 <textarea
                   placeholder={t("placeholders.performance").toUpperCase()}
-                  className="w-full min-h-[120px] p-4 border-4 border-black bg-[#FFFEF5] font-bold text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:bg-white resize-none"
+                  className="w-full min-h-[120px] p-4 border-4 border-black bg-cream font-bold text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:bg-white resize-none"
                   {...register("workoutPerformance")}
                 />
-                {errors.workoutPerformance && <p className="mt-2 font-bold text-sm text-[#FF3B00]">{errors.workoutPerformance.message}</p>}
+                {errors.workoutPerformance && <p className="mt-2 font-bold text-sm text-error-500">{errors.workoutPerformance.message}</p>}
               </div>
             </div>
 
-            <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
               <div className="border-b-4 border-black bg-black p-4">
-                <h2 className="font-black text-lg text-[#FFFEF5]">{t("wellbeingMetrics").toUpperCase()}</h2>
+                <h2 className="font-black text-lg text-cream">{t("wellbeingMetrics").toUpperCase()}</h2>
               </div>
               <div className="p-6 space-y-6">
                 {[
@@ -427,7 +427,7 @@ export default function CheckInPage() {
                   <div key={metric.key}>
                     <div className="flex items-center justify-between mb-3">
                       <label className="font-bold text-sm uppercase">{metric.label}</label>
-                      <span className="text-2xl font-black text-[#FF3B00]">{metric.value}/10</span>
+                      <span className="text-2xl font-black text-primary">{metric.value}/10</span>
                     </div>
                     <div className="flex gap-1">
                       {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
@@ -436,7 +436,7 @@ export default function CheckInPage() {
                           type="button"
                           onClick={() => setValue(metric.key, num)}
                           className={`flex-1 h-10 border-4 border-black font-black text-xs transition-colors ${
-                            metric.value >= num ? "bg-[#FF3B00] text-white" : "bg-neutral-100 hover:bg-neutral-200"
+                            metric.value >= num ? "bg-primary text-white" : "bg-neutral-100 hover:bg-neutral-200"
                           }`}
                         >
                           {num}
@@ -453,15 +453,15 @@ export default function CheckInPage() {
         {/* Step 3: Dietary Adherence */}
         {currentStep === 3 && (
           <div className="space-y-4">
-            <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-              <div className="border-b-4 border-black bg-[#FF3B00] p-4 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center bg-black"><UtensilsCrossed className="h-5 w-5 text-[#FF3B00]" /></div>
+            <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+              <div className="border-b-4 border-black bg-primary p-4 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center bg-black"><UtensilsCrossed className="h-5 w-5 text-primary" /></div>
                 <h2 className="font-black text-xl text-white">{t("adherence").toUpperCase()}</h2>
               </div>
               <div className="p-6 space-y-4">
                 <div className="flex items-center justify-between mb-3">
                   <label className="font-bold text-sm uppercase">{t("adherenceRating")}</label>
-                  <span className="text-2xl font-black text-[#FF3B00]">{dietaryAdherence}/10</span>
+                  <span className="text-2xl font-black text-primary">{dietaryAdherence}/10</span>
                 </div>
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
@@ -470,7 +470,7 @@ export default function CheckInPage() {
                       type="button"
                       onClick={() => setValue("dietaryAdherence", num)}
                       className={`flex-1 h-10 border-4 border-black font-black text-xs transition-colors ${
-                        dietaryAdherence >= num ? "bg-[#00FF94] text-black" : "bg-neutral-100 hover:bg-neutral-200"
+                        dietaryAdherence >= num ? "bg-primary text-white" : "bg-neutral-100 hover:bg-neutral-200"
                       }`}
                     >
                       {num}
@@ -485,7 +485,7 @@ export default function CheckInPage() {
               </div>
             </div>
 
-            <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
               <div className="border-b-4 border-black bg-neutral-100 p-4">
                 <h2 className="font-black text-lg">{t("injuries").toUpperCase()} ({t("optional").toUpperCase()})</h2>
               </div>
@@ -502,9 +502,9 @@ export default function CheckInPage() {
 
         {/* Step 4: Progress Photos */}
         {currentStep === 4 && (
-          <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-            <div className="border-b-4 border-black bg-[#00FF94] p-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center bg-black"><Camera className="h-5 w-5 text-[#00FF94]" /></div>
+          <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <div className="border-b-4 border-black bg-primary p-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center bg-black"><Camera className="h-5 w-5 text-primary" /></div>
               <div>
                 <h2 className="font-black text-xl text-black">{t("photos").toUpperCase()}</h2>
                 <p className="font-bold text-sm text-black/70">{t("maxPhotos").toUpperCase()}</p>
@@ -525,7 +525,7 @@ export default function CheckInPage() {
                     {uploadedPhotos.map((photo, index) => (
                       <div key={index} className="relative border-4 border-black aspect-square overflow-hidden">
                         <img src={URL.createObjectURL(photo)} alt={`Progress photo ${index + 1}`} className="h-full w-full object-cover" />
-                        <button type="button" onClick={() => removePhoto(index)} className="absolute top-2 end-2 h-8 w-8 bg-[#FF3B00] border-2 border-black flex items-center justify-center text-white hover:bg-black transition-colors">
+                        <button type="button" onClick={() => removePhoto(index)} className="absolute top-2 end-2 h-8 w-8 bg-error-500 border-2 border-black flex items-center justify-center text-white hover:bg-black transition-colors">
                           <X className="h-4 w-4" />
                         </button>
                       </div>
@@ -546,10 +546,10 @@ export default function CheckInPage() {
         {/* Step 5: Review & Submit */}
         {currentStep === 5 && (
           <div className="space-y-4">
-            <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
               <div className="border-b-4 border-black bg-black p-4 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center bg-[#00FF94]"><ClipboardCheck className="h-5 w-5 text-black" /></div>
-                <h2 className="font-black text-xl text-[#FFFEF5]">{t("review").toUpperCase()}</h2>
+                <div className="flex h-10 w-10 items-center justify-center bg-primary"><ClipboardCheck className="h-5 w-5 text-white" /></div>
+                <h2 className="font-black text-xl text-cream">{t("review").toUpperCase()}</h2>
               </div>
               <div className="divide-y-4 divide-black">
                 {[
@@ -567,7 +567,7 @@ export default function CheckInPage() {
               </div>
             </div>
 
-            <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
               <div className="border-b-4 border-black bg-neutral-100 p-4">
                 <h2 className="font-black text-lg">{t("additionalNotes").toUpperCase()} ({t("optional").toUpperCase()})</h2>
               </div>
@@ -588,7 +588,7 @@ export default function CheckInPage() {
             type="button"
             onClick={handleBack}
             disabled={currentStep === 1 || isSubmitting}
-            className="h-14 px-6 border-4 border-black bg-[#FFFEF5] font-black text-sm uppercase tracking-wide hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+            className="h-14 px-6 border-4 border-black bg-cream font-black text-sm uppercase tracking-wide hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
             {tCommon("back").toUpperCase()}
@@ -599,7 +599,7 @@ export default function CheckInPage() {
               type="button"
               onClick={handleNext}
               disabled={isSubmitting}
-              className="h-14 px-6 bg-black text-[#FFFEF5] font-black text-sm uppercase tracking-wide hover:bg-[#FF3B00] disabled:opacity-50 transition-colors flex items-center gap-2"
+              className="h-14 px-6 bg-black text-cream font-black text-sm uppercase tracking-wide hover:bg-primary disabled:opacity-50 transition-colors flex items-center gap-2"
             >
               {tCommon("next").toUpperCase()}
               <ArrowRight className="h-4 w-4" />
@@ -608,7 +608,7 @@ export default function CheckInPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="h-14 px-8 bg-[#00FF94] text-black font-black text-sm uppercase tracking-wide hover:bg-[#FF3B00] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="h-14 px-8 bg-primary text-white font-black text-sm uppercase tracking-wide hover:bg-primary-dark hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
             >
               {isSubmitting ? (
                 <>

@@ -76,22 +76,22 @@ export default function FAQPage() {
       {/* Header */}
       <div className="border-4 border-black bg-black p-6">
         <div className="flex items-center gap-4 mb-2">
-          <div className="flex h-12 w-12 items-center justify-center bg-[#00FF94]">
+          <div className="flex h-12 w-12 items-center justify-center bg-primary">
             <HelpCircle className="h-6 w-6 text-black" />
           </div>
-          <h1 className="text-3xl font-black text-[#FFFEF5] tracking-tight">
+          <h1 className="text-3xl font-black text-cream tracking-tight">
             {t("title").toUpperCase()}
           </h1>
         </div>
-        <p className="font-mono text-xs tracking-[0.2em] text-[#00FF94]">
+        <p className="font-mono text-xs tracking-[0.2em] text-primary">
           {t("subtitle").toUpperCase()}
         </p>
       </div>
 
       {/* Search */}
-      <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+      <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <div className="relative flex items-center">
-          <div className="flex h-14 w-14 items-center justify-center border-e-4 border-black bg-[#FF3B00]">
+          <div className="flex h-14 w-14 items-center justify-center border-e-4 border-black bg-primary">
             <Search className="h-6 w-6 text-white" />
           </div>
           <input
@@ -106,7 +106,7 @@ export default function FAQPage() {
 
       {/* FAQ List */}
       {isLoading ? (
-        <div className="border-4 border-black bg-[#FFFEF5] p-12 text-center">
+        <div className="border-4 border-black bg-cream p-12 text-center">
           <div className="h-8 w-8 mx-auto border-4 border-black border-t-transparent animate-spin" />
         </div>
       ) : (
@@ -114,7 +114,7 @@ export default function FAQPage() {
           {filteredFaqs.map((faq, index) => (
             <div
               key={faq.key}
-              className="border-4 border-black -mt-1 first:mt-0 bg-[#FFFEF5] hover:bg-neutral-50 transition-colors"
+              className="border-4 border-black -mt-1 first:mt-0 bg-cream hover:bg-neutral-50 transition-colors"
             >
               <button
                 onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
@@ -122,7 +122,7 @@ export default function FAQPage() {
               >
                 <div className="flex items-start gap-4">
                   <div className={`flex h-10 w-10 shrink-0 items-center justify-center border-4 border-black ${
-                    expandedIndex === index ? "bg-[#FF3B00] text-white" : "bg-[#FFFEF5] text-black"
+                    expandedIndex === index ? "bg-primary text-white" : "bg-cream text-black"
                   }`}>
                     <span className="font-black text-sm">{String(index + 1).padStart(2, "0")}</span>
                   </div>
@@ -131,7 +131,7 @@ export default function FAQPage() {
                   </span>
                 </div>
                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center border-4 border-black ${
-                  expandedIndex === index ? "bg-black text-[#FFFEF5]" : "bg-[#FFFEF5] text-black"
+                  expandedIndex === index ? "bg-black text-cream" : "bg-cream text-black"
                 }`}>
                   {expandedIndex === index ? (
                     <ChevronUp className="h-5 w-5" />
@@ -153,7 +153,7 @@ export default function FAQPage() {
       )}
 
       {!isLoading && filteredFaqs.length === 0 && (
-        <div className="border-4 border-black bg-[#FFFEF5] p-12 text-center">
+        <div className="border-4 border-black bg-cream p-12 text-center">
           <Search className="mx-auto h-12 w-12 text-neutral-300" />
           <p className="mt-4 font-black text-xl text-black">{t("noResults").toUpperCase()}</p>
           <p className="mt-2 font-mono text-xs text-neutral-500">
@@ -163,10 +163,10 @@ export default function FAQPage() {
       )}
 
       {/* Still Need Help */}
-      <div className="border-4 border-black bg-[#FF3B00] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+      <div className="border-4 border-black bg-primary shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <div className="p-8 text-center">
           <div className="inline-flex h-16 w-16 items-center justify-center bg-black mb-4">
-            <MessageSquarePlus className="h-8 w-8 text-[#00FF94]" />
+            <MessageSquarePlus className="h-8 w-8 text-primary" />
           </div>
           <h3 className="text-2xl font-black text-white tracking-tight">
             {t("stillNeedHelp").toUpperCase()}
@@ -175,7 +175,7 @@ export default function FAQPage() {
             {t("stillNeedHelpHint").toUpperCase()}
           </p>
           <Link href="/tickets">
-            <button className="mt-6 h-14 px-8 bg-black text-[#FFFEF5] font-black text-lg uppercase tracking-wide hover:bg-[#FFFEF5] hover:text-black transition-colors">
+            <button className="mt-6 h-14 px-8 bg-black text-cream font-black text-lg uppercase tracking-wide hover:bg-cream hover:text-black transition-colors">
               {t("contactSupport").toUpperCase()}
             </button>
           </Link>

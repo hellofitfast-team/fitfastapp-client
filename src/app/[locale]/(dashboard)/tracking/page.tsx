@@ -150,8 +150,8 @@ export default function TrackingPage() {
   if (mealPlanLoading || workoutPlanLoading || trackingLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="border-4 border-black bg-[#FFFEF5] p-12 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#FF3B00]" />
+        <div className="border-4 border-black bg-cream p-12 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
           <p className="mt-4 font-black uppercase">{tCommon("loading").toUpperCase()}</p>
         </div>
       </div>
@@ -163,14 +163,14 @@ export default function TrackingPage() {
       {/* Header */}
       <div className="border-4 border-black bg-black p-6">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center bg-[#00FF94]">
+          <div className="flex h-12 w-12 items-center justify-center bg-primary">
             <Target className="h-6 w-6 text-black" />
           </div>
           <div>
-            <h1 className="text-3xl font-black text-[#FFFEF5] tracking-tight">
+            <h1 className="text-3xl font-black text-cream tracking-tight">
               {t("title").toUpperCase()}
             </h1>
-            <p className="font-mono text-xs tracking-[0.2em] text-[#00FF94]">
+            <p className="font-mono text-xs tracking-[0.2em] text-primary">
               {t("subtitle").toUpperCase()}
             </p>
           </div>
@@ -180,7 +180,7 @@ export default function TrackingPage() {
       {/* Date Picker & Progress */}
       <div className="grid gap-4 sm:grid-cols-2">
         {/* Date Picker */}
-        <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
           <div className="border-b-4 border-black bg-neutral-100 p-3 flex items-center gap-2">
             <Calendar className="h-4 w-4" />
             <span className="font-bold text-xs uppercase">{t("selectDate").toUpperCase()}</span>
@@ -191,13 +191,13 @@ export default function TrackingPage() {
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
               max={new Date().toISOString().split("T")[0]}
-              className="w-full h-12 px-4 border-4 border-black bg-[#FFFEF5] font-mono text-sm focus:outline-none focus:bg-white transition-colors"
+              className="w-full h-12 px-4 border-4 border-black bg-cream font-mono text-sm focus:outline-none focus:bg-white transition-colors"
             />
           </div>
         </div>
 
         {/* Completion Progress */}
-        <div className="border-4 border-black bg-[#FF3B00] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <div className="border-4 border-black bg-primary shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
           <div className="p-6 flex items-center justify-between">
             <div>
               <p className="font-mono text-xs tracking-[0.2em] text-white/80">{t("todaysProgress").toUpperCase()}</p>
@@ -235,14 +235,14 @@ export default function TrackingPage() {
       </div>
 
       {/* Meal Tracking */}
-      <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+      <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <button
           onClick={() => setIsMealsExpanded(!isMealsExpanded)}
-          className="w-full border-b-4 border-black bg-[#FF3B00] p-4 flex items-center justify-between"
+          className="w-full border-b-4 border-black bg-primary p-4 flex items-center justify-between"
         >
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center bg-black">
-              <UtensilsCrossed className="h-6 w-6 text-[#FF3B00]" />
+              <UtensilsCrossed className="h-6 w-6 text-primary" />
             </div>
             <div className="text-start">
               <h2 className="font-black text-xl text-white tracking-tight">
@@ -277,7 +277,7 @@ export default function TrackingPage() {
                         onClick={() => handleMealToggle(index, isCompleted)}
                         disabled={isTogglingMeal === index}
                         className={`h-12 w-12 shrink-0 border-4 border-black flex items-center justify-center transition-colors ${
-                          isCompleted ? "bg-[#00FF94]" : "bg-[#FFFEF5] hover:bg-neutral-100"
+                          isCompleted ? "bg-success-500" : "bg-cream hover:bg-neutral-100"
                         }`}
                       >
                         {isTogglingMeal === index ? (
@@ -319,20 +319,20 @@ export default function TrackingPage() {
       </div>
 
       {/* Workout Tracking */}
-      <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+      <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <button
           onClick={() => setIsWorkoutsExpanded(!isWorkoutsExpanded)}
           className="w-full border-b-4 border-black bg-black p-4 flex items-center justify-between"
         >
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center bg-[#00FF94]">
+            <div className="flex h-12 w-12 items-center justify-center bg-primary">
               <Dumbbell className="h-6 w-6 text-black" />
             </div>
             <div className="text-start">
-              <h2 className="font-black text-xl text-[#FFFEF5] tracking-tight">
+              <h2 className="font-black text-xl text-cream tracking-tight">
                 {t("workoutTracking").toUpperCase()}
               </h2>
-              <p className="font-bold text-sm text-[#00FF94]">
+              <p className="font-bold text-sm text-primary">
                 {todaysWorkout?.restDay
                   ? tWorkouts("restDay").toUpperCase()
                   : trackingData.workoutCompletions.filter((c) => c.completed).length > 0
@@ -341,7 +341,7 @@ export default function TrackingPage() {
               </p>
             </div>
           </div>
-          <div className="h-10 w-10 flex items-center justify-center bg-[#00FF94] text-black">
+          <div className="h-10 w-10 flex items-center justify-center bg-primary text-black">
             {isWorkoutsExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
           </div>
         </button>
@@ -367,7 +367,7 @@ export default function TrackingPage() {
                   onClick={() => handleWorkoutToggle(0, getWorkoutCompletion(0)?.completed || false)}
                   disabled={isTogglingWorkout === 0}
                   className={`h-12 w-12 shrink-0 border-4 border-black flex items-center justify-center transition-colors ${
-                    getWorkoutCompletion(0)?.completed ? "bg-[#00FF94]" : "bg-[#FFFEF5] hover:bg-neutral-100"
+                    getWorkoutCompletion(0)?.completed ? "bg-success-500" : "bg-cream hover:bg-neutral-100"
                   }`}
                 >
                   {isTogglingWorkout === 0 ? (
@@ -409,10 +409,10 @@ export default function TrackingPage() {
       </div>
 
       {/* Daily Reflection */}
-      <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-        <div className="border-b-4 border-black bg-[#00FF94] p-4 flex items-center gap-4">
+      <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <div className="border-b-4 border-black bg-primary p-4 flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center bg-black">
-            <BookOpen className="h-6 w-6 text-[#00FF94]" />
+            <BookOpen className="h-6 w-6 text-primary" />
           </div>
           <div>
             <h2 className="font-black text-xl text-black tracking-tight">
@@ -430,7 +430,7 @@ export default function TrackingPage() {
           <button
             type="submit"
             disabled={formState.isSubmitting}
-            className="h-12 px-6 bg-black text-[#FFFEF5] font-black text-sm uppercase tracking-wide hover:bg-[#FF3B00] disabled:opacity-50 transition-colors"
+            className="h-12 px-6 bg-black text-cream font-black text-sm uppercase tracking-wide hover:bg-primary disabled:opacity-50 transition-colors"
           >
             {formState.isSubmitting ? t("saving").toUpperCase() : t("saveReflection").toUpperCase()}
           </button>

@@ -5,7 +5,7 @@ export default function ProgressLoading() {
       <div className="border-4 border-black bg-black p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 bg-[#00FF94]/30 animate-pulse" />
+            <div className="h-12 w-12 bg-primary/30 animate-pulse" />
             <div>
               <div className="h-8 w-48 bg-neutral-700 animate-pulse mb-2" />
               <div className="h-3 w-32 bg-neutral-700 animate-pulse" />
@@ -22,13 +22,13 @@ export default function ProgressLoading() {
       {/* Stats Overview skeleton */}
       <div className="grid gap-0 md:grid-cols-4">
         {[0, 1, 2].map((i) => (
-          <div key={i} className="border-4 border-black -ms-0 md:-ms-1 first:ms-0 -mt-1 md:-mt-0 first:mt-0 bg-[#FFFEF5] p-5">
+          <div key={i} className="border-4 border-black -ms-0 md:-ms-1 first:ms-0 -mt-1 md:-mt-0 first:mt-0 bg-cream p-5">
             <div className="h-3 w-20 bg-neutral-200 animate-pulse mb-2" />
             <div className="h-8 w-16 bg-neutral-200 animate-pulse mb-1" />
             <div className="h-3 w-24 bg-neutral-200 animate-pulse" />
           </div>
         ))}
-        <div className="border-4 border-black -ms-0 md:-ms-1 -mt-1 md:-mt-0 bg-[#FF3B00] p-5">
+        <div className="border-4 border-black -ms-0 md:-ms-1 -mt-1 md:-mt-0 bg-primary p-5">
           <div className="h-3 w-20 bg-white/20 animate-pulse mb-2" />
           <div className="h-8 w-16 bg-white/20 animate-pulse mb-1" />
           <div className="h-3 w-24 bg-white/20 animate-pulse" />
@@ -40,7 +40,7 @@ export default function ProgressLoading() {
         {[0, 1, 2].map((i) => (
           <div
             key={i}
-            className={`flex-1 h-14 border-4 border-black -ms-1 first:ms-0 ${i === 0 ? "bg-black" : "bg-[#FFFEF5]"}`}
+            className={`flex-1 h-14 border-4 border-black -ms-1 first:ms-0 ${i === 0 ? "bg-black" : "bg-cream"}`}
           >
             <div className="flex items-center justify-center h-full">
               <div className={`h-4 w-16 animate-pulse ${i === 0 ? "bg-neutral-700" : "bg-neutral-200"}`} />
@@ -50,8 +50,8 @@ export default function ProgressLoading() {
       </div>
 
       {/* Chart area skeleton */}
-      <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-        <div className="border-b-4 border-black bg-[#FF3B00] p-4 h-[72px] animate-pulse" />
+      <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <div className="border-b-4 border-black bg-primary p-4 h-[72px] animate-pulse" />
         <div className="p-6">
           <div className="h-[300px] bg-neutral-100 animate-pulse" />
         </div>

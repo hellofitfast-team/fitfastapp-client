@@ -82,11 +82,11 @@ export default function TicketsPage() {
   const getStatusStyle = (status: string) => {
     switch (status) {
       case "open":
-        return "border-[#FF3B00] bg-[#FF3B00]/10 text-[#FF3B00]";
+        return "border-primary bg-primary/10 text-primary";
       case "coach_responded":
-        return "border-[#00FF94] bg-[#00FF94]/10 text-black";
+        return "border-primary bg-primary/10 text-black";
       case "closed":
-        return "border-neutral-300 bg-neutral-100 text-neutral-500";
+        return "border-success-500 bg-success-500/10 text-success-500";
       default:
         return "";
     }
@@ -106,21 +106,21 @@ export default function TicketsPage() {
       {/* Header */}
       <div className="border-4 border-black bg-black p-6">
         <div className="flex items-center gap-4 mb-2">
-          <div className="flex h-12 w-12 items-center justify-center bg-[#FF3B00]">
+          <div className="flex h-12 w-12 items-center justify-center bg-primary">
             <MessageSquarePlus className="h-6 w-6 text-white" />
           </div>
-          <h1 className="text-3xl font-black tracking-tight" style={{ color: '#FFFEF5' }}>
+          <h1 className="text-3xl font-black tracking-tight text-cream">
             {t("title").toUpperCase()}
           </h1>
         </div>
-        <p className="font-mono text-xs tracking-[0.2em]" style={{ color: '#00FF94' }}>
+        <p className="font-mono text-xs tracking-[0.2em] text-primary">
           {t("myTickets").toUpperCase()}
         </p>
       </div>
 
       {/* Success Message */}
       {submitSuccess && (
-        <div className="border-4 border-black bg-[#00FF94] p-4 animate-fade-in">
+        <div className="border-4 border-black bg-primary p-4 animate-fade-in">
           <p className="font-black text-center text-black">
             TICKET SUBMITTED SUCCESSFULLY!
           </p>
@@ -128,10 +128,10 @@ export default function TicketsPage() {
       )}
 
       {/* New Ticket Form */}
-      <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-        <div className="border-b-4 border-black bg-[#00FF94] p-4 flex items-center gap-3">
+      <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <div className="border-b-4 border-black bg-primary p-4 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center bg-black">
-            <MessageSquarePlus className="h-5 w-5" style={{ color: '#00FF94' }} />
+            <MessageSquarePlus className="h-5 w-5 text-primary" />
           </div>
           <h2 className="font-black text-xl text-black tracking-tight">
             {t("newTicket").toUpperCase()}
@@ -147,7 +147,7 @@ export default function TicketsPage() {
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder={t("subjectPlaceholder").toUpperCase()}
-              className="w-full h-12 px-4 border-4 border-black bg-[#FFFEF5] font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
+              className="w-full h-12 px-4 border-4 border-black bg-cream font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
               required
               disabled={isCreating}
             />
@@ -161,7 +161,7 @@ export default function TicketsPage() {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value as typeof selectedCategory)}
-                className="w-full h-12 px-4 pr-10 border-4 border-black bg-[#FFFEF5] font-bold text-sm uppercase appearance-none cursor-pointer focus:outline-none focus:bg-white transition-colors"
+                className="w-full h-12 px-4 pr-10 border-4 border-black bg-cream font-bold text-sm uppercase appearance-none cursor-pointer focus:outline-none focus:bg-white transition-colors"
                 disabled={isCreating}
               >
                 <option value="meal_issue">{t("categories.mealIssue").toUpperCase()}</option>
@@ -182,7 +182,7 @@ export default function TicketsPage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t("descriptionPlaceholder").toUpperCase()}
-              className="w-full min-h-[120px] p-4 border-4 border-black bg-[#FFFEF5] font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors resize-none"
+              className="w-full min-h-[120px] p-4 border-4 border-black bg-cream font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors resize-none"
               disabled={isCreating}
             />
           </div>
@@ -216,7 +216,7 @@ export default function TicketsPage() {
           <button
             type="submit"
             disabled={isCreating || isUploading || !subject.trim()}
-            className="w-full h-14 bg-black hover:bg-[#FF3B00] text-[#FFFEF5] font-black text-lg uppercase tracking-wide transition-colors flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-14 bg-black hover:bg-primary text-cream font-black text-lg uppercase tracking-wide transition-colors flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isCreating ? (
               <>
@@ -242,16 +242,16 @@ export default function TicketsPage() {
         </div>
 
         {isLoading ? (
-          <div className="border-4 border-black bg-[#FFFEF5] p-12 flex justify-center items-center">
+          <div className="border-4 border-black bg-cream p-12 flex justify-center items-center">
             <Loader2 className="h-12 w-12 animate-spin text-neutral-400" />
           </div>
         ) : error ? (
-          <div className="border-4 border-black bg-[#FF3B00]/10 p-6 text-center">
-            <p className="font-black" style={{ color: '#FF3B00' }}>ERROR LOADING TICKETS</p>
+          <div className="border-4 border-black bg-primary/10 p-6 text-center">
+            <p className="font-black text-error-500">ERROR LOADING TICKETS</p>
             <p className="font-mono text-xs mt-2 text-neutral-600">{error}</p>
           </div>
         ) : tickets.length === 0 ? (
-          <div className="border-4 border-black bg-[#FFFEF5] p-12 text-center">
+          <div className="border-4 border-black bg-cream p-12 text-center">
             <MessageSquare className="mx-auto h-12 w-12 text-neutral-300" />
             <p className="mt-4 font-black text-xl">{t("noTicketsTitle").toUpperCase()}</p>
             <p className="mt-2 font-mono text-xs text-neutral-500">
@@ -263,15 +263,15 @@ export default function TicketsPage() {
             {tickets.map((ticket) => (
               <div
                 key={ticket.id}
-                className="border-4 border-black -mt-1 first:mt-0 bg-[#FFFEF5] hover:bg-neutral-50 transition-colors cursor-pointer"
+                className="border-4 border-black -mt-1 first:mt-0 bg-cream hover:bg-neutral-50 transition-colors cursor-pointer"
               >
                 <div className="p-5 flex items-start sm:items-center justify-between gap-4 flex-col sm:flex-row">
                   <div className="flex items-start gap-4">
                     <div className={`flex h-12 w-12 shrink-0 items-center justify-center border-4 border-black ${
                       ticket.status === "open"
-                        ? "bg-[#FF3B00] text-white"
+                        ? "bg-primary text-white"
                         : ticket.status === "coach_responded"
-                        ? "bg-[#00FF94] text-black"
+                        ? "bg-primary text-black"
                         : "bg-neutral-200 text-neutral-500"
                     }`}>
                       {getStatusIcon(ticket.status)}

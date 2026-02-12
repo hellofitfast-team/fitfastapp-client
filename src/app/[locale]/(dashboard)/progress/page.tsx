@@ -24,15 +24,15 @@ const ProgressCharts = dynamic(
     ssr: false,
     loading: () => (
       <div className="space-y-6">
-        <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <div className="border-b-4 border-black bg-[#FF3B00] p-4 h-[72px] animate-pulse" />
+        <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <div className="border-b-4 border-black bg-primary p-4 h-[72px] animate-pulse" />
           <div className="p-6">
             <div className="h-[300px] bg-neutral-100 animate-pulse" />
           </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] h-[200px] animate-pulse" />
-          <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] h-[200px] animate-pulse" />
+          <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] h-[200px] animate-pulse" />
+          <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] h-[200px] animate-pulse" />
         </div>
       </div>
     ),
@@ -170,8 +170,8 @@ export default function ProgressPage() {
   if (checkInsLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="border-4 border-black bg-[#FFFEF5] p-12 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <Activity className="mx-auto h-12 w-12 animate-pulse text-[#FF3B00]" />
+        <div className="border-4 border-black bg-cream p-12 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <Activity className="mx-auto h-12 w-12 animate-pulse text-primary" />
           <p className="mt-4 font-black uppercase">{t("loading").toUpperCase()}</p>
         </div>
       </div>
@@ -184,14 +184,14 @@ export default function ProgressPage() {
       <div className="border-4 border-black bg-black p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center bg-[#00FF94]">
+            <div className="flex h-12 w-12 items-center justify-center bg-primary">
               <Activity className="h-6 w-6 text-black" />
             </div>
             <div>
-              <h1 className="text-3xl font-black text-[#FFFEF5] tracking-tight">
+              <h1 className="text-3xl font-black text-cream tracking-tight">
                 {t("title").toUpperCase()}
               </h1>
-              <p className="font-mono text-xs tracking-[0.2em] text-[#00FF94]">
+              <p className="font-mono text-xs tracking-[0.2em] text-primary">
                 {t("description").toUpperCase()}
               </p>
             </div>
@@ -202,7 +202,7 @@ export default function ProgressPage() {
                 key={range}
                 onClick={() => setDateRange(range)}
                 className={`h-10 px-4 border-4 border-black -ms-1 first:ms-0 font-black text-xs uppercase transition-colors ${
-                  dateRange === range ? "bg-[#00FF94] text-black z-10" : "bg-[#FFFEF5] text-black hover:bg-neutral-100"
+                  dateRange === range ? "bg-primary text-black z-10" : "bg-cream text-black hover:bg-neutral-100"
                 }`}
               >
                 {range === "30" ? t("days30").toUpperCase() : range === "90" ? t("days90").toUpperCase() : t("all").toUpperCase()}
@@ -214,7 +214,7 @@ export default function ProgressPage() {
 
       {/* Stats Overview */}
       <div className="grid gap-0 md:grid-cols-4">
-        <div className="border-4 border-black -ms-0 md:-ms-0 -mt-1 md:-mt-0 first:mt-0 first:ms-0 bg-[#FFFEF5] p-5">
+        <div className="border-4 border-black -ms-0 md:-ms-0 -mt-1 md:-mt-0 first:mt-0 first:ms-0 bg-cream p-5">
           <div className="flex items-center gap-2 mb-2">
             <Weight className="h-4 w-4 text-neutral-500" />
             <span className="font-bold text-sm text-neutral-500">{t("startWeight").toUpperCase()}</span>
@@ -225,7 +225,7 @@ export default function ProgressPage() {
           </p>
         </div>
 
-        <div className="border-4 border-black -ms-0 md:-ms-1 -mt-1 md:-mt-0 bg-[#FFFEF5] p-5">
+        <div className="border-4 border-black -ms-0 md:-ms-1 -mt-1 md:-mt-0 bg-cream p-5">
           <div className="flex items-center gap-2 mb-2">
             <Weight className="h-4 w-4 text-neutral-500" />
             <span className="font-bold text-sm text-neutral-500">{t("currentWeight").toUpperCase()}</span>
@@ -236,16 +236,16 @@ export default function ProgressPage() {
           </p>
         </div>
 
-        <div className="border-4 border-black -ms-0 md:-ms-1 -mt-1 md:-mt-0 bg-[#FFFEF5] p-5">
+        <div className="border-4 border-black -ms-0 md:-ms-1 -mt-1 md:-mt-0 bg-cream p-5">
           <div className="flex items-center gap-2 mb-2">
             {weightChange < 0 ? (
-              <TrendingDown className="h-4 w-4 text-[#00FF94]" />
+              <TrendingDown className="h-4 w-4 text-success-500" />
             ) : (
-              <TrendingUp className="h-4 w-4 text-[#FF3B00]" />
+              <TrendingUp className="h-4 w-4 text-error-500" />
             )}
             <span className="font-bold text-sm text-neutral-500">{t("totalChange").toUpperCase()}</span>
           </div>
-          <p className={`text-3xl font-black ${weightChange < 0 ? "text-[#00FF94]" : "text-[#FF3B00]"}`}>
+          <p className={`text-3xl font-black ${weightChange < 0 ? "text-success-500" : "text-error-500"}`}>
             {weightChange !== 0 ? `${weightChange > 0 ? "+" : ""}${weightChange.toFixed(1)}` : "-"}
           </p>
           <p className="font-bold text-sm text-neutral-500 mt-1">
@@ -253,7 +253,7 @@ export default function ProgressPage() {
           </p>
         </div>
 
-        <div className="border-4 border-black -ms-0 md:-ms-1 -mt-1 md:-mt-0 bg-[#FF3B00] p-5">
+        <div className="border-4 border-black -ms-0 md:-ms-1 -mt-1 md:-mt-0 bg-primary p-5">
           <div className="flex items-center gap-2 mb-2">
             <Calendar className="h-4 w-4 text-white/80" />
             <span className="font-bold text-sm text-white/80">{t("checkIns").toUpperCase()}</span>
@@ -270,7 +270,7 @@ export default function ProgressPage() {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`flex-1 h-14 border-4 border-black -ms-1 first:ms-0 font-black text-sm uppercase tracking-wide transition-colors flex items-center justify-center gap-2 ${
-              activeTab === tab ? "bg-black text-[#FFFEF5]" : "bg-[#FFFEF5] text-black hover:bg-neutral-100"
+              activeTab === tab ? "bg-black text-cream" : "bg-cream text-black hover:bg-neutral-100"
             }`}
           >
             {tab === "charts" && <Activity className="h-4 w-4" />}
@@ -292,10 +292,10 @@ export default function ProgressPage() {
 
       {/* Photos Tab */}
       {activeTab === "photos" && (
-        <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <div className="border-b-4 border-black bg-[#00FF94] p-4 flex items-center gap-3">
+        <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <div className="border-b-4 border-black bg-primary p-4 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center bg-black">
-              <Camera className="h-5 w-5 text-[#00FF94]" />
+              <Camera className="h-5 w-5 text-primary" />
             </div>
             <div>
               <h2 className="font-black text-xl text-black tracking-tight">
@@ -323,7 +323,7 @@ export default function ProgressPage() {
                       />
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 bg-black p-2">
-                      <p className="text-xs font-mono text-[#FFFEF5]">{photo.date}</p>
+                      <p className="text-xs font-mono text-cream">{photo.date}</p>
                     </div>
                   </div>
                 ))}
@@ -343,16 +343,16 @@ export default function ProgressPage() {
 
       {/* History Tab */}
       {activeTab === "history" && (
-        <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
           <div className="border-b-4 border-black bg-black p-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center bg-[#FF3B00]">
+            <div className="flex h-10 w-10 items-center justify-center bg-primary">
               <Calendar className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h2 className="font-black text-xl text-[#FFFEF5] tracking-tight">
+              <h2 className="font-black text-xl text-cream tracking-tight">
                 {t("checkInHistory").toUpperCase()}
               </h2>
-              <p className="font-mono text-xs text-[#00FF94]">{t("checkInHistoryDescription").toUpperCase()}</p>
+              <p className="font-mono text-xs text-primary">{t("checkInHistoryDescription").toUpperCase()}</p>
             </div>
           </div>
           <div className="divide-y-4 divide-black">
@@ -371,9 +371,9 @@ export default function ProgressPage() {
                         </p>
                       </div>
                       {checkIn.weight && (
-                        <div className="border-4 border-[#FF3B00] bg-[#FF3B00]/10 px-3 py-1">
-                          <span className="text-2xl font-black text-[#FF3B00]">{checkIn.weight}</span>
-                          <span className="font-mono text-xs text-[#FF3B00] ml-1">{tUnits("kg") || "KG"}</span>
+                        <div className="border-4 border-primary bg-primary/10 px-3 py-1">
+                          <span className="text-2xl font-black text-primary">{checkIn.weight}</span>
+                          <span className="font-mono text-xs text-primary ml-1">{tUnits("kg") || "KG"}</span>
                         </div>
                       )}
                     </div>
@@ -428,10 +428,10 @@ export default function ProgressPage() {
       {/* Photo Modal */}
       {selectedPhoto && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={() => setSelectedPhoto(null)}>
-          <div className="relative max-w-3xl w-full border-4 border-black bg-[#FFFEF5]" onClick={(e) => e.stopPropagation()}>
+          <div className="relative max-w-3xl w-full border-4 border-black bg-cream" onClick={(e) => e.stopPropagation()}>
             <div className="border-b-4 border-black bg-black p-3 flex items-center justify-between">
-              <span className="font-black text-[#FFFEF5]">{t("progressPhoto").toUpperCase()}</span>
-              <button onClick={() => setSelectedPhoto(null)} className="h-8 w-8 bg-[#FF3B00] flex items-center justify-center hover:bg-[#FFFEF5] hover:text-black transition-colors text-white">
+              <span className="font-black text-cream">{t("progressPhoto").toUpperCase()}</span>
+              <button onClick={() => setSelectedPhoto(null)} className="h-8 w-8 bg-primary flex items-center justify-center hover:bg-cream hover:text-black transition-colors text-white">
                 <X className="h-5 w-5" />
               </button>
             </div>
