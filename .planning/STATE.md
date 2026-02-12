@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-12)
 
 **Core value:** Every user flow works reliably, looks polished, and feels consistent in both languages
-**Current focus:** Phases 2 & 3 complete — Ready for Phase 4
+**Current focus:** Phase 4 complete — Ready for Phase 5
 
 ## Current Position
 
-Phase: 4 of 10 (Hardening Service Layer)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-12 — Completed 04-02 (Query Layer Extraction)
+Phase: 5 of 10 (Hardening API Routes) — Not yet planned
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-02-12 — Completed Phase 4 (Hardening Service Layer) — verified passed
 
 Progress: [████████░░] 80%
 
@@ -80,8 +80,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-12T21:28:41Z
-Stopped at: Completed 04-02 (Query Layer Extraction). Phase 4 complete.
+Last session: 2026-02-12T21:35:00Z
+Stopped at: Phase 4 verified and complete. Ready for Phase 5 planning.
 Resume file: None
 
 ---

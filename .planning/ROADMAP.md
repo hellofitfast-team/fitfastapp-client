@@ -18,7 +18,7 @@ This milestone transforms FitFast from functionally complete to demo-ready. We s
 - [x] **Phase 1: Theme Rebrand - Core Color Swap** - Replace orange/green with Royal Blue in CSS variables
 - [x] **Phase 2: Theme Rebrand - Visual Audit** - Verify all components and accessibility compliance
 - [x] **Phase 3: Hardening Foundation** - Create validation schemas, retry utilities, error infrastructure
-- [ ] **Phase 4: Hardening Service Layer** - Wrap AI generation with retry and validation
+- [x] **Phase 4: Hardening Service Layer** - Wrap AI generation with retry and validation
 - [ ] **Phase 5: Hardening API Routes** - Add input validation, parallelization, comprehensive error handling
 - [ ] **Phase 6: UX Polish** - Consistent loading states, empty states, form validation, touch targets
 - [ ] **Phase 7: Performance Optimization** - Admin pagination, chart filters for scalability
@@ -105,8 +105,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — OpenRouter retry + timeout, meal/workout generators with Zod validation and Sentry
-- [ ] 04-02-PLAN.md — Extract Supabase queries to lib/supabase/queries/, update plan API routes with Sentry context
+- [x] 04-01-PLAN.md — OpenRouter retry + timeout, meal/workout generators with Zod validation and Sentry
+- [x] 04-02-PLAN.md — Extract Supabase queries to lib/supabase/queries/, update plan API routes with Sentry context
 
 ### Phase 5: Hardening API Routes
 **Goal**: All API routes validate inputs, execute efficiently, and provide comprehensive error feedback
@@ -240,7 +240,7 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 | 1. Theme Core | 3/3 | ✓ Complete | 2026-02-12 |
 | 2. Theme Audit | 3/3 | ✓ Complete | 2026-02-12 |
 | 3. Foundation | 2/2 | ✓ Complete | 2026-02-12 |
-| 4. Service Layer | 0/2 | Not started | - |
+| 4. Service Layer | 2/2 | ✓ Complete | 2026-02-12 |
 | 5. API Routes | 0/TBD | Not started | - |
 | 6. UX Polish | 0/TBD | Not started | - |
 | 7. Performance | 0/TBD | Not started | - |
@@ -250,4 +250,4 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-12 (Phase 4 planned)*
+*Last updated: 2026-02-12 (Phase 4 complete)*
