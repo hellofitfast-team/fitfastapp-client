@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-12)
 
 **Core value:** Every user flow works reliably, looks polished, and feels consistent in both languages
-**Current focus:** Phase 1 - Theme Rebrand - Core Color Swap
+**Current focus:** Phase 1 complete — ready for Phase 2 or 3
 
 ## Current Position
 
@@ -55,7 +55,10 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+- [Phase 4/5] AI-generated meal/workout plans are in English even when user locale is Arabic — AI prompts need locale-aware generation
+- [Phase 4/5] Progress notes and safety tips stored in English in DB — same AI prompt issue
+- [Phase 10] Western numerals (0-9) displayed in Arabic view instead of Eastern Arabic numerals (٠-٩)
+- [Phase 10] Number formatting (times, stats, percentages) not locale-aware in Arabic mode
 
 ### Blockers/Concerns
 
