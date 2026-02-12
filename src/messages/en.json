@@ -162,6 +162,8 @@
     "submitCheckIn": "Submit Check-in",
     "checkInSuccess": "Check-in submitted successfully!",
     "newPlanGenerated": "Your new plans are being generated",
+    "planGenerationWarning": "Check-in saved! Plan generation is taking longer than expected. You'll see your new plans shortly.",
+    "planGenerationFailed": "Check-in saved, but we couldn't generate your plans right now. Your coach has been notified.",
     "optional": "Optional",
     "review": "Review Your Check-in",
     "wellbeingMetrics": "Wellbeing Metrics",

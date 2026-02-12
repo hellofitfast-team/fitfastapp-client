@@ -162,6 +162,8 @@
     "submitCheckIn": "إرسال المتابعة",
     "checkInSuccess": "تم إرسال المتابعة بنجاح!",
     "newPlanGenerated": "جاري إنشاء خططك الجديدة",
+    "planGenerationWarning": "تم حفظ التسجيل! جاري إعداد الخطة الخاصة بك. ستراها قريباً.",
+    "planGenerationFailed": "تم حفظ التسجيل، لكن لم نتمكن من إنشاء خططك الآن. تم إبلاغ مدربك.",
     "optional": "اختياري",
     "review": "راجع متابعتك",
     "wellbeingMetrics": "مقاييس الصحة",

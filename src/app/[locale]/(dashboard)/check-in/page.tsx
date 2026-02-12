@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, ArrowRight, Check, Upload, X, Weight, Dumbbell, UtensilsCrossed, Camera, ClipboardCheck, Loader2, Lock, Calendar } from "lucide-react";
+import * as Sentry from "@sentry/nextjs";
 
 const checkInSchema = z.object({
   weight: z.coerce.number().positive("Weight must be positive").min(20, "Weight seems too low").max(300, "Weight seems too high"),
@@ -132,7 +133,10 @@ export default function CheckInPage() {
           }
         }
       } catch (error) {
-        console.error("Error checking lock status:", error);
+        Sentry.captureException(error, {
+          tags: { feature: "check-in-lock-status" },
+          extra: { userId: user.id },
+        });
       } finally {
         setIsLoadingLockStatus(false);
       }
@@ -234,20 +238,52 @@ export default function CheckInPage() {
 
       if (checkInError) throw checkInError;
 
-      try {
-        await Promise.all([
-          fetch("/api/plans/meal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ checkInId: (checkInData as any).id }) }),
-          fetch("/api/plans/workout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ checkInId: (checkInData as any).id }) }),
-        ]);
-      } catch (planError) {
-        console.error("Plan generation error:", planError);
+      // RELY-05: user sees warning on failure
+      const [mealResponse, workoutResponse] = await Promise.all([
+        fetch("/api/plans/meal", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ checkInId: (checkInData as any).id }),
+        }).catch((err) => {
+          Sentry.captureException(err, {
+            tags: { feature: "plan-generation", planType: "meal" },
+            extra: { userId: user.id, checkInId: (checkInData as any).id },
+          });
+          return { ok: false } as Response;
+        }),
+        fetch("/api/plans/workout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ checkInId: (checkInData as any).id }),
+        }).catch((err) => {
+          Sentry.captureException(err, {
+            tags: { feature: "plan-generation", planType: "workout" },
+            extra: { userId: user.id, checkInId: (checkInData as any).id },
+          });
+          return { ok: false } as Response;
+        }),
+      ]);
+
+      if (!mealResponse.ok || !workoutResponse.ok) {
+        // RELY-05: Show clear warning to user that plans failed
+        toast({
+          title: t("checkInSuccess"),
+          description: t("planGenerationWarning"),
+        });
+      } else {
+        toast({
+          title: t("checkInSuccess"),
+          description: t("newPlanGenerated"),
+        });
       }
 
-      toast({ title: t("checkInSuccess"), description: t("newPlanGenerated") });
       router.push("/");
       router.refresh();
     } catch (error) {
-      console.error("Check-in submission error:", error);
+      Sentry.captureException(error, {
+        tags: { feature: "check-in-submission" },
+        extra: { userId: user.id },
+      });
       toast({ title: t("submissionFailed"), description: error instanceof Error ? error.message : t("tryAgain"), variant: "destructive" });
     } finally {
       setIsSubmitting(false);
