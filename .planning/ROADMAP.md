@@ -19,7 +19,7 @@ This milestone transforms FitFast from functionally complete to demo-ready. We s
 - [x] **Phase 2: Theme Rebrand - Visual Audit** - Verify all components and accessibility compliance
 - [x] **Phase 3: Hardening Foundation** - Create validation schemas, retry utilities, error infrastructure
 - [x] **Phase 4: Hardening Service Layer** - Wrap AI generation with retry and validation
-- [ ] **Phase 5: Hardening API Routes** - Add input validation, parallelization, comprehensive error handling
+- [x] **Phase 5: Hardening API Routes** - Add input validation, parallelization, comprehensive error handling
 - [ ] **Phase 6: UX Polish** - Consistent loading states, empty states, form validation, touch targets
 - [ ] **Phase 7: Performance Optimization** - Admin pagination, chart filters for scalability
 - [ ] **Phase 8: Component Refactoring** - Extract hooks, split large components, add error boundaries
@@ -127,10 +127,10 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Validation helper (validateRequestBody) + Zod schemas for all API routes
-- [ ] 05-02-PLAN.md — Apply validation to plan generation, ticket, and auth routes + Sentry
-- [ ] 05-03-PLAN.md — Apply validation to admin routes (OCR input+output, approve-signup, notifications)
-- [ ] 05-04-PLAN.md — Apply validation to notification routes + check-in RELY-05 plan generation warning
+- [x] 05-01-PLAN.md — Validation helper (validateRequestBody) + Zod schemas for all API routes
+- [x] 05-02-PLAN.md — Apply validation to plan generation, ticket, and auth routes + Sentry
+- [x] 05-03-PLAN.md — Apply validation to admin routes (OCR input+output, approve-signup, notifications)
+- [x] 05-04-PLAN.md — Apply validation to notification routes + check-in RELY-05 plan generation warning
 
 ### Phase 6: UX Polish
 **Goal**: Consistent, professional user experience across all pages with proper loading, error, and empty states
@@ -243,7 +243,7 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 | 2. Theme Audit | 3/3 | ✓ Complete | 2026-02-12 |
 | 3. Foundation | 2/2 | ✓ Complete | 2026-02-12 |
 | 4. Service Layer | 2/2 | ✓ Complete | 2026-02-12 |
-| 5. API Routes | 0/4 | Not started | - |
+| 5. API Routes | 4/4 | ✓ Complete | 2026-02-13 |
 | 6. UX Polish | 0/TBD | Not started | - |
 | 7. Performance | 0/TBD | Not started | - |
 | 8. Refactoring | 0/TBD | Not started | - |
@@ -252,4 +252,4 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-13 (Phase 5 planned)*
+*Last updated: 2026-02-13 (Phase 5 complete)*
