@@ -2,6 +2,9 @@ import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import type { PendingSignup } from "@/types/database";
 import { getOneSignalClient } from "@/lib/onesignal";
+import { validateRequestBody } from "@/lib/api-validation";
+import { ApproveSignupSchema } from "@/lib/api-validation/admin";
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -25,7 +28,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { signupId } = await request.json();
+  const body = await request.json();
+  const validation = validateRequestBody(body, ApproveSignupSchema, {
+    userId: user.id,
+    feature: "approve-signup",
+  });
+  if (!validation.success) return validation.response;
+  const { signupId } = validation.data;
 
   // Fetch the signup
   const { data: signup, error: fetchError } = await supabase
@@ -94,8 +103,12 @@ export async function POST(request: Request) {
       "Welcome to FitFast!",
       "Your account has been approved. Start your fitness journey now!"
     );
-  } catch {
-    // Never block response on notification failure
+  } catch (notifError) {
+    Sentry.captureException(notifError, {
+      level: "warning",
+      tags: { feature: "notification" },
+      extra: { coachId: user.id, newUserId: authData.user.id, action: "welcome-notification" },
+    });
   }
 
   return NextResponse.json({ success: true, userId: authData.user.id });

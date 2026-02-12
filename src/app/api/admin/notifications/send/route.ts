@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getOneSignalClient } from "@/lib/onesignal";
+import { validateRequestBody } from "@/lib/api-validation";
+import { SendNotificationSchema } from "@/lib/api-validation/admin";
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -24,14 +27,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { title, message, user_ids, send_to_all } = await request.json();
-
-  if (!title || !message) {
-    return NextResponse.json(
-      { error: "title and message are required" },
-      { status: 400 }
-    );
-  }
+  const body = await request.json();
+  const validation = validateRequestBody(body, SendNotificationSchema, {
+    userId: user.id,
+    feature: "send-notification",
+  });
+  if (!validation.success) return validation.response;
+  const { title, message, user_ids, send_to_all } = validation.data;
 
   try {
     const onesignal = getOneSignalClient();
@@ -41,17 +43,13 @@ export async function POST(request: Request) {
       return NextResponse.json(result);
     }
 
-    if (!user_ids || !Array.isArray(user_ids) || user_ids.length === 0) {
-      return NextResponse.json(
-        { error: "user_ids array is required when send_to_all is false" },
-        { status: 400 }
-      );
-    }
-
-    const result = await onesignal.sendToUsers(user_ids, title, message);
+    const result = await onesignal.sendToUsers(user_ids!, title, message);
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Error sending notification:", error);
+    Sentry.captureException(error, {
+      tags: { feature: "send-notification" },
+      extra: { coachId: user.id, send_to_all },
+    });
     return NextResponse.json(
       { error: "Failed to send notification" },
       { status: 500 }
