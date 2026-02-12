@@ -3,6 +3,9 @@
  * Uses DeepSeek V3 for meal and workout plan generation
  */
 
+import { withRetry, AIGenerationError } from "@/lib/errors";
+import * as Sentry from "@sentry/nextjs";
+
 export interface OpenRouterMessage {
   role: "system" | "user" | "assistant";
   content: string;
@@ -53,34 +56,81 @@ export class OpenRouterClient {
       model = MODEL,
     } = options;
 
-    const response = await fetch(OPENROUTER_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.apiKey}`,
-        "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-        "X-Title": "FitFast",
+    return withRetry(
+      async () => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+        try {
+          const response = await fetch(OPENROUTER_API_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${this.apiKey}`,
+              "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+              "X-Title": "FitFast",
+            },
+            body: JSON.stringify({
+              model,
+              messages,
+              temperature,
+              max_tokens,
+            }),
+            signal: controller.signal,
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new AIGenerationError(
+              `OpenRouter API error: ${response.status}`,
+              "openrouter",
+              new Error(errorText)
+            );
+          }
+
+          const data: OpenRouterResponse = await response.json();
+
+          if (!data.choices || data.choices.length === 0) {
+            throw new AIGenerationError(
+              "No response from OpenRouter",
+              "openrouter"
+            );
+          }
+
+          return data.choices[0].message.content;
+        } catch (error) {
+          if (error instanceof Error && error.name === "AbortError") {
+            throw new AIGenerationError(
+              "OpenRouter request timed out after 30s",
+              "openrouter"
+            );
+          }
+          throw error;
+        } finally {
+          clearTimeout(timeoutId);
+        }
       },
-      body: JSON.stringify({
-        model,
-        messages,
-        temperature,
-        max_tokens,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`OpenRouter API error: ${response.status} - ${error}`);
-    }
-
-    const data: OpenRouterResponse = await response.json();
-
-    if (!data.choices || data.choices.length === 0) {
-      throw new Error("No response from OpenRouter");
-    }
-
-    return data.choices[0].message.content;
+      {
+        maxAttempts: 3,
+        operationName: "openrouter-chat",
+        shouldRetry: (error) => {
+          // Don't retry on client errors (4xx)
+          if (error instanceof AIGenerationError) {
+            const message = error.message;
+            if (
+              message.includes("400") ||
+              message.includes("401") ||
+              message.includes("403") ||
+              message.includes("422")
+            ) {
+              return false;
+            }
+          }
+          // Retry on 5xx and network errors
+          return true;
+        },
+      }
+    );
   }
 
   /**
