@@ -17,6 +17,7 @@ export function OneSignalProvider() {
       serviceWorkerPath: "/OneSignalSDKWorker.js",
       allowLocalhostAsSecureOrigin: process.env.NODE_ENV === "development",
     }).catch((err) => {
+      if (String(err).includes("already initialized")) return;
       console.error("OneSignal init failed:", err);
     });
   }, []);
