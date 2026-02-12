@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useDashboardData } from "@/hooks/use-dashboard";
+import { cn } from "@/lib/utils/cn";
 
 // StatCard component with CSS-only hover states
 function StatCard({
@@ -114,7 +115,7 @@ export default function DashboardPage() {
   return (
     <div className="text-black overflow-x-hidden">
       {/* Top Banner */}
-      <div className="py-2 px-4 overflow-hidden" style={{ backgroundColor: "#000000", color: "#FFFEF5" }}>
+      <div className="py-2 px-4 overflow-hidden bg-black text-cream">
         <div className="animate-marquee whitespace-nowrap font-mono text-xs tracking-widest">
           {marquee}
         </div>
@@ -234,20 +235,23 @@ export default function DashboardPage() {
               </div>
               {dashboardData.todaysWorkout ? (
                 <div
-                  className="p-6"
-                  style={dashboardData.todaysWorkout.done ? { backgroundColor: "#000000", color: "#FFFEF5" } : undefined}
+                  className={cn("p-6", dashboardData.todaysWorkout.done && "bg-black text-cream")}
                 >
                   <div className="flex items-start justify-between mb-6">
                     <div>
                       <p
-                        className="font-mono text-xs tracking-[0.3em] mb-1"
-                        style={{ color: dashboardData.todaysWorkout.done ? "#a3a3a3" : "#737373" }}
+                        className={cn(
+                          "font-mono text-xs tracking-[0.3em] mb-1",
+                          dashboardData.todaysWorkout.done ? "text-neutral-400" : "text-neutral-500"
+                        )}
                       >
                         {dashboardData.todaysWorkout.type}
                       </p>
                       <h4
-                        className="text-3xl md:text-4xl font-black"
-                        style={{ color: dashboardData.todaysWorkout.done ? "#FFFEF5" : undefined }}
+                        className={cn(
+                          "text-3xl md:text-4xl font-black",
+                          dashboardData.todaysWorkout.done && "text-cream"
+                        )}
                       >
                         {dashboardData.todaysWorkout.name}
                       </h4>
@@ -260,35 +264,47 @@ export default function DashboardPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div
-                      className="border-4 p-4"
-                      style={{ borderColor: dashboardData.todaysWorkout.done ? "#FFFEF5" : "#000000" }}
+                      className={cn(
+                        "border-4 p-4",
+                        dashboardData.todaysWorkout.done ? "border-cream" : "border-black"
+                      )}
                     >
                       <p
-                        className="text-3xl md:text-4xl font-black"
-                        style={{ color: dashboardData.todaysWorkout.done ? "#FFFEF5" : undefined }}
+                        className={cn(
+                          "text-3xl md:text-4xl font-black",
+                          dashboardData.todaysWorkout.done && "text-cream"
+                        )}
                       >
                         {dashboardData.todaysWorkout.duration}
                       </p>
                       <p
-                        className="font-mono text-xs mt-1"
-                        style={{ color: dashboardData.todaysWorkout.done ? "#FFFEF5" : undefined }}
+                        className={cn(
+                          "font-mono text-xs mt-1",
+                          dashboardData.todaysWorkout.done && "text-cream"
+                        )}
                       >
                         {t("workouts.duration").toUpperCase()}
                       </p>
                     </div>
                     <div
-                      className="border-4 p-4"
-                      style={{ borderColor: dashboardData.todaysWorkout.done ? "#FFFEF5" : "#000000" }}
+                      className={cn(
+                        "border-4 p-4",
+                        dashboardData.todaysWorkout.done ? "border-cream" : "border-black"
+                      )}
                     >
                       <p
-                        className="text-3xl md:text-4xl font-black"
-                        style={{ color: dashboardData.todaysWorkout.done ? "#FFFEF5" : undefined }}
+                        className={cn(
+                          "text-3xl md:text-4xl font-black",
+                          dashboardData.todaysWorkout.done && "text-cream"
+                        )}
                       >
                         {dashboardData.todaysWorkout.exercises}
                       </p>
                       <p
-                        className="font-mono text-xs mt-1"
-                        style={{ color: dashboardData.todaysWorkout.done ? "#FFFEF5" : undefined }}
+                        className={cn(
+                          "font-mono text-xs mt-1",
+                          dashboardData.todaysWorkout.done && "text-cream"
+                        )}
                       >
                         {t("workouts.exercises").toUpperCase()}
                       </p>
@@ -352,15 +368,15 @@ export default function DashboardPage() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t-4 border-black px-6 py-4" style={{ backgroundColor: "#000000", color: "#FFFEF5" }}>
+      <div className="border-t-4 border-black px-6 py-4 bg-black text-cream">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="font-mono text-xs tracking-[0.3em]">
             {locale === "ar" ? `فيت فاست™ ${new Date().getFullYear()} • جميع الحقوق محفوظة` : `FITFAST™ ${new Date().getFullYear()} • ALL RIGHTS RESERVED`}
           </div>
           <div className="flex gap-8 font-mono text-xs tracking-[0.2em]">
-            <Link href="/faq" className="transition-colors hover:opacity-80" style={{ color: "#FFFEF5" }}>{t("nav.faq").toUpperCase()}</Link>
-            <Link href="/settings" className="transition-colors hover:opacity-80" style={{ color: "#FFFEF5" }}>{t("nav.settings").toUpperCase()}</Link>
-            <Link href="/tickets" className="transition-colors hover:opacity-80" style={{ color: "#FFFEF5" }}>{t("nav.tickets").toUpperCase()}</Link>
+            <Link href="/faq" className="text-cream transition-colors hover:opacity-80">{t("nav.faq").toUpperCase()}</Link>
+            <Link href="/settings" className="text-cream transition-colors hover:opacity-80">{t("nav.settings").toUpperCase()}</Link>
+            <Link href="/tickets" className="text-cream transition-colors hover:opacity-80">{t("nav.tickets").toUpperCase()}</Link>
           </div>
         </div>
       </div>
