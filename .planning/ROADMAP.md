@@ -102,11 +102,11 @@ Plans:
   4. Supabase query functions extracted to lib/supabase/queries/ for reusability
   5. Service layer errors include context (userId, action, timestamp) for debugging
 
-**Plans**: TBD (estimated 7-10 plans)
+**Plans:** 2 plans
 
 Plans:
-- [ ] 04-01: TBD after planning
-- [ ] 04-02: TBD after planning
+- [ ] 04-01-PLAN.md — OpenRouter retry + timeout, meal/workout generators with Zod validation and Sentry
+- [ ] 04-02-PLAN.md — Extract Supabase queries to lib/supabase/queries/, update plan API routes with Sentry context
 
 ### Phase 5: Hardening API Routes
 **Goal**: All API routes validate inputs, execute efficiently, and provide comprehensive error feedback
@@ -240,7 +240,7 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 | 1. Theme Core | 3/3 | ✓ Complete | 2026-02-12 |
 | 2. Theme Audit | 3/3 | ✓ Complete | 2026-02-12 |
 | 3. Foundation | 2/2 | ✓ Complete | 2026-02-12 |
-| 4. Service Layer | 0/TBD | Not started | - |
+| 4. Service Layer | 0/2 | Not started | - |
 | 5. API Routes | 0/TBD | Not started | - |
 | 6. UX Polish | 0/TBD | Not started | - |
 | 7. Performance | 0/TBD | Not started | - |
@@ -250,4 +250,4 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-12 (Phase 2 planned)*
+*Last updated: 2026-02-12 (Phase 4 planned)*
