@@ -28,9 +28,9 @@ const toastVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-[#FFFEF5] text-black",
-        destructive: "bg-[#FF3B00] text-white border-[#FF3B00]",
-        success: "bg-[#00FF94] text-black border-[#00FF94]",
+        default: "bg-cream text-black",
+        destructive: "bg-error-500 text-white border-error-500",
+        success: "bg-success-500 text-black border-success-500",
       },
     },
     defaultVariants: {
@@ -61,7 +61,7 @@ const ToastAction = React.forwardRef<
   <ToastPrimitives.Action
     ref={ref}
     className={cn(
-      "inline-flex h-10 shrink-0 items-center justify-center border-4 border-black bg-[#FFFEF5] px-4 text-sm font-black uppercase transition-colors hover:bg-black hover:text-[#FFFEF5] focus:outline-none focus:ring-4 focus:ring-[#FF3B00] disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-white group-[.destructive]:bg-white group-[.destructive]:text-[#FF3B00] group-[.destructive]:hover:bg-black group-[.destructive]:hover:text-white",
+      "inline-flex h-10 shrink-0 items-center justify-center border-4 border-black bg-cream px-4 text-sm font-black uppercase transition-colors hover:bg-black hover:text-cream focus:outline-none focus:ring-4 focus:ring-primary disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-white group-[.destructive]:bg-white group-[.destructive]:text-error-500 group-[.destructive]:hover:bg-black group-[.destructive]:hover:text-white",
       className
     )}
     {...props}
@@ -76,7 +76,7 @@ const ToastClose = React.forwardRef<
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
-      "absolute right-2 top-2 h-8 w-8 flex items-center justify-center border-2 border-black bg-transparent transition-colors hover:bg-black hover:text-[#FFFEF5] focus:outline-none focus:ring-2 focus:ring-[#FF3B00] group-[.destructive]:border-white group-[.destructive]:text-white group-[.destructive]:hover:bg-white group-[.destructive]:hover:text-[#FF3B00]",
+      "absolute right-2 top-2 h-8 w-8 flex items-center justify-center border-2 border-black bg-transparent transition-colors hover:bg-black hover:text-cream focus:outline-none focus:ring-2 focus:ring-primary group-[.destructive]:border-white group-[.destructive]:text-white group-[.destructive]:hover:bg-white group-[.destructive]:hover:text-error-500",
       className
     )}
     toast-close=""
