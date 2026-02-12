@@ -12,7 +12,7 @@ export default function DashboardLoading() {
           <div>
             <div className="h-3 w-32 bg-neutral-200 animate-pulse mb-2" />
             <div className="h-12 w-64 bg-neutral-200 animate-pulse mb-2" />
-            <div className="h-12 w-48 bg-[#FF3B00]/20 animate-pulse" />
+            <div className="h-12 w-48 bg-primary/20 animate-pulse" />
           </div>
           <div className="text-end">
             <div className="h-16 w-20 bg-neutral-200 animate-pulse ms-auto" />

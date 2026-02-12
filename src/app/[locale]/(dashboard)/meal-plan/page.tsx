@@ -54,8 +54,8 @@ export default function MealPlanPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="border-4 border-black bg-[#FFFEF5] p-12 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <div className="mx-auto w-12 h-12 border-4 border-black border-t-[#FF3B00] animate-spin mb-4" />
+        <div className="border-4 border-black bg-cream p-12 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <div className="mx-auto w-12 h-12 border-4 border-black border-t-primary animate-spin mb-4" />
           <p className="font-black uppercase">{tCommon("loading").toUpperCase()}</p>
         </div>
       </div>
@@ -67,23 +67,23 @@ export default function MealPlanPage() {
       <div className="space-y-6">
         <div className="border-4 border-black bg-black p-6">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center bg-[#FF3B00]">
+            <div className="flex h-12 w-12 items-center justify-center bg-primary">
               <UtensilsCrossed className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-black tracking-tight" style={{ color: '#FFFEF5' }}>
+              <h1 className="text-3xl font-black tracking-tight text-cream">
                 {t("title").toUpperCase()}
               </h1>
-              <p className="font-mono text-xs tracking-[0.2em]" style={{ color: '#00FF94' }}>
+              <p className="font-mono text-xs tracking-[0.2em] text-primary">
                 {t("getStarted").toUpperCase()}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
           <div className="p-12 text-center">
-            <div className="inline-flex h-20 w-20 items-center justify-center bg-[#FF3B00] mb-6">
+            <div className="inline-flex h-20 w-20 items-center justify-center bg-primary mb-6">
               <UtensilsCrossed className="h-10 w-10 text-white" />
             </div>
             <h3 className="text-2xl font-black tracking-tight">
@@ -95,7 +95,7 @@ export default function MealPlanPage() {
             <button
               onClick={handleGeneratePlan}
               disabled={generatingPlan}
-              className="mt-8 h-14 px-8 bg-black text-[#FFFEF5] font-black text-lg uppercase tracking-wide hover:bg-[#FF3B00] disabled:opacity-50 transition-colors flex items-center gap-3 mx-auto"
+              className="mt-8 h-14 px-8 bg-black text-cream font-black text-lg uppercase tracking-wide hover:bg-primary disabled:opacity-50 transition-colors flex items-center gap-3 mx-auto"
             >
               {generatingPlan ? (
                 <>
@@ -124,14 +124,14 @@ export default function MealPlanPage() {
       <div className="border-4 border-black bg-black p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center bg-[#FF3B00]">
+            <div className="flex h-12 w-12 items-center justify-center bg-primary">
               <UtensilsCrossed className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-black tracking-tight" style={{ color: '#FFFEF5' }}>
+              <h1 className="text-3xl font-black tracking-tight text-cream">
                 {t("title").toUpperCase()}
               </h1>
-              <p className="font-mono text-xs tracking-[0.2em]" style={{ color: '#00FF94' }}>
+              <p className="font-mono text-xs tracking-[0.2em] text-primary">
                 {mealPlan.start_date} - {mealPlan.end_date}
               </p>
             </div>
@@ -143,7 +143,7 @@ export default function MealPlanPage() {
             onMouseLeave={() => setHoveredNewPlanBtn(false)}
             className="h-12 px-6 text-black font-black text-sm uppercase tracking-wide disabled:opacity-50 transition-colors flex items-center gap-2"
             style={{
-              backgroundColor: hoveredNewPlanBtn ? '#00FF94' : '#FFFEF5'
+              backgroundColor: hoveredNewPlanBtn ? '#4169E1' : '#FFFEF5'
             }}
           >
             <Calendar className="h-4 w-4" />
@@ -153,21 +153,21 @@ export default function MealPlanPage() {
       </div>
 
       {/* Weekly Overview */}
-      <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-        <div className="border-b-4 border-black bg-[#00FF94] p-4 flex items-center gap-3">
+      <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <div className="border-b-4 border-black bg-primary p-4 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center bg-black">
-            <TrendingUp className="h-5 w-5" style={{ color: '#00FF94' }} />
+            <TrendingUp className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h2 className="font-black text-xl text-black tracking-tight">
+            <h2 className="font-black text-xl text-white tracking-tight">
               {t("weeklyOverview").toUpperCase()}
             </h2>
-            <p className="font-mono text-xs text-black/70">{t("nutritionSummary").toUpperCase()}</p>
+            <p className="font-mono text-xs text-white/80">{t("nutritionSummary").toUpperCase()}</p>
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4">
           <div className="p-6 text-center border-e-4 border-b-4 sm:border-b-0 border-black">
-            <p className="text-4xl font-black" style={{ color: '#FF3B00' }}>{planData.weeklyTotals.calories}</p>
+            <p className="text-4xl font-black text-primary">{planData.weeklyTotals.calories}</p>
             <p className="font-bold text-sm text-neutral-500 mt-1">{t("calories").toUpperCase()}</p>
           </div>
           <div className="p-6 text-center border-b-4 sm:border-b-0 sm:border-e-4 border-black">
@@ -193,10 +193,9 @@ export default function MealPlanPage() {
             onClick={() => setSelectedDay(day)}
             className={`flex-1 min-w-[80px] p-3 border-4 border-black -ms-1 first:ms-0 font-black text-sm transition-colors ${
               selectedDay === day
-                ? "bg-black z-10"
-                : "bg-[#FFFEF5] text-black hover:bg-neutral-100"
+                ? "bg-black text-primary z-10"
+                : "bg-cream text-black hover:bg-neutral-100"
             }`}
-            style={selectedDay === day ? { color: '#00FF94' } : undefined}
           >
             {/* Show short day name for English, full name for Arabic */}
             {locale === "ar" ? tDays(day as any) : tDays((day.slice(0, 3)) as any)}
@@ -208,7 +207,7 @@ export default function MealPlanPage() {
       {dayPlan && (
         <>
           {/* Daily Totals */}
-          <div className="border-4 border-black bg-[#FF3B00] p-4">
+          <div className="border-4 border-black bg-primary p-4">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <Flame className="h-6 w-6 text-white" />
@@ -226,10 +225,10 @@ export default function MealPlanPage() {
           {/* Meals */}
           <div className="space-y-0">
             {dayPlan.meals.map((meal, index) => (
-              <div key={index} className="border-4 border-black -mt-1 first:mt-0 bg-[#FFFEF5]">
+              <div key={index} className="border-4 border-black -mt-1 first:mt-0 bg-cream">
                 <div className="border-b-4 border-black bg-neutral-100 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center bg-black font-black text-sm" style={{ color: '#FFFEF5' }}>
+                    <div className="flex h-10 w-10 items-center justify-center bg-black font-black text-sm text-cream">
                       {String(index + 1).padStart(2, "0")}
                     </div>
                     <div>
@@ -241,13 +240,13 @@ export default function MealPlanPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="font-black" style={{ color: '#FF3B00' }}>{meal.calories} {t("kcal").toUpperCase()}</span>
+                    <span className="font-black text-primary">{meal.calories} {t("kcal").toUpperCase()}</span>
                     <button
                       onMouseEnter={() => setHoveredMealButtons({ ...hoveredMealButtons, [index]: true })}
                       onMouseLeave={() => setHoveredMealButtons({ ...hoveredMealButtons, [index]: false })}
                       className="h-10 w-10 border-4 border-black transition-colors flex items-center justify-center"
                       style={{
-                        backgroundColor: hoveredMealButtons[index] ? '#00FF94' : '#FFFEF5'
+                        backgroundColor: hoveredMealButtons[index] ? '#4169E1' : '#FFFEF5'
                       }}
                     >
                       <CheckCircle2 className="h-5 w-5" />
@@ -276,7 +275,7 @@ export default function MealPlanPage() {
                       <ul className="space-y-2 font-semibold text-base">
                         {meal.ingredients.map((ingredient, i) => (
                           <li key={i} className="flex items-start gap-2">
-                            <span className="font-black" style={{ color: '#FF3B00' }}>•</span>
+                            <span className="font-black text-primary">•</span>
                             {ingredient}
                           </li>
                         ))}
@@ -291,7 +290,7 @@ export default function MealPlanPage() {
                       <ol className="space-y-3 font-semibold text-base">
                         {meal.instructions.map((instruction, i) => (
                           <li key={i} className="flex items-start gap-3">
-                            <span className="flex h-7 w-7 shrink-0 items-center justify-center bg-black font-black text-sm" style={{ color: '#FFFEF5' }}>
+                            <span className="flex h-7 w-7 shrink-0 items-center justify-center bg-black font-black text-sm text-cream">
                               {i + 1}
                             </span>
                             {instruction}
@@ -305,11 +304,11 @@ export default function MealPlanPage() {
                   {meal.alternatives && meal.alternatives.length > 0 && (
                     <div>
                       <h4 className="font-black text-base uppercase mb-2">{t("alternatives")}</h4>
-                      <div className="border-4 border-dashed border-black bg-[#00FF94]/10 p-4">
+                      <div className="border-4 border-dashed border-black bg-primary/10 p-4">
                         <ul className="space-y-2 font-semibold text-base">
                           {meal.alternatives.map((alt, i) => (
                             <li key={i} className="flex items-start gap-2">
-                              <span className="font-black" style={{ color: '#00FF94' }}>↔</span>
+                              <span className="font-black text-primary">↔</span>
                               {alt}
                             </li>
                           ))}
@@ -326,8 +325,8 @@ export default function MealPlanPage() {
 
       {/* Notes */}
       {planData.notes && (
-        <div className="border-4 border-black bg-black text-[#FFFEF5] p-6">
-          <p className="font-mono text-xs tracking-[0.2em] text-[#00FF94] mb-2">{t("coachNotes").toUpperCase()}</p>
+        <div className="border-4 border-black bg-black text-cream p-6">
+          <p className="font-mono text-xs tracking-[0.2em] text-primary mb-2">{t("coachNotes").toUpperCase()}</p>
           <p className="font-mono text-sm">{planData.notes}</p>
         </div>
       )}

@@ -55,8 +55,8 @@ export default function WorkoutPlanPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="border-4 border-black bg-[#FFFEF5] p-12 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <div className="mx-auto w-12 h-12 border-4 border-black border-t-[#00FF94] animate-spin mb-4" />
+        <div className="border-4 border-black bg-cream p-12 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <div className="mx-auto w-12 h-12 border-4 border-black border-t-primary animate-spin mb-4" />
           <p className="font-black uppercase">{tCommon("loading").toUpperCase()}</p>
         </div>
       </div>
@@ -68,24 +68,24 @@ export default function WorkoutPlanPage() {
       <div className="space-y-6">
         <div className="border-4 border-black bg-black p-6">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center bg-[#00FF94]">
-              <Dumbbell className="h-6 w-6 text-black" />
+            <div className="flex h-12 w-12 items-center justify-center bg-primary">
+              <Dumbbell className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-black tracking-tight" style={{ color: '#FFFEF5' }}>
+              <h1 className="text-3xl font-black tracking-tight text-cream">
                 {t("title").toUpperCase()}
               </h1>
-              <p className="font-bold text-sm tracking-[0.2em]" style={{ color: '#00FF94' }}>
+              <p className="font-bold text-sm tracking-[0.2em] text-primary">
                 {t("getStarted").toUpperCase()}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
           <div className="p-12 text-center">
-            <div className="inline-flex h-20 w-20 items-center justify-center bg-[#00FF94] mb-6">
-              <Dumbbell className="h-10 w-10 text-black" />
+            <div className="inline-flex h-20 w-20 items-center justify-center bg-primary mb-6">
+              <Dumbbell className="h-10 w-10 text-white" />
             </div>
             <h3 className="text-2xl font-black tracking-tight">
               {t("noActivePlan").toUpperCase()}
@@ -100,8 +100,8 @@ export default function WorkoutPlanPage() {
               onMouseLeave={() => setHoveredGenerateBtn(false)}
               className="mt-8 h-14 px-8 font-black text-lg uppercase tracking-wide disabled:opacity-50 transition-colors flex items-center gap-3 mx-auto"
               style={{
-                backgroundColor: hoveredGenerateBtn ? '#00FF94' : '#000000',
-                color: hoveredGenerateBtn ? '#000000' : '#FFFEF5'
+                backgroundColor: hoveredGenerateBtn ? '#4169E1' : '#000000',
+                color: hoveredGenerateBtn ? '#FFFFFF' : '#FFFEF5'
               }}
             >
               {generatingPlan ? (
@@ -131,14 +131,14 @@ export default function WorkoutPlanPage() {
       <div className="border-4 border-black bg-black p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center bg-[#00FF94]">
-              <Dumbbell className="h-6 w-6 text-black" />
+            <div className="flex h-12 w-12 items-center justify-center bg-primary">
+              <Dumbbell className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-black tracking-tight" style={{ color: '#FFFEF5' }}>
+              <h1 className="text-3xl font-black tracking-tight text-cream">
                 {t("title").toUpperCase()}
               </h1>
-              <p className="font-bold text-sm" style={{ color: '#00FF94' }}>
+              <p className="font-bold text-sm text-primary">
                 {workoutPlan.start_date} - {workoutPlan.end_date}
               </p>
             </div>
@@ -150,7 +150,7 @@ export default function WorkoutPlanPage() {
             onMouseLeave={() => setHoveredNewPlanBtn(false)}
             className="h-12 px-6 text-black font-black text-sm uppercase tracking-wide disabled:opacity-50 transition-colors flex items-center gap-2"
             style={{
-              backgroundColor: hoveredNewPlanBtn ? '#00FF94' : '#FFFEF5'
+              backgroundColor: hoveredNewPlanBtn ? '#4169E1' : '#FFFEF5'
             }}
           >
             <Calendar className="h-4 w-4" />
@@ -169,12 +169,11 @@ export default function WorkoutPlanPage() {
               onClick={() => setSelectedDay(day)}
               className={`flex-1 min-w-[80px] p-3 border-4 border-black -ms-1 first:ms-0 font-black text-sm transition-colors ${
                 selectedDay === day
-                  ? "bg-black z-10"
+                  ? "bg-black text-primary z-10"
                   : isPlanRestDay
                   ? "bg-neutral-200 text-neutral-500"
-                  : "bg-[#FFFEF5] text-black hover:bg-neutral-100"
+                  : "bg-cream text-black hover:bg-neutral-100"
               }`}
-              style={selectedDay === day ? { color: '#00FF94' } : undefined}
             >
               {/* Show short day name for English, full name for Arabic */}
               <div>{locale === "ar" ? tDays(day as any) : tDays((day.slice(0, 3)) as any)}</div>
@@ -190,10 +189,10 @@ export default function WorkoutPlanPage() {
       {dayPlan && (
         <>
           {dayPlan.restDay ? (
-            <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
               <div className="border-b-4 border-black bg-neutral-200 p-4 flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center bg-black">
-                  <Info className="h-5 w-5" style={{ color: '#FFFEF5' }} />
+                  <Info className="h-5 w-5 text-cream" />
                 </div>
                 <h2 className="font-black text-xl text-black tracking-tight">
                   {t("restDay").toUpperCase()}
@@ -214,11 +213,11 @@ export default function WorkoutPlanPage() {
           ) : (
             <>
               {/* Workout Overview */}
-              <div className="border-4 border-black bg-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                <div className="border-b-4 border-black bg-[#FF3B00] p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                <div className="border-b-4 border-black bg-primary p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center bg-black">
-                      <Target className="h-5 w-5" style={{ color: '#FF3B00' }} />
+                      <Target className="h-5 w-5 text-primary" />
                     </div>
                     <div>
                       <h2 className="font-black text-xl text-white tracking-tight">
@@ -242,8 +241,8 @@ export default function WorkoutPlanPage() {
                     onMouseLeave={() => setHoveredStartBtn(false)}
                     className="w-full h-14 font-black text-lg uppercase tracking-wide transition-colors flex items-center justify-center gap-3"
                     style={{
-                      backgroundColor: hoveredStartBtn ? '#00FF94' : '#000000',
-                      color: hoveredStartBtn ? '#000000' : '#FFFEF5'
+                      backgroundColor: hoveredStartBtn ? '#4169E1' : '#000000',
+                      color: hoveredStartBtn ? '#FFFFFF' : '#FFFEF5'
                     }}
                   >
                     <Zap className="h-5 w-5" />
@@ -254,12 +253,12 @@ export default function WorkoutPlanPage() {
 
               {/* Warmup */}
               {dayPlan.warmup && (
-                <div className="border-4 border-black bg-[#FFFEF5]">
-                  <div className="border-b-4 border-black bg-[#00FF94] p-4 flex items-center gap-3">
+                <div className="border-4 border-black bg-cream">
+                  <div className="border-b-4 border-black bg-primary p-4 flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center bg-black">
-                      <span className="font-black text-[#00FF94]">W</span>
+                      <span className="font-black text-primary">W</span>
                     </div>
-                    <h3 className="font-black text-lg text-black tracking-tight">
+                    <h3 className="font-black text-lg text-white tracking-tight">
                       {t("warmup").toUpperCase()}
                     </h3>
                   </div>
@@ -284,12 +283,12 @@ export default function WorkoutPlanPage() {
               )}
 
               {/* Exercises */}
-              <div className="border-4 border-black bg-[#FFFEF5]">
+              <div className="border-4 border-black bg-cream">
                 <div className="border-b-4 border-black bg-black p-4 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center bg-[#FF3B00]">
+                  <div className="flex h-10 w-10 items-center justify-center bg-primary">
                     <Dumbbell className="h-5 w-5 text-white" />
                   </div>
-                  <h3 className="font-black text-lg text-[#FFFEF5] tracking-tight">
+                  <h3 className="font-black text-lg text-cream tracking-tight">
                     {t("exercises").toUpperCase()}
                   </h3>
                 </div>
@@ -298,7 +297,7 @@ export default function WorkoutPlanPage() {
                     <div key={index} className="p-5">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex items-start gap-4">
-                          <div className="flex h-12 w-12 shrink-0 items-center justify-center bg-black text-[#FFFEF5] font-black">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center bg-black text-cream font-black">
                             {String(index + 1).padStart(2, "0")}
                           </div>
                           <div>
@@ -306,7 +305,7 @@ export default function WorkoutPlanPage() {
                               {exercise.name.toUpperCase()}
                             </h4>
                             <div className="flex flex-wrap gap-3 mt-2 font-mono text-xs">
-                              <span className="px-2 py-1 border-2 border-black bg-[#FF3B00]/10 text-[#FF3B00]">
+                              <span className="px-2 py-1 border-2 border-black bg-primary/10 text-primary">
                                 {exercise.sets} {t("sets").toUpperCase()}
                               </span>
                               <span className="px-2 py-1 border-2 border-black bg-neutral-100">
@@ -316,7 +315,7 @@ export default function WorkoutPlanPage() {
                                 {t("rest").toUpperCase()}: {exercise.rest}S
                               </span>
                               {exercise.equipment && (
-                                <span className="px-2 py-1 border-2 border-black bg-[#00FF94]/10 uppercase">
+                                <span className="px-2 py-1 border-2 border-black bg-primary/10 uppercase">
                                   {exercise.equipment}
                                 </span>
                               )}
@@ -328,7 +327,7 @@ export default function WorkoutPlanPage() {
                             )}
                           </div>
                         </div>
-                        <button className="h-12 w-12 shrink-0 border-4 border-black bg-[#FFFEF5] hover:bg-[#00FF94] transition-colors flex items-center justify-center">
+                        <button className="h-12 w-12 shrink-0 border-4 border-black bg-cream hover:bg-primary transition-colors flex items-center justify-center">
                           <CheckCircle2 className="h-5 w-5" />
                         </button>
                       </div>
@@ -339,10 +338,10 @@ export default function WorkoutPlanPage() {
 
               {/* Cooldown */}
               {dayPlan.cooldown && (
-                <div className="border-4 border-black bg-[#FFFEF5]">
+                <div className="border-4 border-black bg-cream">
                   <div className="border-b-4 border-black bg-neutral-200 p-4 flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center bg-black">
-                      <span className="font-black text-[#FFFEF5]">C</span>
+                      <span className="font-black text-cream">C</span>
                     </div>
                     <h3 className="font-black text-lg text-black tracking-tight">
                       {t("cooldown").toUpperCase()}
@@ -374,15 +373,15 @@ export default function WorkoutPlanPage() {
 
       {/* Progression Notes */}
       {planData.progressionNotes && (
-        <div className="border-4 border-black bg-[#00FF94] p-6">
-          <p className="font-mono text-xs tracking-[0.2em] text-black/70 mb-2">{t("progressionNotes").toUpperCase()}</p>
-          <p className="font-black">{planData.progressionNotes}</p>
+        <div className="border-4 border-black bg-primary p-6">
+          <p className="font-mono text-xs tracking-[0.2em] text-white/80 mb-2">{t("progressionNotes").toUpperCase()}</p>
+          <p className="font-black text-white">{planData.progressionNotes}</p>
         </div>
       )}
 
       {/* Safety Tips */}
       {planData.safetyTips && planData.safetyTips.length > 0 && (
-        <div className="border-4 border-black bg-[#FF3B00] p-6">
+        <div className="border-4 border-black bg-error-500 p-6">
           <p className="font-mono text-xs tracking-[0.2em] text-white/70 mb-3">{t("safetyTips").toUpperCase()}</p>
           <ul className="space-y-2">
             {planData.safetyTips.map((tip, index) => (

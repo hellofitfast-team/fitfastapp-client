@@ -28,12 +28,12 @@ function StatCard({
   return (
     <div
       className={`group border-e-4 border-black p-6 transition-colors cursor-pointer ${
-        isOrange ? "hover:bg-[#FF3B00]" : "hover:bg-black"
-      } hover:text-[#FFFEF5] ${className}`}
+        isOrange ? "hover:bg-primary" : "hover:bg-black"
+      } hover:text-cream ${className}`}
     >
       <p
         className={`font-mono text-xs tracking-[0.3em] mb-2 transition-colors ${
-          isOrange ? "" : "group-hover:text-[#00FF94]"
+          isOrange ? "" : "group-hover:text-primary"
         }`}
       >
         {label}
@@ -41,7 +41,7 @@ function StatCard({
       <p className="text-4xl md:text-5xl font-black">
         {value}
         {suffix && (
-          <span className="text-neutral-400 group-hover:text-[#FFFEF5] transition-colors">{suffix}</span>
+          <span className="text-neutral-400 group-hover:text-cream transition-colors">{suffix}</span>
         )}
       </p>
     </div>
@@ -51,7 +51,7 @@ function StatCard({
 // ViewPlanButton with CSS-only hover
 function ViewPlanButton({ label }: { label: string }) {
   return (
-    <div className="p-6 border-b-4 lg:border-b-0 border-black transition-colors cursor-pointer hover:bg-black hover:text-[#FFFEF5]">
+    <div className="p-6 border-b-4 lg:border-b-0 border-black transition-colors cursor-pointer hover:bg-black hover:text-cream">
       <span className="font-black text-lg">{label}</span>
     </div>
   );
@@ -84,8 +84,8 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="border-4 border-black bg-[#FFFEF5] p-12 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <div className="mx-auto w-12 h-12 border-4 border-black border-t-[#FF3B00] animate-spin mb-4" />
+        <div className="border-4 border-black bg-cream p-12 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <div className="mx-auto w-12 h-12 border-4 border-black border-t-primary animate-spin mb-4" />
           <p className="font-black uppercase">{t("common.loading").toUpperCase()}</p>
         </div>
       </div>
@@ -96,8 +96,8 @@ export default function DashboardPage() {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="border-4 border-black bg-[#FFFEF5] p-12 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <p className="font-black text-[#FF3B00] uppercase">ERROR LOADING DASHBOARD</p>
+        <div className="border-4 border-black bg-cream p-12 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <p className="font-black text-error-500 uppercase">ERROR LOADING DASHBOARD</p>
         </div>
       </div>
     );
@@ -130,7 +130,7 @@ export default function DashboardPage() {
             <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none">
               {t("dashboard.welcome").toUpperCase().replace("!", "")}
               <br />
-              <span className="text-[#FF3B00]">{userName}</span>
+              <span className="text-primary">{userName}</span>
             </h1>
           </div>
           <div className="flex gap-8">
@@ -187,12 +187,12 @@ export default function DashboardPage() {
               <div
                 key={meal.id}
                 className={`group border-b-4 border-black flex transition-colors cursor-pointer ${
-                  meal.done ? "bg-neutral-100" : "hover:bg-[#FF3B00] hover:text-white"
+                  meal.done ? "bg-neutral-100" : "hover:bg-primary hover:text-white"
                 }`}
               >
                 <div
                   className={`w-20 md:w-24 border-e-4 border-black p-4 flex items-center justify-center font-mono text-sm ${
-                    meal.done ? "bg-black text-[#00FF94]" : ""
+                    meal.done ? "bg-black text-primary" : ""
                   }`}
                 >
                   {meal.time}
@@ -212,7 +212,7 @@ export default function DashboardPage() {
                           : "border-black group-hover:border-white"
                       }`}
                     >
-                      {meal.done && <span className="block w-full h-full bg-[#00FF94]" />}
+                      {meal.done && <span className="block w-full h-full bg-primary" />}
                     </div>
                   </div>
                 </div>
@@ -253,7 +253,7 @@ export default function DashboardPage() {
                       </h4>
                     </div>
                     {dashboardData.todaysWorkout.done && (
-                      <div style={{ backgroundColor: "#00FF94", color: "#000000" }} className="px-3 py-1 font-mono text-xs font-bold">
+                      <div className="px-3 py-1 font-mono text-xs font-bold bg-primary text-black">
                         {t("dashboard.completedToday").toUpperCase()}
                       </div>
                     )}
@@ -296,12 +296,11 @@ export default function DashboardPage() {
                   </div>
                   <Link href="/workout-plan">
                     <button
-                      className="w-full mt-6 py-4 font-black text-xl transition-all"
-                      style={
+                      className={`w-full mt-6 py-4 font-black text-xl transition-all ${
                         dashboardData.todaysWorkout.done
-                          ? { backgroundColor: "#FFFEF5", color: "#000000" }
-                          : { backgroundColor: "#FF3B00", color: "#FFFFFF" }
-                      }
+                          ? "bg-cream text-black"
+                          : "bg-primary text-white"
+                      }`}
                     >
                       {dashboardData.todaysWorkout.done ? t("dashboard.viewPlan").toUpperCase() : t("dashboard.startWorkout").toUpperCase()} {locale === "ar" ? "←" : "→"}
                     </button>
@@ -311,7 +310,7 @@ export default function DashboardPage() {
                 <div className="p-12 text-center">
                   <p className="font-black text-xl text-neutral-400">{locale === "ar" ? "يوم راحة أو لا يوجد تمرين اليوم" : "REST DAY OR NO WORKOUT TODAY"}</p>
                   <Link href="/workout-plan" className="inline-block mt-4">
-                    <button className="px-6 py-3 bg-black text-[#FFFEF5] font-black text-sm uppercase">
+                    <button className="px-6 py-3 bg-black text-cream font-black text-sm uppercase">
                       {t("dashboard.viewPlan").toUpperCase()} {locale === "ar" ? "←" : "→"}
                     </button>
                   </Link>
@@ -321,14 +320,14 @@ export default function DashboardPage() {
 
             {/* Quick Actions */}
             <div className="grid grid-cols-2">
-              <Link href="/check-in" className="border-e-4 border-b-4 border-black p-6 md:p-8 text-start hover:bg-black hover:text-[#FFFEF5] transition-colors group">
+              <Link href="/check-in" className="border-e-4 border-b-4 border-black p-6 md:p-8 text-start hover:bg-black hover:text-cream transition-colors group">
                 <ClipboardCheck className="w-10 h-10 md:w-12 md:h-12 mb-4 group-hover:animate-bounce" />
                 <span className="font-black text-lg md:text-xl block">{t("checkIn.submitCheckIn").toUpperCase()}</span>
                 <span className="block font-mono text-xs mt-1 text-neutral-500 group-hover:text-neutral-400">
                   {t("checkIn.title").toUpperCase()}
                 </span>
               </Link>
-              <Link href="/progress" className="border-b-4 border-black p-6 md:p-8 text-start hover:bg-[#FF3B00] hover:text-white transition-colors group">
+              <Link href="/progress" className="border-b-4 border-black p-6 md:p-8 text-start hover:bg-primary hover:text-white transition-colors group">
                 <TrendingUp className="w-10 h-10 md:w-12 md:h-12 mb-4 group-hover:animate-bounce" />
                 <span className="font-black text-lg md:text-xl block">{t("progress.title").toUpperCase()}</span>
                 <span className="block font-mono text-xs mt-1 text-neutral-500 group-hover:text-neutral-200">
@@ -338,12 +337,12 @@ export default function DashboardPage() {
             </div>
 
             {/* Motivational Block */}
-            <div className="p-6 md:p-8" style={{ backgroundColor: "#000000", color: "#FFFEF5" }}>
-              <p className="font-mono text-xs tracking-[0.5em] mb-4" style={{ color: "#00FF94" }}>{motivational.reminder}</p>
+            <div className="p-6 md:p-8 bg-black text-cream">
+              <p className="font-mono text-xs tracking-[0.5em] mb-4 text-primary">{motivational.reminder}</p>
               <p className="text-2xl md:text-3xl font-black leading-tight">
                 {motivational.line1}
                 <br />
-                <span style={{ color: "#FF3B00" }}>{motivational.line2}</span>
+                <span className="text-primary">{motivational.line2}</span>
                 <br />
                 {motivational.line3}
               </p>

@@ -4,7 +4,7 @@ export default function MealPlanLoading() {
       {/* Header skeleton */}
       <div className="border-4 border-black bg-black p-6">
         <div className="flex items-center gap-4">
-          <div className="h-12 w-12 bg-[#00FF94]/30 animate-pulse" />
+          <div className="h-12 w-12 bg-primary/30 animate-pulse" />
           <div>
             <div className="h-8 w-48 bg-neutral-700 animate-pulse mb-2" />
             <div className="h-3 w-32 bg-neutral-700 animate-pulse" />
