@@ -1,8 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import type { Profile, InitialAssessment } from "@/types/database";
+import * as Sentry from "@sentry/nextjs";
 
 export async function GET() {
+  let userId: string | undefined;
+
   try {
     const supabase = await createClient();
 
@@ -11,6 +14,8 @@ export async function GET() {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser();
+
+    userId = user?.id;
 
     if (authError || !user) {
       return NextResponse.json(
@@ -104,7 +109,10 @@ export async function GET() {
       canAccessDashboard,
     });
   } catch (error) {
-    console.error("Profile API error:", error);
+    Sentry.captureException(error, {
+      tags: { feature: "profile" },
+      extra: { userId },
+    });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

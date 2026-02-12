@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST() {
   try {
@@ -14,7 +15,9 @@ export async function POST() {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Logout error:", error);
+    Sentry.captureException(error, {
+      tags: { feature: "logout" },
+    });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

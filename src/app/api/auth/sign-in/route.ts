@@ -1,16 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { validateRequestBody, SignInSchema } from "@/lib/api-validation";
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST(request: Request) {
   try {
-    const { email, locale = "en" } = await request.json();
-
-    if (!email) {
-      return NextResponse.json(
-        { error: "Email is required" },
-        { status: 400 }
-      );
-    }
+    const body = await request.json();
+    const validation = validateRequestBody(body, SignInSchema, {
+      feature: "sign-in",
+    });
+    if (!validation.success) return validation.response;
+    const { email, locale } = validation.data;
 
     const supabase = await createClient();
     const { origin } = new URL(request.url);
@@ -24,7 +24,11 @@ export async function POST(request: Request) {
     });
 
     if (error) {
-      console.error("Sign-in error:", error);
+      Sentry.captureException(error, {
+        level: "warning",
+        tags: { feature: "sign-in" },
+        extra: { email },
+      });
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
@@ -33,7 +37,10 @@ export async function POST(request: Request) {
       message: "Check your email for the magic link"
     });
   } catch (error) {
-    console.error("Sign-in API error:", error);
+    Sentry.captureException(error, {
+      tags: { feature: "sign-in" },
+      extra: { email: "unknown" },
+    });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
