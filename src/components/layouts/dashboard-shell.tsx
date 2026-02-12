@@ -15,7 +15,7 @@ export function DashboardShell({ children, userName }: DashboardShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#FFFEF5] text-black selection:bg-black selection:text-[#FFFEF5]">
+    <div className="flex min-h-screen bg-cream text-black selection:bg-black selection:text-cream">
       {/* Noise texture overlay */}
       <div
         className="fixed inset-0 pointer-events-none opacity-[0.03] z-0"

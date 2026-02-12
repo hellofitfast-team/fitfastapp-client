@@ -71,11 +71,11 @@ export function InstallPrompt() {
   if (dismissed || (!deferredPrompt && !showIos)) return null;
 
   return (
-    <div className="fixed bottom-4 inset-x-4 z-50 mx-auto max-w-md border-4 border-black bg-black text-[#FFFEF5] shadow-[8px_8px_0px_0px_rgba(0,255,148,0.3)]">
+    <div className="fixed bottom-4 inset-x-4 z-50 mx-auto max-w-md border-4 border-black bg-black text-cream shadow-[8px_8px_0px_0px_rgba(0,255,148,0.3)]">
       <div className="p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#00FF94]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-primary">
               {showIos ? (
                 <Share className="h-5 w-5 text-black" />
               ) : (
@@ -104,13 +104,13 @@ export function InstallPrompt() {
           <div className="mt-3 flex gap-2">
             <button
               onClick={handleInstall}
-              className="flex-1 h-10 bg-[#00FF94] text-black font-black text-xs uppercase tracking-wide hover:bg-[#00cc78] transition-colors"
+              className="flex-1 h-10 bg-primary text-black font-black text-xs uppercase tracking-wide hover:bg-primary-dark transition-colors"
             >
               {t("installButton")}
             </button>
             <button
               onClick={dismiss}
-              className="h-10 px-4 border-2 border-neutral-600 font-bold text-xs uppercase tracking-wide text-neutral-400 hover:border-neutral-400 hover:text-[#FFFEF5] transition-colors"
+              className="h-10 px-4 border-2 border-neutral-600 font-bold text-xs uppercase tracking-wide text-neutral-400 hover:border-neutral-400 hover:text-cream transition-colors"
             >
               {t("dismissButton")}
             </button>

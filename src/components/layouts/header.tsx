@@ -30,12 +30,12 @@ export function Header({ onMenuClick, userName }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 h-16 border-b-4 border-black bg-[#FFFEF5]">
+    <header className="sticky top-0 z-40 h-16 border-b-4 border-black bg-cream">
       <div className="flex h-full items-center justify-between px-4 lg:px-6">
         {/* Left side - Menu button (mobile only) */}
         <div className="flex items-center">
           <button
-            className="flex h-10 w-10 items-center justify-center border-4 border-black bg-[#FFFEF5] hover:bg-black hover:text-[#FFFEF5] transition-colors lg:hidden"
+            className="flex h-10 w-10 items-center justify-center border-4 border-black bg-cream hover:bg-black hover:text-cream transition-colors lg:hidden"
             onClick={onMenuClick}
             aria-label="Toggle menu"
           >
@@ -47,7 +47,7 @@ export function Header({ onMenuClick, userName }: HeaderProps) {
         <div className="flex items-center gap-2">
           {/* Language Switcher */}
           <button
-            className="flex h-10 w-10 items-center justify-center border-4 border-black bg-[#FFFEF5] font-mono text-xs font-bold hover:bg-black hover:text-[#00FF94] transition-colors"
+            className="flex h-10 w-10 items-center justify-center border-4 border-black bg-cream font-mono text-xs font-bold hover:bg-black hover:text-primary transition-colors"
             onClick={switchLocale}
             aria-label="Switch language"
           >
@@ -56,7 +56,7 @@ export function Header({ onMenuClick, userName }: HeaderProps) {
 
           {/* Notifications */}
           <button
-            className="flex h-10 w-10 items-center justify-center border-4 border-black bg-[#FFFEF5] hover:bg-[#FF3B00] hover:text-white hover:border-[#FF3B00] transition-colors"
+            className="flex h-10 w-10 items-center justify-center border-4 border-black bg-cream hover:bg-primary hover:text-white hover:border-primary transition-colors"
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5" />
@@ -66,7 +66,7 @@ export function Header({ onMenuClick, userName }: HeaderProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="flex items-center gap-2 border-4 border-black bg-[#FFFEF5] px-3 h-10 hover:bg-black hover:text-[#FFFEF5] transition-colors"
+                className="flex items-center gap-2 border-4 border-black bg-cream px-3 h-10 hover:bg-black hover:text-cream transition-colors"
                 aria-label="User menu"
               >
                 <User className="h-5 w-5" />
@@ -79,19 +79,19 @@ export function Header({ onMenuClick, userName }: HeaderProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-48 border-4 border-black rounded-none bg-[#FFFEF5] p-0 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+              className="w-48 border-4 border-black rounded-none bg-cream p-0 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
             >
               <DropdownMenuItem asChild className="rounded-none">
                 <Link
                   href="/settings"
-                  className="flex items-center gap-2 px-4 py-3 font-bold uppercase text-sm hover:bg-black hover:text-[#FFFEF5] cursor-pointer"
+                  className="flex items-center gap-2 px-4 py-3 font-bold uppercase text-sm hover:bg-black hover:text-cream cursor-pointer"
                 >
                   <Settings className="h-4 w-4" />
                   {t("nav.settings")}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-black h-[2px] m-0" />
-              <DropdownMenuItem className="flex items-center gap-2 px-4 py-3 font-bold uppercase text-sm text-[#FF3B00] hover:bg-[#FF3B00] hover:text-white cursor-pointer rounded-none">
+              <DropdownMenuItem className="flex items-center gap-2 px-4 py-3 font-bold uppercase text-sm text-primary hover:bg-primary hover:text-white cursor-pointer rounded-none">
                 <LogOut className="h-4 w-4" />
                 {t("auth.logout")}
               </DropdownMenuItem>

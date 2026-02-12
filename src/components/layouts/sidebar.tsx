@@ -41,8 +41,8 @@ function NavItem({
         className={cn(
           "flex items-center gap-4 border-b-2 border-black/10 px-6 py-4 font-bold uppercase text-sm tracking-wide transition-colors",
           isActive
-            ? "bg-black text-[#00FF94]"
-            : "hover:bg-black hover:text-[#FFFEF5]"
+            ? "bg-black text-primary"
+            : "hover:bg-black hover:text-cream"
         )}
       >
         <Icon className="h-5 w-5 shrink-0" />
@@ -55,7 +55,7 @@ function NavItem({
 function CloseButton({ onClick }: { onClick?: () => void }) {
   return (
     <button
-      className="flex h-10 w-10 items-center justify-center border-4 border-black hover:bg-black hover:text-[#FFFEF5] transition-colors"
+      className="flex h-10 w-10 items-center justify-center border-4 border-black hover:bg-black hover:text-cream transition-colors"
       onClick={onClick}
     >
       <X className="h-5 w-5" />
@@ -103,7 +103,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
       <aside
         className={cn(
           // Base styles
-          "flex w-72 flex-col border-e-4 border-black bg-[#FFFEF5] transition-transform duration-300",
+          "flex w-72 flex-col border-e-4 border-black bg-cream transition-transform duration-300",
           // Mobile: fixed positioning with transforms
           "fixed inset-y-0 start-0 z-50",
           // Desktop: relative positioning, always visible
@@ -166,11 +166,11 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
         </nav>
 
         {/* Footer */}
-        <div className="border-t-4 border-black p-4" style={{ backgroundColor: "#000000", color: "#FFFEF5" }}>
+        <div className="border-t-4 border-black p-4 bg-black text-cream">
           <p className="font-mono text-xs tracking-[0.2em]">
             {tBrand("name").toUpperCase()}™ V1.0.0
           </p>
-          <p className="font-mono text-[10px] tracking-[0.15em] mt-1" style={{ color: "#00FF94" }}>
+          <p className="font-mono text-[10px] tracking-[0.15em] mt-1 text-primary">
             {tBrand("tagline").toUpperCase()}
           </p>
         </div>
