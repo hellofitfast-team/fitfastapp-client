@@ -41,11 +41,12 @@ This milestone transforms FitFast from functionally complete to demo-ready. We s
   3. PWA manifest theme_color and meta tags reflect Royal Blue
   4. No hardcoded orange/green color values remain in codebase (verified via grep)
 
-**Plans**: TBD (estimated 5-8 plans)
+**Plans:** 3 plans
 
 Plans:
-- [ ] 01-01: TBD after planning
-- [ ] 01-02: TBD after planning
+- [ ] 01-01-PLAN.md — CSS foundation + PWA config + UI component library color swap
+- [ ] 01-02-PLAN.md — Auth pages, onboarding pages, and shared layout components color swap
+- [ ] 01-03-PLAN.md — Dashboard pages color swap + final codebase verification
 
 ### Phase 2: Theme Rebrand - Visual Audit
 **Goal**: All components verified to render correctly with Royal Blue theme and meet accessibility standards
@@ -235,7 +236,7 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Theme Core | 0/TBD | Not started | - |
+| 1. Theme Core | 0/3 | Planned | - |
 | 2. Theme Audit | 0/TBD | Not started | - |
 | 3. Foundation | 0/TBD | Not started | - |
 | 4. Service Layer | 0/TBD | Not started | - |
