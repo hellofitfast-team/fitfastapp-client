@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { validateRequestBody } from "@/lib/api-validation";
+import { SubscriptionSchema, UnsubscribeSchema } from "@/lib/api-validation";
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -12,14 +15,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { onesignal_subscription_id, device_type } = await request.json();
-
-  if (!onesignal_subscription_id) {
-    return NextResponse.json(
-      { error: "onesignal_subscription_id is required" },
-      { status: 400 }
-    );
-  }
+  const body = await request.json();
+  const validation = validateRequestBody(body, SubscriptionSchema, {
+    userId: user.id,
+    feature: "push-subscription",
+  });
+  if (!validation.success) return validation.response;
+  const { onesignal_subscription_id, device_type } = validation.data;
 
   // Upsert: check if subscription already exists
   const { data: existing } = await supabase
@@ -50,7 +52,10 @@ export async function POST(request: Request) {
     .single<{ id: string }>();
 
   if (error) {
-    console.error("Error saving subscription:", error);
+    Sentry.captureException(error, {
+      tags: { feature: "push-subscription" },
+      extra: { userId: user.id, action: "save-subscription" },
+    });
     return NextResponse.json(
       { error: "Failed to save subscription" },
       { status: 500 }
@@ -71,14 +76,13 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { onesignal_subscription_id } = await request.json();
-
-  if (!onesignal_subscription_id) {
-    return NextResponse.json(
-      { error: "onesignal_subscription_id is required" },
-      { status: 400 }
-    );
-  }
+  const body = await request.json();
+  const validation = validateRequestBody(body, UnsubscribeSchema, {
+    userId: user.id,
+    feature: "push-unsubscribe",
+  });
+  if (!validation.success) return validation.response;
+  const { onesignal_subscription_id } = validation.data;
 
   // Soft-deactivate
   await supabase

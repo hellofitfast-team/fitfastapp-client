@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { validateRequestBody } from "@/lib/api-validation";
+import { ReminderTimeSchema } from "@/lib/api-validation";
+import * as Sentry from "@sentry/nextjs";
 
 export async function GET() {
   const supabase = await createClient();
@@ -40,15 +43,13 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { reminder_time } = await request.json();
-
-  // Validate HH:MM format
-  if (!reminder_time || !/^\d{2}:\d{2}$/.test(reminder_time)) {
-    return NextResponse.json(
-      { error: "Invalid time format. Use HH:MM" },
-      { status: 400 }
-    );
-  }
+  const body = await request.json();
+  const validation = validateRequestBody(body, ReminderTimeSchema, {
+    userId: user.id,
+    feature: "reminder-time",
+  });
+  if (!validation.success) return validation.response;
+  const { reminder_time } = validation.data;
 
   const { error } = await supabase
     .from("profiles")
@@ -56,7 +57,10 @@ export async function PUT(request: Request) {
     .eq("id", user.id);
 
   if (error) {
-    console.error("Error updating reminder time:", error);
+    Sentry.captureException(error, {
+      tags: { feature: "reminder-time" },
+      extra: { userId: user.id, action: "update-reminder" },
+    });
     return NextResponse.json(
       { error: "Failed to update reminder time" },
       { status: 500 }
