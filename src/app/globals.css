@@ -7,8 +7,16 @@
   /* Brutalist Color Palette */
   --color-cream: #FFFEF5;
   --color-black: #000000;
-  --color-orange: #FF3B00;
-  --color-green: #00FF94;
+  --color-brand-orange: #FF3B00;
+  --color-brand-green: #00FF94;
+
+  /* Primary Theme - Royal Blue */
+  --color-primary: #4169E1;
+  --color-primary-foreground: #FFFEF5;
+  --color-primary-light: #5A82F0;
+  --color-primary-dark: #2952B3;
+  --color-accent: #4169E1;
+  --color-accent-foreground: #FFFEF5;
 
   /* Neutral Colors */
   --color-neutral-50: #fafafa;
@@ -42,7 +50,7 @@
   --color-muted-foreground: var(--color-neutral-600);
   --color-border: #000000;
   --color-input: #000000;
-  --color-ring: #FF3B00;
+  --color-ring: #4169E1;
 
   /* Fonts - Cairo for Arabic, System fonts for English, Outfit for admin headings */
   --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -172,7 +180,7 @@
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-orange);
+    background: var(--color-primary);
   }
 }
 
