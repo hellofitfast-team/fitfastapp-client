@@ -1,5 +1,8 @@
 import { getOpenRouterClient } from "./openrouter";
 import type { InitialAssessment, Profile, CheckIn } from "@/types/database";
+import { validateWorkoutPlanResponse, type ValidatedWorkoutPlan } from "@/lib/validation";
+import { AIGenerationError, ValidationError } from "@/lib/errors";
+import * as Sentry from "@sentry/nextjs";
 
 export interface WorkoutPlanGenerationParams {
   profile: Profile;
@@ -9,6 +12,7 @@ export interface WorkoutPlanGenerationParams {
   planDuration?: number; // days
 }
 
+/** @deprecated Use ValidatedWorkoutPlan from @/lib/validation instead */
 export interface GeneratedWorkoutPlan {
   weeklyPlan: {
     [day: string]: {
@@ -47,7 +51,7 @@ export interface GeneratedWorkoutPlan {
 
 export async function generateWorkoutPlan(
   params: WorkoutPlanGenerationParams
-): Promise<GeneratedWorkoutPlan> {
+): Promise<ValidatedWorkoutPlan> {
   const { profile, assessment, checkIn, language, planDuration = 7 } = params;
 
   const isArabic = language === "ar";
@@ -145,17 +149,34 @@ Return a JSON object with this exact structure:
       max_tokens: 6000,
     });
 
-    // Parse the JSON response
-    const cleanedResponse = response
-      .replace(/```json\n?/g, "")
-      .replace(/```\n?/g, "")
-      .trim();
-
-    const workoutPlan: GeneratedWorkoutPlan = JSON.parse(cleanedResponse);
-
-    return workoutPlan;
+    // Validate with Zod (handles JSON cleaning, parsing, and schema validation)
+    const validatedPlan = validateWorkoutPlanResponse(response);
+    return validatedPlan;
   } catch (error) {
-    console.error("Workout plan generation error:", error);
-    throw new Error("Failed to generate workout plan");
+    Sentry.captureException(error, {
+      tags: {
+        feature: "workout-plan-generation",
+        language,
+      },
+      extra: {
+        userId: profile.id,
+        planDuration,
+        hasCheckIn: !!checkIn,
+        action: "generate-workout-plan",
+        timestamp: new Date().toISOString(),
+      },
+    });
+
+    // Wrap ValidationError in AIGenerationError for consistent error type
+    if (error instanceof ValidationError) {
+      throw new AIGenerationError(
+        `AI generated invalid workout plan: ${error.message}`,
+        "openrouter",
+        error
+      );
+    }
+
+    // RetryError, AIGenerationError bubble up as-is
+    throw error;
   }
 }
