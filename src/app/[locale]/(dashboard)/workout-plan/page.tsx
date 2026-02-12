@@ -16,9 +16,6 @@ export default function WorkoutPlanPage() {
   const { workoutPlan, isLoading, error } = useCurrentWorkoutPlan(user?.id);
   const [selectedDay, setSelectedDay] = useState("monday");
   const [generatingPlan, setGeneratingPlan] = useState(false);
-  const [hoveredGenerateBtn, setHoveredGenerateBtn] = useState(false);
-  const [hoveredNewPlanBtn, setHoveredNewPlanBtn] = useState(false);
-  const [hoveredStartBtn, setHoveredStartBtn] = useState(false);
 
   const weekDays = [
     "monday",
@@ -96,13 +93,7 @@ export default function WorkoutPlanPage() {
             <button
               onClick={handleGeneratePlan}
               disabled={generatingPlan}
-              onMouseEnter={() => setHoveredGenerateBtn(true)}
-              onMouseLeave={() => setHoveredGenerateBtn(false)}
-              className="mt-8 h-14 px-8 font-black text-lg uppercase tracking-wide disabled:opacity-50 transition-colors flex items-center gap-3 mx-auto"
-              style={{
-                backgroundColor: hoveredGenerateBtn ? '#4169E1' : '#000000',
-                color: hoveredGenerateBtn ? '#FFFFFF' : '#FFFEF5'
-              }}
+              className="mt-8 h-14 px-8 bg-black text-cream hover:bg-primary hover:text-white font-black text-lg uppercase tracking-wide disabled:opacity-50 transition-colors flex items-center gap-3 mx-auto"
             >
               {generatingPlan ? (
                 <>
@@ -146,12 +137,7 @@ export default function WorkoutPlanPage() {
           <button
             onClick={handleGeneratePlan}
             disabled={generatingPlan}
-            onMouseEnter={() => setHoveredNewPlanBtn(true)}
-            onMouseLeave={() => setHoveredNewPlanBtn(false)}
-            className="h-12 px-6 text-black font-black text-sm uppercase tracking-wide disabled:opacity-50 transition-colors flex items-center gap-2"
-            style={{
-              backgroundColor: hoveredNewPlanBtn ? '#4169E1' : '#FFFEF5'
-            }}
+            className="h-12 px-6 bg-cream text-black hover:bg-primary hover:text-cream font-black text-sm uppercase tracking-wide disabled:opacity-50 transition-colors flex items-center gap-2"
           >
             <Calendar className="h-4 w-4" />
             {generatingPlan ? t("generating").toUpperCase() : t("newPlan").toUpperCase()}
@@ -237,13 +223,7 @@ export default function WorkoutPlanPage() {
                 </div>
                 <div className="p-4">
                   <button
-                    onMouseEnter={() => setHoveredStartBtn(true)}
-                    onMouseLeave={() => setHoveredStartBtn(false)}
-                    className="w-full h-14 font-black text-lg uppercase tracking-wide transition-colors flex items-center justify-center gap-3"
-                    style={{
-                      backgroundColor: hoveredStartBtn ? '#4169E1' : '#000000',
-                      color: hoveredStartBtn ? '#FFFFFF' : '#FFFEF5'
-                    }}
+                    className="w-full h-14 bg-black text-cream hover:bg-primary hover:text-white font-black text-lg uppercase tracking-wide transition-colors flex items-center justify-center gap-3"
                   >
                     <Zap className="h-5 w-5" />
                     {t("startWorkout").toUpperCase()}

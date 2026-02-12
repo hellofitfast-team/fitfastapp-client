@@ -16,8 +16,6 @@ export default function MealPlanPage() {
   const { mealPlan, isLoading, error } = useCurrentMealPlan(user?.id);
   const [selectedDay, setSelectedDay] = useState("monday");
   const [generatingPlan, setGeneratingPlan] = useState(false);
-  const [hoveredNewPlanBtn, setHoveredNewPlanBtn] = useState(false);
-  const [hoveredMealButtons, setHoveredMealButtons] = useState<{ [key: number]: boolean }>({});
 
   const weekDays = [
     "monday",
@@ -139,12 +137,7 @@ export default function MealPlanPage() {
           <button
             onClick={handleGeneratePlan}
             disabled={generatingPlan}
-            onMouseEnter={() => setHoveredNewPlanBtn(true)}
-            onMouseLeave={() => setHoveredNewPlanBtn(false)}
-            className="h-12 px-6 text-black font-black text-sm uppercase tracking-wide disabled:opacity-50 transition-colors flex items-center gap-2"
-            style={{
-              backgroundColor: hoveredNewPlanBtn ? '#4169E1' : '#FFFEF5'
-            }}
+            className="h-12 px-6 bg-cream text-black hover:bg-primary hover:text-cream font-black text-sm uppercase tracking-wide disabled:opacity-50 transition-colors flex items-center gap-2"
           >
             <Calendar className="h-4 w-4" />
             {generatingPlan ? t("generating").toUpperCase() : t("newPlan").toUpperCase()}
@@ -242,12 +235,7 @@ export default function MealPlanPage() {
                   <div className="flex items-center gap-4">
                     <span className="font-black text-primary">{meal.calories} {t("kcal").toUpperCase()}</span>
                     <button
-                      onMouseEnter={() => setHoveredMealButtons({ ...hoveredMealButtons, [index]: true })}
-                      onMouseLeave={() => setHoveredMealButtons({ ...hoveredMealButtons, [index]: false })}
-                      className="h-10 w-10 border-4 border-black transition-colors flex items-center justify-center"
-                      style={{
-                        backgroundColor: hoveredMealButtons[index] ? '#4169E1' : '#FFFEF5'
-                      }}
+                      className="h-10 w-10 border-4 border-black bg-cream hover:bg-primary hover:text-cream transition-colors flex items-center justify-center"
                     >
                       <CheckCircle2 className="h-5 w-5" />
                     </button>
