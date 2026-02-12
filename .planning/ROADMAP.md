@@ -15,7 +15,7 @@ This milestone transforms FitFast from functionally complete to demo-ready. We s
 - Phase 7 can run in parallel with Phase 6 (performance independent of UX polish)
 - All other phases follow strict dependency chain
 
-- [ ] **Phase 1: Theme Rebrand - Core Color Swap** - Replace orange/green with Royal Blue in CSS variables
+- [x] **Phase 1: Theme Rebrand - Core Color Swap** - Replace orange/green with Royal Blue in CSS variables
 - [ ] **Phase 2: Theme Rebrand - Visual Audit** - Verify all components and accessibility compliance
 - [ ] **Phase 3: Hardening Foundation** - Create validation schemas, retry utilities, error infrastructure
 - [ ] **Phase 4: Hardening Service Layer** - Wrap AI generation with retry and validation
@@ -44,9 +44,9 @@ This milestone transforms FitFast from functionally complete to demo-ready. We s
 **Plans:** 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — CSS foundation + PWA config + UI component library color swap
-- [ ] 01-02-PLAN.md — Auth pages, onboarding pages, and shared layout components color swap
-- [ ] 01-03-PLAN.md — Dashboard pages color swap + final codebase verification
+- [x] 01-01-PLAN.md — CSS foundation + PWA config + UI component library color swap
+- [x] 01-02-PLAN.md — Auth pages, onboarding pages, and shared layout components color swap
+- [x] 01-03-PLAN.md — Dashboard pages color swap + final codebase verification
 
 ### Phase 2: Theme Rebrand - Visual Audit
 **Goal**: All components verified to render correctly with Royal Blue theme and meet accessibility standards
@@ -236,7 +236,7 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Theme Core | 0/3 | Planned | - |
+| 1. Theme Core | 3/3 | ✓ Complete | 2026-02-12 |
 | 2. Theme Audit | 0/TBD | Not started | - |
 | 3. Foundation | 0/TBD | Not started | - |
 | 4. Service Layer | 0/TBD | Not started | - |
@@ -249,4 +249,4 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-12*
+*Last updated: 2026-02-12 (Phase 1 complete)*
