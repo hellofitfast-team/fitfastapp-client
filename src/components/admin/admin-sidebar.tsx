@@ -99,7 +99,7 @@ export function AdminSidebar({
 
       <aside
         className={cn(
-          "flex w-64 flex-col bg-[#1C1917] transition-transform duration-300",
+          "flex w-64 flex-col bg-stone-900 transition-transform duration-300",
           "fixed inset-y-0 start-0 z-50",
           "lg:relative lg:z-auto lg:shrink-0",
           isOpen

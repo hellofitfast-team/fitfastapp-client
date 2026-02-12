@@ -86,7 +86,7 @@ export default function AdminLoginPage() {
       className="flex min-h-screen items-center justify-center bg-stone-50 p-4"
       style={{ fontFamily: "var(--font-outfit)" }}
     >
-      {/* Subtle background pattern */}
+      {/* Subtle background pattern - decorative admin branding */}
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #92400e 1px, transparent 0)", backgroundSize: "32px 32px" }} />
 
       <div className="relative w-full max-w-md">

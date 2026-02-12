@@ -222,11 +222,11 @@ export default function SetPasswordPage() {
               <div className="mt-3 space-y-2">
                 <div className="flex gap-1">
                   <div className={`h-2 flex-1 border-2 border-black ${strength.level >= 1 ? "bg-error-500" : "bg-neutral-200"}`} />
-                  <div className={`h-2 flex-1 border-2 border-black ${strength.level >= 2 ? "bg-orange-400" : "bg-neutral-200"}`} />
+                  <div className={`h-2 flex-1 border-2 border-black ${strength.level >= 2 ? "bg-warning-500" : "bg-neutral-200"}`} />
                   <div className={`h-2 flex-1 border-2 border-black ${strength.level >= 3 ? "bg-success-500" : "bg-neutral-200"}`} />
                 </div>
                 <p className="font-mono text-xs uppercase">
-                  STRENGTH: <span className={strength.level === 3 ? "text-success-500" : strength.level === 2 ? "text-orange-500" : "text-error-500"}>{strength.text}</span>
+                  STRENGTH: <span className={strength.level === 3 ? "text-success-500" : strength.level === 2 ? "text-warning-500" : "text-error-500"}>{strength.text}</span>
                 </p>
               </div>
             )}
