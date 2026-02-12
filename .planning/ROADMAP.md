@@ -16,8 +16,8 @@ This milestone transforms FitFast from functionally complete to demo-ready. We s
 - All other phases follow strict dependency chain
 
 - [x] **Phase 1: Theme Rebrand - Core Color Swap** - Replace orange/green with Royal Blue in CSS variables
-- [ ] **Phase 2: Theme Rebrand - Visual Audit** - Verify all components and accessibility compliance
-- [ ] **Phase 3: Hardening Foundation** - Create validation schemas, retry utilities, error infrastructure
+- [x] **Phase 2: Theme Rebrand - Visual Audit** - Verify all components and accessibility compliance
+- [x] **Phase 3: Hardening Foundation** - Create validation schemas, retry utilities, error infrastructure
 - [ ] **Phase 4: Hardening Service Layer** - Wrap AI generation with retry and validation
 - [ ] **Phase 5: Hardening API Routes** - Add input validation, parallelization, comprehensive error handling
 - [ ] **Phase 6: UX Polish** - Consistent loading states, empty states, form validation, touch targets
@@ -64,9 +64,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Fix inline style hex values and hover anti-patterns in dashboard pages
-- [ ] 02-02-PLAN.md — Fix remaining hardcoded hex in UI components, loading skeletons, charts, auth
-- [ ] 02-03-PLAN.md — Automated verification sweep + cross-browser/RTL manual testing checkpoint
+- [x] 02-01-PLAN.md — Fix inline style hex values and hover anti-patterns in dashboard pages
+- [x] 02-02-PLAN.md — Fix remaining hardcoded hex in UI components, loading skeletons, charts, auth
+- [x] 02-03-PLAN.md — Automated verification sweep + cross-browser/RTL manual testing checkpoint
 
 ### Phase 3: Hardening Foundation
 **Goal**: Reusable validation schemas, retry utilities, and error infrastructure established for all hardening work
@@ -85,8 +85,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Custom error classes (AppError, ValidationError, RetryError, AIGenerationError) + exponential backoff retry utility
-- [ ] 03-02-PLAN.md — Zod validation schemas for meal/workout plans + reusable ErrorBoundary component
+- [x] 03-01-PLAN.md — Custom error classes (AppError, ValidationError, RetryError, AIGenerationError) + exponential backoff retry utility
+- [x] 03-02-PLAN.md — Zod validation schemas for meal/workout plans + reusable ErrorBoundary component
 
 ### Phase 4: Hardening Service Layer
 **Goal**: AI generation and Supabase queries reliable with retry logic and validation
@@ -238,8 +238,8 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Theme Core | 3/3 | ✓ Complete | 2026-02-12 |
-| 2. Theme Audit | 0/3 | Planned | - |
-| 3. Foundation | 0/2 | Planned | - |
+| 2. Theme Audit | 3/3 | ✓ Complete | 2026-02-12 |
+| 3. Foundation | 2/2 | ✓ Complete | 2026-02-12 |
 | 4. Service Layer | 0/TBD | Not started | - |
 | 5. API Routes | 0/TBD | Not started | - |
 | 6. UX Polish | 0/TBD | Not started | - |
