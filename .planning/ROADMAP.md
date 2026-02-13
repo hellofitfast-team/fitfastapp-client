@@ -146,11 +146,14 @@ Plans:
   4. All interactive elements meet 48x48px minimum touch target size
   5. Loading states, error messages, and empty states use consistent design language
 
-**Plans**: TBD (estimated 8-12 plans)
+**Plans:** 5 plans
 
 Plans:
-- [ ] 06-01: TBD after planning
-- [ ] 06-02: TBD after planning
+- [ ] 06-01-PLAN.md — Foundation: Skeleton + EmptyState components, button touch targets, i18n keys
+- [ ] 06-02-PLAN.md — Skeleton loading states for tickets, FAQ, settings, progress, tracking pages
+- [ ] 06-03-PLAN.md — EmptyState component for tickets, progress, and tracking empty scenarios
+- [ ] 06-04-PLAN.md — React Hook Form + Zod inline validation for tickets and settings forms
+- [ ] 06-05-PLAN.md — Touch target audit for check-in, progress, FAQ, tracking, header, sidebar
 
 ### Phase 7: Performance Optimization
 **Goal**: App scales to 1000+ clients without performance degradation
@@ -245,7 +248,7 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 | 3. Foundation | 2/2 | ✓ Complete | 2026-02-12 |
 | 4. Service Layer | 2/2 | ✓ Complete | 2026-02-12 |
 | 5. API Routes | 4/4 | ✓ Complete | 2026-02-13 |
-| 6. UX Polish | 0/TBD | Not started | - |
+| 6. UX Polish | 0/5 | Planned | - |
 | 7. Performance | 0/1 | Planned | - |
 | 8. Refactoring | 0/TBD | Not started | - |
 | 9. Admin Polish | 0/TBD | Not started | - |
@@ -253,4 +256,4 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-13 (Phase 7 planned)*
+*Last updated: 2026-02-13 (Phase 6 planned)*
