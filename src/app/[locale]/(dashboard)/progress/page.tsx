@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import useSWR from "swr";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
   TrendingDown,
@@ -17,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import type { CheckIn, MealCompletion, WorkoutCompletion } from "@/types/database";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const ProgressCharts = dynamic(
   () => import("@/components/charts/ProgressCharts"),
@@ -98,8 +100,10 @@ async function getCurrentUser() {
 
 export default function ProgressPage() {
   const t = useTranslations("progress");
+  const tEmpty = useTranslations("emptyStates");
   const tUnits = useTranslations("units");
   const tCheckIn = useTranslations("checkIn");
+  const router = useRouter();
   const [dateRange, setDateRange] = useState<DateRange>("30");
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"charts" | "photos" | "history">("charts");
@@ -329,13 +333,11 @@ export default function ProgressPage() {
                 ))}
               </div>
             ) : (
-              <div className="flex h-[300px] items-center justify-center border-4 border-dashed border-black">
-                <div className="text-center">
-                  <ImageIcon className="mx-auto h-12 w-12 text-neutral-300" />
-                  <p className="mt-4 font-black">{t("noPhotos").toUpperCase()}</p>
-                  <p className="mt-2 font-mono text-xs text-neutral-500">{t("noPhotosHint").toUpperCase()}</p>
-                </div>
-              </div>
+              <EmptyState
+                icon={ImageIcon}
+                title={tEmpty("noPhotos.title")}
+                description={tEmpty("noPhotos.description")}
+              />
             )}
           </div>
         </div>
@@ -416,9 +418,16 @@ export default function ProgressPage() {
                 );
               })
             ) : (
-              <div className="p-12 text-center">
-                <Calendar className="mx-auto h-12 w-12 text-neutral-300" />
-                <p className="mt-4 font-black">{t("noCheckIns").toUpperCase()}</p>
+              <div className="p-12">
+                <EmptyState
+                  icon={Calendar}
+                  title={tEmpty("noCheckIns.title")}
+                  description={tEmpty("noCheckIns.description")}
+                  action={{
+                    label: tEmpty("noCheckIns.action"),
+                    onClick: () => router.push("/check-in"),
+                  }}
+                />
               </div>
             )}
           </div>

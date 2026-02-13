@@ -6,9 +6,11 @@ import { MessageSquarePlus, Clock, CheckCircle2, MessageSquare, ChevronDown, Upl
 import { useTickets } from "@/hooks/use-tickets";
 import { useAuth } from "@/hooks/use-auth";
 import { createClient } from "@/lib/supabase/client";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function TicketsPage() {
   const t = useTranslations("tickets");
+  const tEmpty = useTranslations("emptyStates");
   const { tickets, isLoading, error, createTicket, isCreating } = useTickets();
   const { user } = useAuth();
 
@@ -251,13 +253,18 @@ export default function TicketsPage() {
             <p className="font-mono text-xs mt-2 text-neutral-600">{error}</p>
           </div>
         ) : tickets.length === 0 ? (
-          <div className="border-4 border-black bg-cream p-12 text-center">
-            <MessageSquare className="mx-auto h-12 w-12 text-neutral-300" />
-            <p className="mt-4 font-black text-xl">{t("noTicketsTitle").toUpperCase()}</p>
-            <p className="mt-2 font-mono text-xs text-neutral-500">
-              {t("noTickets").toUpperCase()}
-            </p>
-          </div>
+          <EmptyState
+            icon={MessageSquare}
+            title={tEmpty("noTickets.title")}
+            description={tEmpty("noTickets.description")}
+            action={{
+              label: tEmpty("noTickets.action"),
+              onClick: () => {
+                // Scroll to the new ticket form at top of page
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              },
+            }}
+          />
         ) : (
           <div className="space-y-0">
             {tickets.map((ticket) => (
