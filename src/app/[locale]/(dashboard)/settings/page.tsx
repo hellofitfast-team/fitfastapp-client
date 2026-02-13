@@ -7,16 +7,49 @@ import { useAuth } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
 import { createClient } from "@/lib/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { cn } from "@/lib/utils";
+
+const profileSchema = z.object({
+  fullName: z.string().min(2, "Name must be at least 2 characters").max(100, "Name must be under 100 characters"),
+  phone: z.string().regex(/^[\d+\-\s()]*$/, "Invalid phone number format").optional().or(z.literal("")),
+  language: z.enum(["en", "ar"]),
+});
+type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function SettingsPage() {
   const t = useTranslations("settings");
   const { profile, signOut, user, refetch } = useAuth();
   const { isSupported, isSubscribed, permission, toggleSubscription, loading: notifLoading } = useNotifications();
-  const [fullName, setFullName] = useState(profile?.full_name || "");
-  const [phone, setPhone] = useState(profile?.phone || "");
-  const [language, setLanguage] = useState<string>(profile?.language || "en");
+
+  // React Hook Form for profile settings
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<ProfileFormData>({
+    resolver: zodResolver(profileSchema),
+    mode: "onBlur",
+    reValidateMode: "onBlur",
+    defaultValues: {
+      fullName: profile?.full_name || "",
+      phone: profile?.phone || "",
+      language: (profile?.language || "en") as "en" | "ar",
+    },
+  });
+
+  // Other state (not in form)
   const [reminderTime, setReminderTime] = useState("08:00");
   const [isSaving, setIsSaving] = useState(false);
+
+  // Reset form when profile loads
+  useEffect(() => {
+    if (profile) {
+      reset({
+        fullName: profile.full_name || "",
+        phone: profile.phone || "",
+        language: (profile.language || "en") as "en" | "ar",
+      });
+    }
+  }, [profile, reset]);
 
   // Fetch persisted reminder time on mount
   useEffect(() => {
@@ -27,6 +60,19 @@ export default function SettingsPage() {
       })
       .catch(() => {});
   }, []);
+
+  // Form submit handler
+  const onSubmit = async (data: ProfileFormData) => {
+    if (!user) return;
+    setIsSaving(true);
+    const supabase = createClient();
+    await supabase
+      .from("profiles")
+      .update({ full_name: data.fullName, phone: data.phone, language: data.language } as never)
+      .eq("id", user.id);
+    refetch();
+    setIsSaving(false);
+  };
 
   // Calculate plan details from profile data
   const calculatePlanDetails = () => {
@@ -85,7 +131,7 @@ export default function SettingsPage() {
             {t("profile").toUpperCase()}
           </h2>
         </div>
-        <div className="p-6 space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
           <div>
             <label className="block font-bold text-xs uppercase tracking-wide mb-2">
               {t("fullName")}
@@ -93,10 +139,18 @@ export default function SettingsPage() {
             <input
               type="text"
               placeholder="John Doe"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="w-full h-12 px-4 border-4 border-black bg-cream font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
+              {...register("fullName")}
+              className={cn(
+                "w-full h-12 px-4 border-4 bg-cream font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors",
+                errors.fullName ? "border-error-500" : "border-black"
+              )}
+              aria-invalid={errors.fullName ? "true" : "false"}
             />
+            {errors.fullName && (
+              <p className="mt-1 font-mono text-xs text-error-500" role="alert">
+                {errors.fullName.message}
+              </p>
+            )}
           </div>
           <div>
             <label className="block font-bold text-xs uppercase tracking-wide mb-2">
@@ -105,10 +159,18 @@ export default function SettingsPage() {
             <input
               type="tel"
               placeholder="01xxxxxxxxx"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full h-12 px-4 border-4 border-black bg-cream font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
+              {...register("phone")}
+              className={cn(
+                "w-full h-12 px-4 border-4 bg-cream font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors",
+                errors.phone ? "border-error-500" : "border-black"
+              )}
+              aria-invalid={errors.phone ? "true" : "false"}
             />
+            {errors.phone && (
+              <p className="mt-1 font-mono text-xs text-error-500" role="alert">
+                {errors.phone.message}
+              </p>
+            )}
           </div>
           <div>
             <label className="block font-bold text-xs uppercase tracking-wide mb-2">
@@ -116,8 +178,7 @@ export default function SettingsPage() {
             </label>
             <div className="relative">
               <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
+                {...register("language")}
                 className="w-full h-12 px-4 pr-10 border-4 border-black bg-cream font-bold text-sm uppercase appearance-none cursor-pointer focus:outline-none focus:bg-white transition-colors"
               >
                 <option value="en">ENGLISH</option>
@@ -127,23 +188,13 @@ export default function SettingsPage() {
             </div>
           </div>
           <button
-            onClick={async () => {
-              if (!user) return;
-              setIsSaving(true);
-              const supabase = createClient();
-              await supabase
-                .from("profiles")
-                .update({ full_name: fullName, phone, language } as never)
-                .eq("id", user.id);
-              refetch();
-              setIsSaving(false);
-            }}
+            type="submit"
             disabled={isSaving}
             className="w-full h-12 bg-black text-white font-black text-sm uppercase tracking-wide hover:bg-primary transition-colors disabled:opacity-50"
           >
             {isSaving ? "SAVING..." : t("saveChanges").toUpperCase()}
           </button>
-        </div>
+        </form>
       </div>
 
       {/* Notifications */}
