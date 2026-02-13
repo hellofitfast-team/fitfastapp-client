@@ -471,7 +471,7 @@ export default function CheckInPage() {
                           key={num}
                           type="button"
                           onClick={() => setValue(metric.key, num)}
-                          className={`flex-1 h-10 border-4 border-black font-black text-xs transition-colors ${
+                          className={`flex-1 h-12 border-4 border-black font-black text-xs transition-colors ${
                             metric.value >= num ? "bg-primary text-white" : "bg-neutral-100 hover:bg-neutral-200"
                           }`}
                         >
@@ -505,7 +505,7 @@ export default function CheckInPage() {
                       key={num}
                       type="button"
                       onClick={() => setValue("dietaryAdherence", num)}
-                      className={`flex-1 h-10 border-4 border-black font-black text-xs transition-colors ${
+                      className={`flex-1 h-12 border-4 border-black font-black text-xs transition-colors ${
                         dietaryAdherence >= num ? "bg-primary text-white" : "bg-neutral-100 hover:bg-neutral-200"
                       }`}
                     >
@@ -561,7 +561,7 @@ export default function CheckInPage() {
                     {uploadedPhotos.map((photo, index) => (
                       <div key={index} className="relative border-4 border-black aspect-square overflow-hidden">
                         <img src={URL.createObjectURL(photo)} alt={`Progress photo ${index + 1}`} className="h-full w-full object-cover" />
-                        <button type="button" onClick={() => removePhoto(index)} className="absolute top-2 end-2 h-8 w-8 bg-error-500 border-2 border-black flex items-center justify-center text-white hover:bg-black transition-colors">
+                        <button type="button" onClick={() => removePhoto(index)} className="absolute top-2 end-2 h-12 w-12 bg-error-500 border-2 border-black flex items-center justify-center text-white hover:bg-black transition-colors">
                           <X className="h-4 w-4" />
                         </button>
                       </div>

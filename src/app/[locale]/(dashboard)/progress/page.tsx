@@ -245,7 +245,7 @@ export default function ProgressPage() {
               <button
                 key={range}
                 onClick={() => setDateRange(range)}
-                className={`h-10 px-4 border-4 border-black -ms-1 first:ms-0 font-black text-xs uppercase transition-colors ${
+                className={`h-12 px-4 border-4 border-black -ms-1 first:ms-0 font-black text-xs uppercase transition-colors ${
                   dateRange === range ? "bg-primary text-black z-10" : "bg-cream text-black hover:bg-neutral-100"
                 }`}
               >
@@ -482,7 +482,7 @@ export default function ProgressPage() {
           <div className="relative max-w-3xl w-full border-4 border-black bg-cream" onClick={(e) => e.stopPropagation()}>
             <div className="border-b-4 border-black bg-black p-3 flex items-center justify-between">
               <span className="font-black text-cream">{t("progressPhoto").toUpperCase()}</span>
-              <button onClick={() => setSelectedPhoto(null)} className="h-8 w-8 bg-primary flex items-center justify-center hover:bg-cream hover:text-black transition-colors text-white">
+              <button onClick={() => setSelectedPhoto(null)} className="h-12 w-12 bg-primary flex items-center justify-center hover:bg-cream hover:text-black transition-colors text-white">
                 <X className="h-5 w-5" />
               </button>
             </div>
