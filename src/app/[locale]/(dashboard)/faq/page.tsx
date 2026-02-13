@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { Search, ChevronDown, ChevronUp, HelpCircle, MessageSquarePlus } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Faq {
   id: string;
@@ -106,8 +107,18 @@ export default function FAQPage() {
 
       {/* FAQ List */}
       {isLoading ? (
-        <div className="border-4 border-black bg-cream p-12 text-center">
-          <div className="h-8 w-8 mx-auto border-4 border-black border-t-transparent animate-spin" />
+        <div className="space-y-0">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div key={i} className="border-4 border-black -mt-1 first:mt-0 bg-cream p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-4 flex-1">
+                  <Skeleton className="h-10 w-10 shrink-0" />
+                  <Skeleton className="h-6 w-3/4" />
+                </div>
+                <Skeleton className="h-10 w-10 shrink-0" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="space-y-0">

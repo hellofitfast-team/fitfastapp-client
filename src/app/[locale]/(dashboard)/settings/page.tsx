@@ -6,6 +6,7 @@ import { User, Bell, Shield, CreditCard, ChevronDown, LogOut } from "lucide-reac
 import { useAuth } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
 import { createClient } from "@/lib/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SettingsPage() {
   const t = useTranslations("settings");
@@ -167,21 +168,25 @@ export default function SettingsPage() {
                   : t("notificationsUnsupported").toUpperCase()}
               </p>
             </div>
-            <button
-              onClick={() => toggleSubscription()}
-              disabled={!isSupported || (permission === "denied" && !isSubscribed) || notifLoading}
-              className={`relative h-8 w-16 border-4 border-black transition-colors ${
-                isSubscribed ? "bg-primary" : "bg-neutral-200"
-              } ${(!isSupported || permission === "denied") ? "opacity-50 cursor-not-allowed" : ""}`}
-              role="switch"
-              aria-checked={isSubscribed}
-            >
-              <span
-                className={`absolute top-0 h-full w-1/2 bg-black transition-transform ${
-                  isSubscribed ? "translate-x-full" : "translate-x-0"
-                }`}
-              />
-            </button>
+            {notifLoading ? (
+              <Skeleton className="h-8 w-16" />
+            ) : (
+              <button
+                onClick={() => toggleSubscription()}
+                disabled={!isSupported || (permission === "denied" && !isSubscribed)}
+                className={`relative h-8 w-16 border-4 border-black transition-colors ${
+                  isSubscribed ? "bg-primary" : "bg-neutral-200"
+                } ${(!isSupported || permission === "denied") ? "opacity-50 cursor-not-allowed" : ""}`}
+                role="switch"
+                aria-checked={isSubscribed}
+              >
+                <span
+                  className={`absolute top-0 h-full w-1/2 bg-black transition-transform ${
+                    isSubscribed ? "translate-x-full" : "translate-x-0"
+                  }`}
+                />
+              </button>
+            )}
           </div>
           <div>
             <label className="block font-bold text-xs uppercase tracking-wide mb-2">

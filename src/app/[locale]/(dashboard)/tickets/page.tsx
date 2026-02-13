@@ -7,6 +7,7 @@ import { useTickets } from "@/hooks/use-tickets";
 import { useAuth } from "@/hooks/use-auth";
 import { createClient } from "@/lib/supabase/client";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function TicketsPage() {
   const t = useTranslations("tickets");
@@ -19,7 +20,6 @@ export default function TicketsPage() {
   const [selectedCategory, setSelectedCategory] = useState<"meal_issue" | "workout_issue" | "technical" | "bug_report" | "other">("meal_issue");
   const [description, setDescription] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [hoveredSubmitBtn, setHoveredSubmitBtn] = useState(false);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -244,8 +244,21 @@ export default function TicketsPage() {
         </div>
 
         {isLoading ? (
-          <div className="border-4 border-black bg-cream p-12 flex justify-center items-center">
-            <Loader2 className="h-12 w-12 animate-spin text-neutral-400" />
+          <div className="space-y-0">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="border-4 border-black -mt-1 first:mt-0 bg-cream p-5">
+                <div className="flex items-start sm:items-center justify-between gap-4 flex-col sm:flex-row">
+                  <div className="flex items-start gap-4 flex-1">
+                    <Skeleton className="h-12 w-12 shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-6 w-48" />
+                      <Skeleton className="h-3 w-32" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-8 w-24" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : error ? (
           <div className="border-4 border-black bg-primary/10 p-6 text-center">
