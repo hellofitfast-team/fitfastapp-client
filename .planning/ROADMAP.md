@@ -149,11 +149,11 @@ Plans:
 **Plans:** 5 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Foundation: Skeleton + EmptyState components, button touch targets, i18n keys
-- [ ] 06-02-PLAN.md — Skeleton loading states for tickets, FAQ, settings, progress, tracking pages
-- [ ] 06-03-PLAN.md — EmptyState component for tickets, progress, and tracking empty scenarios
-- [ ] 06-04-PLAN.md — React Hook Form + Zod inline validation for tickets and settings forms
-- [ ] 06-05-PLAN.md — Touch target audit for check-in, progress, FAQ, tracking, header, sidebar
+- [x] 06-01-PLAN.md — Foundation: Skeleton + EmptyState components, button touch targets, i18n keys
+- [x] 06-02-PLAN.md — Skeleton loading states for tickets, FAQ, settings, progress, tracking pages
+- [x] 06-03-PLAN.md — EmptyState component for tickets, progress, and tracking empty scenarios
+- [x] 06-04-PLAN.md — React Hook Form + Zod inline validation for tickets and settings forms
+- [x] 06-05-PLAN.md — Touch target audit for check-in, progress, FAQ, tracking, header, sidebar
 
 ### Phase 7: Performance Optimization
 **Goal**: App scales to 1000+ clients without performance degradation
@@ -171,7 +171,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 07-01-PLAN.md — Server-side pagination for admin clients list with page controls and i18n
+- [x] 07-01-PLAN.md — Server-side pagination for admin clients list with page controls and i18n
 
 Note: PERF-03 (progress chart date range filter) is already implemented with 30/90/all day buttons and client-side useMemo filtering. No additional work needed.
 
@@ -248,12 +248,12 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 | 3. Foundation | 2/2 | ✓ Complete | 2026-02-12 |
 | 4. Service Layer | 2/2 | ✓ Complete | 2026-02-12 |
 | 5. API Routes | 4/4 | ✓ Complete | 2026-02-13 |
-| 6. UX Polish | 0/5 | Planned | - |
-| 7. Performance | 0/1 | Planned | - |
+| 6. UX Polish | 5/5 | ✓ Complete | 2026-02-13 |
+| 7. Performance | 1/1 | ✓ Complete | 2026-02-13 |
 | 8. Refactoring | 0/TBD | Not started | - |
 | 9. Admin Polish | 0/TBD | Not started | - |
 | 10. RTL Audit | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-13 (Phase 6 planned)*
+*Last updated: 2026-02-13 (Phase 6 & 7 complete)*
