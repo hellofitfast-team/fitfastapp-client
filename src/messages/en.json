@@ -22,6 +22,38 @@
     "year": "Year",
     "min": "min"
   },
+  "emptyStates": {
+    "noMealPlan": {
+      "title": "No Meal Plan Yet",
+      "description": "Your AI-powered meal plan will appear here after your first check-in. Complete a check-in to get started!"
+    },
+    "noWorkoutPlan": {
+      "title": "No Workout Plan Yet",
+      "description": "Your personalized workout plan will appear here after your first check-in. Complete a check-in to get started!"
+    },
+    "noTickets": {
+      "title": "No Support Tickets",
+      "description": "Having an issue with your plan? Submit a ticket and your coach will respond within 24 hours.",
+      "action": "Create a Ticket"
+    },
+    "noCheckIns": {
+      "title": "No Check-Ins Yet",
+      "description": "Track your progress by submitting regular check-ins. Your coach uses this data to optimize your plans.",
+      "action": "Submit Check-In"
+    },
+    "noPhotos": {
+      "title": "No Progress Photos",
+      "description": "Upload photos during your check-ins to track your visual progress over time."
+    },
+    "noFaqs": {
+      "title": "No Results Found",
+      "description": "Try a different search term or browse all questions below."
+    },
+    "noTrackingData": {
+      "title": "Nothing to Track Today",
+      "description": "You need an active meal or workout plan to start tracking. Complete a check-in to generate your plans."
+    }
+  },
   "auth": {
     "login": "Login",
     "logout": "Logout",
@@ -470,7 +502,13 @@
     "signups": "Signups",
     "clients": "Clients",
     "faqs": "FAQs",
-    "settingsPage": "Settings"
+    "settingsPage": "Settings",
+    "page": "Page",
+    "perPage": "per page",
+    "showing": "Showing",
+    "of": "of",
+    "previous": "Previous",
+    "next": "Next"
   },
   "adminNav": {
     "dashboard": "Dashboard",
