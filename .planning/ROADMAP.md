@@ -165,11 +165,12 @@ Plans:
   3. Large lists load under 2 seconds on realistic data volumes
   4. Database queries use proper indexes (verified with EXPLAIN ANALYZE if needed)
 
-**Plans**: TBD (estimated 5-7 plans)
+**Plans:** 1 plan
 
 Plans:
-- [ ] 07-01: TBD after planning
-- [ ] 07-02: TBD after planning
+- [ ] 07-01-PLAN.md — Server-side pagination for admin clients list with page controls and i18n
+
+Note: PERF-03 (progress chart date range filter) is already implemented with 30/90/all day buttons and client-side useMemo filtering. No additional work needed.
 
 ### Phase 8: Component Refactoring
 **Goal**: Large components split into maintainable pieces with extracted hooks and error boundaries
@@ -245,11 +246,11 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 | 4. Service Layer | 2/2 | ✓ Complete | 2026-02-12 |
 | 5. API Routes | 4/4 | ✓ Complete | 2026-02-13 |
 | 6. UX Polish | 0/TBD | Not started | - |
-| 7. Performance | 0/TBD | Not started | - |
+| 7. Performance | 0/1 | Planned | - |
 | 8. Refactoring | 0/TBD | Not started | - |
 | 9. Admin Polish | 0/TBD | Not started | - |
 | 10. RTL Audit | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-13 (Phase 5 complete)*
+*Last updated: 2026-02-13 (Phase 7 planned)*
