@@ -45,6 +45,7 @@ Progress: [█████████░] 92%
 | Phase 07 P01 | 406 | 2 tasks | 6 files |
 | Phase 06 P01 | 334 | 2 tasks | 5 files |
 | Phase 06 P03 | 236 | 2 tasks | 3 files |
+| Phase 06 P02 | 402 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,8 @@ Recent decisions affecting current work:
 - [Phase 06-03]: Progress photos empty state has no CTA (photos come from check-ins)
 - [Phase 06-03]: Progress history and tracking empty states use check-in CTA
 - [Phase 06-03]: Tracking page shows header with empty state to maintain layout consistency
+- [Phase 06-02]: Skeleton loading shows content-shaped placeholders (3 tickets, 5 FAQs, 4 stats) for better UX
+- [Phase 06-02]: Primary color backgrounds use white/20 opacity skeletons for visual contrast
 
 ### Pending Todos
 
