@@ -184,16 +184,19 @@ Note: PERF-03 (progress chart date range filter) is already implemented with 30/
 
 **Success Criteria** (what must be TRUE):
   1. No client component exceeds 400 lines (measured via cloc)
-  2. Reusable logic extracted to custom hooks (use-check-in-form.ts, etc.)
+  2. Reusable logic extracted to custom hooks (use-check-in-lock.ts, etc.)
   3. Error boundaries added at route segment level for isolated error recovery
   4. Large components split into _components/ subdirectories for organization
   5. Data fetching moved to Server Components where possible (Client Components only for interactivity)
 
-**Plans**: TBD (estimated 6-9 plans)
+**Plans:** 5 plans
 
 Plans:
-- [ ] 08-01: TBD after planning
-- [ ] 08-02: TBD after planning
+- [ ] 08-01-PLAN.md — Split check-in page (668 lines) with FormProvider pattern + useCheckInLock hook
+- [ ] 08-02-PLAN.md — Split initial-assessment page (594 lines) + extract BrutalistMultiSelect to shared UI
+- [ ] 08-03-PLAN.md — Split tracking page (547 lines) into meal/workout/reflection sub-components
+- [ ] 08-04-PLAN.md — Split progress page (495 lines) into stats/photos/history sub-components
+- [ ] 08-05-PLAN.md — Route segment error boundaries (5 routes) + final 400-line verification
 
 ### Phase 9: Admin/Coach Polish
 **Goal**: Coach admin panel handles errors gracefully with clear feedback
@@ -250,10 +253,10 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 | 5. API Routes | 4/4 | ✓ Complete | 2026-02-13 |
 | 6. UX Polish | 5/5 | ✓ Complete | 2026-02-13 |
 | 7. Performance | 1/1 | ✓ Complete | 2026-02-13 |
-| 8. Refactoring | 0/TBD | Not started | - |
+| 8. Refactoring | 0/5 | Planned | - |
 | 9. Admin Polish | 0/TBD | Not started | - |
 | 10. RTL Audit | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-13 (Phase 6 & 7 complete)*
+*Last updated: 2026-02-13 (Phase 8 planned)*
