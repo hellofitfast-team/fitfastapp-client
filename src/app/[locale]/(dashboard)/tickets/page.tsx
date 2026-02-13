@@ -8,17 +8,37 @@ import { useAuth } from "@/hooks/use-auth";
 import { createClient } from "@/lib/supabase/client";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { cn } from "@/lib/utils";
+
+const ticketSchema = z.object({
+  subject: z.string().min(3, "Subject must be at least 3 characters").max(100, "Subject must be under 100 characters"),
+  category: z.enum(["meal_issue", "workout_issue", "technical", "bug_report", "other"]),
+  description: z.string().optional(),
+});
+type TicketFormData = z.infer<typeof ticketSchema>;
 
 export default function TicketsPage() {
   const t = useTranslations("tickets");
   const tEmpty = useTranslations("emptyStates");
-  const { tickets, isLoading, error, createTicket, isCreating } = useTickets();
+  const { tickets, isLoading, error, createTicket } = useTickets();
   const { user } = useAuth();
 
-  // Form state
-  const [subject, setSubject] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<"meal_issue" | "workout_issue" | "technical" | "bug_report" | "other">("meal_issue");
-  const [description, setDescription] = useState("");
+  // Form state (React Hook Form)
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<TicketFormData>({
+    resolver: zodResolver(ticketSchema),
+    mode: "onBlur",
+    reValidateMode: "onBlur",
+    defaultValues: {
+      subject: "",
+      category: "meal_issue",
+      description: "",
+    },
+  });
+
+  // Screenshot file and UI state (separate from form schema)
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -39,27 +59,19 @@ export default function TicketsPage() {
     return publicUrl;
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
-    if (!subject.trim()) {
-      return;
-    }
-
+  const onSubmit = async (data: TicketFormData) => {
     const screenshotUrl = await uploadScreenshot();
 
     const result = await createTicket({
-      subject: subject.trim(),
-      category: selectedCategory,
-      description: description.trim() || undefined,
+      subject: data.subject.trim(),
+      category: data.category,
+      description: data.description?.trim() || undefined,
       screenshot_url: screenshotUrl,
     });
 
     if (result) {
       // Reset form on success
-      setSubject("");
-      setDescription("");
-      setSelectedCategory("meal_issue");
+      reset();
       setScreenshotFile(null);
       setSubmitSuccess(true);
 
@@ -139,20 +151,27 @@ export default function TicketsPage() {
             {t("newTicket").toUpperCase()}
           </h2>
         </div>
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
           <div>
             <label className="block font-bold text-xs uppercase tracking-wide mb-2">
               {t("subject")}
             </label>
             <input
               type="text"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
+              {...register("subject")}
               placeholder={t("subjectPlaceholder").toUpperCase()}
-              className="w-full h-12 px-4 border-4 border-black bg-cream font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
-              required
-              disabled={isCreating}
+              className={cn(
+                "w-full h-12 px-4 border-4 bg-cream font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors",
+                errors.subject ? "border-error-500" : "border-black"
+              )}
+              aria-invalid={errors.subject ? "true" : "false"}
+              disabled={isSubmitting}
             />
+            {errors.subject && (
+              <p className="mt-1 font-mono text-xs text-error-500" role="alert">
+                {errors.subject.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -161,10 +180,9 @@ export default function TicketsPage() {
             </label>
             <div className="relative">
               <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value as typeof selectedCategory)}
+                {...register("category")}
                 className="w-full h-12 px-4 pr-10 border-4 border-black bg-cream font-bold text-sm uppercase appearance-none cursor-pointer focus:outline-none focus:bg-white transition-colors"
-                disabled={isCreating}
+                disabled={isSubmitting}
               >
                 <option value="meal_issue">{t("categories.mealIssue").toUpperCase()}</option>
                 <option value="workout_issue">{t("categories.workoutIssue").toUpperCase()}</option>
@@ -181,11 +199,10 @@ export default function TicketsPage() {
               {t("description")}
             </label>
             <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              {...register("description")}
               placeholder={t("descriptionPlaceholder").toUpperCase()}
               className="w-full min-h-[120px] p-4 border-4 border-black bg-cream font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors resize-none"
-              disabled={isCreating}
+              disabled={isSubmitting}
             />
           </div>
 
@@ -204,7 +221,7 @@ export default function TicketsPage() {
                     setScreenshotFile(file);
                   }
                 }}
-                disabled={isCreating || isUploading}
+                disabled={isSubmitting || isUploading}
               />
               <div className="flex items-center gap-3 text-neutral-500">
                 <Upload className="h-5 w-5" />
@@ -217,10 +234,10 @@ export default function TicketsPage() {
 
           <button
             type="submit"
-            disabled={isCreating || isUploading || !subject.trim()}
+            disabled={isSubmitting || isUploading}
             className="w-full h-14 bg-black hover:bg-primary text-cream font-black text-lg uppercase tracking-wide transition-colors flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isCreating ? (
+            {isSubmitting ? (
               <>
                 <Loader2 className="h-5 w-5 animate-spin" />
                 SUBMITTING...
