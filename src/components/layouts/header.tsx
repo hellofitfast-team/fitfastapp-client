@@ -42,7 +42,7 @@ export function Header({ onMenuClick, userName }: HeaderProps) {
         {/* Left side - Menu button (mobile only) */}
         <div className="flex items-center">
           <button
-            className="flex h-10 w-10 items-center justify-center border-4 border-black bg-cream hover:bg-black hover:text-cream transition-colors lg:hidden"
+            className="flex h-12 w-12 items-center justify-center border-4 border-black bg-cream hover:bg-black hover:text-cream transition-colors lg:hidden"
             onClick={onMenuClick}
             aria-label="Toggle menu"
           >
@@ -54,7 +54,7 @@ export function Header({ onMenuClick, userName }: HeaderProps) {
         <div className="flex items-center gap-2">
           {/* Language Switcher */}
           <button
-            className="flex h-10 w-10 items-center justify-center border-4 border-black bg-cream font-mono text-xs font-bold hover:bg-black hover:text-primary transition-colors"
+            className="flex h-12 w-12 items-center justify-center border-4 border-black bg-cream font-mono text-xs font-bold hover:bg-black hover:text-primary transition-colors"
             onClick={switchLocale}
             aria-label="Switch language"
           >
@@ -63,7 +63,7 @@ export function Header({ onMenuClick, userName }: HeaderProps) {
 
           {/* Notifications */}
           <button
-            className="flex h-10 w-10 items-center justify-center border-4 border-black bg-cream hover:bg-primary hover:text-white hover:border-primary transition-colors"
+            className="flex h-12 w-12 items-center justify-center border-4 border-black bg-cream hover:bg-primary hover:text-white hover:border-primary transition-colors"
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5" />
@@ -73,7 +73,7 @@ export function Header({ onMenuClick, userName }: HeaderProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="flex items-center gap-2 border-4 border-black bg-cream px-3 h-10 hover:bg-black hover:text-cream transition-colors"
+                className="flex items-center gap-2 border-4 border-black bg-cream px-3 h-12 hover:bg-black hover:text-cream transition-colors"
                 aria-label="User menu"
               >
                 <User className="h-5 w-5" />

@@ -55,7 +55,7 @@ function NavItem({
 function CloseButton({ onClick }: { onClick?: () => void }) {
   return (
     <button
-      className="flex h-10 w-10 items-center justify-center border-4 border-black hover:bg-black hover:text-cream transition-colors"
+      className="flex h-12 w-12 items-center justify-center border-4 border-black hover:bg-black hover:text-cream transition-colors"
       onClick={onClick}
     >
       <X className="h-5 w-5" />
@@ -122,7 +122,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
               alt="FitFast"
               width={40}
               height={40}
-              className="h-10 w-10 rounded"
+              className="h-12 w-12 rounded"
             />
             <span className="font-black text-xl tracking-tight">FITFAST</span>
           </div>
@@ -137,7 +137,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
               alt="FitFast"
               width={40}
               height={40}
-              className="h-10 w-10 rounded"
+              className="h-12 w-12 rounded"
             />
             <span className="font-black text-xl tracking-tight">FITFAST</span>
           </div>
