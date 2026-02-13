@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { useCurrentMealPlan } from "@/hooks/use-meal-plans";
 import { useCurrentWorkoutPlan } from "@/hooks/use-workout-plans";
@@ -26,6 +27,7 @@ import {
 } from "lucide-react";
 import type { GeneratedMealPlan } from "@/lib/ai/meal-plan-generator";
 import type { GeneratedWorkoutPlan } from "@/lib/ai/workout-plan-generator";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface ReflectionForm {
   reflection: string;
@@ -33,9 +35,11 @@ interface ReflectionForm {
 
 export default function TrackingPage() {
   const t = useTranslations("tracking");
+  const tEmpty = useTranslations("emptyStates");
   const tCommon = useTranslations("common");
   const tMeals = useTranslations("meals");
   const tWorkouts = useTranslations("workouts");
+  const router = useRouter();
 
   const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState<string>(
@@ -154,6 +158,41 @@ export default function TrackingPage() {
           <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
           <p className="mt-4 font-black uppercase">{tCommon("loading").toUpperCase()}</p>
         </div>
+      </div>
+    );
+  }
+
+  // Show empty state if no plans exist
+  if (!mealPlan && !workoutPlan) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="border-4 border-black bg-black p-6">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center bg-primary">
+              <Target className="h-6 w-6 text-black" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-cream tracking-tight">
+                {t("title").toUpperCase()}
+              </h1>
+              <p className="font-mono text-xs tracking-[0.2em] text-primary">
+                {t("subtitle").toUpperCase()}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Empty State */}
+        <EmptyState
+          icon={Target}
+          title={tEmpty("noTrackingData.title")}
+          description={tEmpty("noTrackingData.description")}
+          action={{
+            label: tEmpty("noCheckIns.action"),
+            onClick: () => router.push("/check-in"),
+          }}
+        />
       </div>
     );
   }
