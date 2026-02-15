@@ -1,17 +1,18 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { useTranslations } from "next-intl";
-import { MessageSquarePlus, Clock, CheckCircle2, MessageSquare, ChevronDown, Upload, Send, Loader2 } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
+import { MessageSquarePlus, Clock, CheckCircle2, MessageSquare, ChevronDown, ChevronRight, Upload, Send, Loader2 } from "lucide-react";
 import { useTickets } from "@/hooks/use-tickets";
 import { useAuth } from "@/hooks/use-auth";
 import { createClient } from "@/lib/supabase/client";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "@/i18n/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 
 const ticketSchema = z.object({
   subject: z.string().min(3, "Subject must be at least 3 characters").max(100, "Subject must be under 100 characters"),
@@ -23,6 +24,7 @@ type TicketFormData = z.infer<typeof ticketSchema>;
 export default function TicketsPage() {
   const t = useTranslations("tickets");
   const tEmpty = useTranslations("emptyStates");
+  const locale = useLocale();
   const { tickets, isLoading, error, createTicket } = useTickets();
   const { user } = useAuth();
 
@@ -106,14 +108,6 @@ export default function TicketsPage() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-  };
 
   return (
     <div className="space-y-6">
@@ -298,9 +292,10 @@ export default function TicketsPage() {
         ) : (
           <div className="space-y-0">
             {tickets.map((ticket) => (
-              <div
+              <Link
                 key={ticket.id}
-                className="border-4 border-black -mt-1 first:mt-0 bg-cream hover:bg-neutral-50 transition-colors cursor-pointer"
+                href={`/tickets/${ticket.id}`}
+                className="block border-4 border-black -mt-1 first:mt-0 bg-cream hover:bg-neutral-50 transition-colors"
               >
                 <div className="p-5 flex items-start sm:items-center justify-between gap-4 flex-col sm:flex-row">
                   <div className="flex items-start gap-4">
@@ -321,22 +316,25 @@ export default function TicketsPage() {
                         {ticket.category && (
                           <>
                             <span className="font-mono text-xs text-neutral-500">
-                              {t(`categories.${ticket.category.replace("_", "") as any}`).toUpperCase()}
+                              {t(`categories.${ticket.category.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase()) as any}`).toUpperCase()}
                             </span>
                             <span className="text-neutral-300">•</span>
                           </>
                         )}
                         <span className="font-mono text-xs text-neutral-500">
-                          {formatDate(ticket.created_at)}
+                          {formatDate(ticket.created_at, locale)}
                         </span>
                       </div>
                     </div>
                   </div>
-                  <span className={`inline-flex items-center border-4 px-3 py-1 font-black text-xs uppercase ${getStatusStyle(ticket.status)}`}>
-                    {t(`status.${ticket.status === "coach_responded" ? "coachResponded" : ticket.status}`).toUpperCase()}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-flex items-center border-4 px-3 py-1 font-black text-xs uppercase ${getStatusStyle(ticket.status)}`}>
+                      {t(`status.${ticket.status === "coach_responded" ? "coachResponded" : ticket.status}`).toUpperCase()}
+                    </span>
+                    <ChevronRight className="h-5 w-5 text-neutral-400" />
+                  </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

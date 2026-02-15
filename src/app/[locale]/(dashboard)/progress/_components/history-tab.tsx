@@ -1,10 +1,11 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Calendar } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { CheckIn } from "@/types/database";
+import { formatDate, formatTime } from "@/lib/utils";
 
 interface MeasurementData {
   chest?: number;
@@ -23,6 +24,7 @@ export function HistoryTab({ checkIns }: HistoryTabProps) {
   const tEmpty = useTranslations("emptyStates");
   const tCheckIn = useTranslations("checkIn");
   const tUnits = useTranslations("units");
+  const locale = useLocale();
   const router = useRouter();
 
   return (
@@ -47,10 +49,10 @@ export function HistoryTab({ checkIns }: HistoryTabProps) {
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <p className="font-black">
-                      {new Date(checkIn.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                      {formatDate(checkIn.created_at, locale)}
                     </p>
                     <p className="font-mono text-xs text-neutral-500">
-                      {new Date(checkIn.created_at).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                      {formatTime(checkIn.created_at, locale)}
                     </p>
                   </div>
                   {checkIn.weight && (

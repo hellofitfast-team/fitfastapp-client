@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Users, Search, ArrowRight } from "lucide-react";
+import { formatDate } from "@/lib/utils";
 
 interface Client {
   id: string;
@@ -31,6 +32,7 @@ const tierLabels: Record<string, string> = {
 
 export function ClientsList({ clients }: { clients: Client[] }) {
   const t = useTranslations("admin");
+  const locale = useLocale();
   const [search, setSearch] = useState("");
 
   const filtered = clients.filter((c) => {
@@ -116,7 +118,7 @@ export function ClientsList({ clients }: { clients: Client[] }) {
                   </td>
                   <td className="px-4 py-4 text-xs text-stone-500">
                     {client.plan_end_date
-                      ? new Date(client.plan_end_date).toLocaleDateString()
+                      ? formatDate(client.plan_end_date, locale)
                       : "—"}
                   </td>
                   <td className="px-4 py-4">

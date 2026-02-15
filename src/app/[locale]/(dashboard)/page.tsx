@@ -9,6 +9,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { useDashboardData } from "@/hooks/use-dashboard";
 import { cn } from "@/lib/utils/cn";
+import { formatDateWithWeekday } from "@/lib/utils";
 
 // StatCard component with CSS-only hover states
 function StatCard({
@@ -126,7 +127,7 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>
             <p className="font-mono text-xs tracking-[0.5em] text-neutral-500 mb-2">
-              [{new Date().toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", { weekday: "short", month: "short", day: "numeric" }).toUpperCase()}]
+              [{formatDateWithWeekday(new Date(), locale).toUpperCase()}]
             </p>
             <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none">
               {t("dashboard.welcome").toUpperCase().replace("!", "")}

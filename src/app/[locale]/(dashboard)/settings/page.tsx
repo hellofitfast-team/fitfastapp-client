@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { User, Bell, Shield, CreditCard, ChevronDown, LogOut, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
@@ -21,6 +21,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function SettingsPage() {
   const t = useTranslations("settings");
+  const locale = useLocale();
   const { profile, signOut, user, refetch } = useAuth();
   const { isSupported, isSubscribed, permission, toggleSubscription, loading: notifLoading, error: notifError } = useNotifications();
 
@@ -98,7 +99,7 @@ export default function SettingsPage() {
     const progressPercentage = totalDays > 0 ? Math.min(100, Math.max(0, (daysPassed / totalDays) * 100)) : 0;
 
     // Format end date (e.g., "JANUARY 15, 2027")
-    const formattedEndDate = endDate.toLocaleDateString("en-US", {
+    const formattedEndDate = endDate.toLocaleDateString(locale === "ar" ? "ar-u-nu-latn" : "en-US", {
       month: "long",
       day: "numeric",
       year: "numeric",

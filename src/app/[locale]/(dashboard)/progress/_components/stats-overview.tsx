@@ -1,8 +1,9 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Weight, TrendingDown, TrendingUp, Calendar } from "lucide-react";
 import type { CheckIn } from "@/types/database";
+import { formatDate } from "@/lib/utils";
 
 interface StatsOverviewProps {
   firstCheckIn: CheckIn | undefined;
@@ -20,6 +21,7 @@ export function StatsOverview({
   totalCheckIns,
 }: StatsOverviewProps) {
   const t = useTranslations("progress");
+  const locale = useLocale();
 
   return (
     <div className="grid gap-0 md:grid-cols-4">
@@ -30,7 +32,7 @@ export function StatsOverview({
         </div>
         <p className="text-3xl font-black">{firstCheckIn?.weight ? `${firstCheckIn.weight}` : "-"}</p>
         <p className="font-bold text-sm text-neutral-500 mt-1">
-          {firstCheckIn ? new Date(firstCheckIn.created_at).toLocaleDateString() : "-"}
+          {firstCheckIn ? formatDate(firstCheckIn.created_at, locale) : "-"}
         </p>
       </div>
 
@@ -41,7 +43,7 @@ export function StatsOverview({
         </div>
         <p className="text-3xl font-black">{latestCheckIn?.weight ? `${latestCheckIn.weight}` : "-"}</p>
         <p className="font-bold text-sm text-neutral-500 mt-1">
-          {latestCheckIn ? new Date(latestCheckIn.created_at).toLocaleDateString() : "-"}
+          {latestCheckIn ? formatDate(latestCheckIn.created_at, locale) : "-"}
         </p>
       </div>
 

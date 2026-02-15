@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import useSWR from "swr";
 import dynamic from "next/dynamic";
 import { createClient } from "@/lib/supabase/client";
@@ -11,6 +11,7 @@ import { StatsOverview } from "./_components/stats-overview";
 import { PhotosTab } from "./_components/photos-tab";
 import { HistoryTab } from "./_components/history-tab";
 import { ProgressSkeleton } from "./_components/progress-skeleton";
+import { formatDateShort, formatDate } from "@/lib/utils";
 
 const ProgressCharts = dynamic(
   () => import("@/components/charts/ProgressCharts"),
@@ -92,6 +93,7 @@ async function getCurrentUser() {
 
 export default function ProgressPage() {
   const t = useTranslations("progress");
+  const locale = useLocale();
   const [dateRange, setDateRange] = useState<DateRange>("30");
   const [activeTab, setActiveTab] = useState<"charts" | "photos" | "history">("charts");
 
@@ -117,10 +119,10 @@ export default function ProgressPage() {
     return filteredCheckIns
       .filter((checkIn) => checkIn.weight)
       .map((checkIn) => ({
-        date: new Date(checkIn.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        date: formatDateShort(checkIn.created_at, locale),
         weight: checkIn.weight,
       }));
-  }, [filteredCheckIns]);
+  }, [filteredCheckIns, locale]);
 
   const measurementChartData = useMemo(() => {
     return filteredCheckIns
@@ -128,7 +130,7 @@ export default function ProgressPage() {
       .map((checkIn) => {
         const measurements = checkIn.measurements as MeasurementData;
         return {
-          date: new Date(checkIn.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+          date: formatDateShort(checkIn.created_at, locale),
           chest: measurements.chest,
           waist: measurements.waist,
           hips: measurements.hips,
@@ -136,7 +138,7 @@ export default function ProgressPage() {
           thighs: measurements.thighs,
         };
       });
-  }, [filteredCheckIns]);
+  }, [filteredCheckIns, locale]);
 
   const firstCheckIn = filteredCheckIns[0];
   const latestCheckIn = filteredCheckIns[filteredCheckIns.length - 1];
@@ -153,10 +155,10 @@ export default function ProgressPage() {
       .flatMap((checkIn) =>
         (checkIn.progress_photo_urls || []).map((url: string) => ({
           url,
-          date: new Date(checkIn.created_at).toLocaleDateString(),
+          date: formatDate(checkIn.created_at, locale),
         }))
       );
-  }, [filteredCheckIns]);
+  }, [filteredCheckIns, locale]);
 
   if (checkInsLoading) {
     return <ProgressSkeleton />;

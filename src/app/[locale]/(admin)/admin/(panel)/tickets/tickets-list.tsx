@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -11,6 +11,7 @@ import {
   Clock,
   MessageCircle,
 } from "lucide-react";
+import { formatDate } from "@/lib/utils";
 
 interface Ticket {
   id: string;
@@ -47,6 +48,7 @@ const categoryLabels: Record<string, string> = {
 
 export function TicketsList({ tickets }: { tickets: Ticket[] }) {
   const t = useTranslations("admin");
+  const locale = useLocale();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -131,7 +133,7 @@ export function TicketsList({ tickets }: { tickets: Ticket[] }) {
                 </div>
                 <p className="text-xs text-stone-400 mt-0.5">
                   {ticket.profiles?.full_name ?? "Unknown"} &middot;{" "}
-                  {new Date(ticket.created_at).toLocaleDateString()}
+                  {formatDate(ticket.created_at, locale)}
                 </p>
               </div>
               <span

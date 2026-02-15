@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import type { Profile, InitialAssessment, CheckIn } from "@/types/database";
 import {
@@ -10,6 +10,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { formatDate } from "@/lib/utils";
 
 export default async function ClientDetailPage({
   params,
@@ -18,6 +19,7 @@ export default async function ClientDetailPage({
 }) {
   const { id } = await params;
   const t = await getTranslations("admin");
+  const locale = await getLocale();
   const supabase = await createClient();
 
   const [profileRes, assessmentRes, checkInsRes] = await Promise.all([
@@ -116,7 +118,7 @@ export default async function ClientDetailPage({
               <dt className="text-stone-500">Start</dt>
               <dd className="text-stone-900">
                 {profile.plan_start_date
-                  ? new Date(profile.plan_start_date).toLocaleDateString()
+                  ? formatDate(profile.plan_start_date, locale)
                   : "—"}
               </dd>
             </div>
@@ -124,7 +126,7 @@ export default async function ClientDetailPage({
               <dt className="text-stone-500">End</dt>
               <dd className="text-stone-900">
                 {profile.plan_end_date
-                  ? new Date(profile.plan_end_date).toLocaleDateString()
+                  ? formatDate(profile.plan_end_date, locale)
                   : "—"}
               </dd>
             </div>
@@ -211,7 +213,7 @@ export default async function ClientDetailPage({
               >
                 <div className="text-sm">
                   <span className="text-stone-500">
-                    {new Date(ci.created_at).toLocaleDateString()}
+                    {formatDate(ci.created_at, locale)}
                   </span>
                   {ci.weight && (
                     <span className="ms-4 font-medium text-stone-900">{ci.weight} kg</span>

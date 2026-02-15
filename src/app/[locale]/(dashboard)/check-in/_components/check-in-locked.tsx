@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Lock, Calendar } from "lucide-react";
 
 interface CheckInLockedProps {
@@ -10,6 +10,7 @@ interface CheckInLockedProps {
 
 export function CheckInLocked({ nextCheckInDate, daysUntilNextCheckIn }: CheckInLockedProps) {
   const t = useTranslations("checkIn");
+  const locale = useLocale();
 
   return (
     <div className="border-4 border-black bg-cream shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
@@ -32,7 +33,7 @@ export function CheckInLocked({ nextCheckInDate, daysUntilNextCheckIn }: CheckIn
           {daysUntilNextCheckIn} {t("days", { default: "DAYS" }).toUpperCase()}
         </p>
         <p className="mt-4 font-mono text-sm text-neutral-500">
-          {nextCheckInDate.toLocaleDateString("en-US", {
+          {nextCheckInDate.toLocaleDateString(locale === "ar" ? "ar-u-nu-latn" : "en-US", {
             weekday: "long",
             year: "numeric",
             month: "long",

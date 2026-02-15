@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -14,6 +14,7 @@ import {
   ExternalLink,
   ImageIcon,
 } from "lucide-react";
+import { formatDate } from "@/lib/utils";
 
 interface OcrData {
   amount?: string;
@@ -58,6 +59,7 @@ const ocrFieldLabels: Record<string, string> = {
 
 export function SignupsTable({ signups }: { signups: Signup[] }) {
   const t = useTranslations("admin");
+  const locale = useLocale();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [actionId, setActionId] = useState<string | null>(null);
@@ -192,7 +194,7 @@ export function SignupsTable({ signups }: { signups: Signup[] }) {
 
                     {/* Date */}
                     <div className="px-4 py-4 text-xs text-stone-500">
-                      {new Date(signup.created_at).toLocaleDateString()}
+                      {formatDate(signup.created_at, locale)}
                     </div>
 
                     {/* Actions */}
