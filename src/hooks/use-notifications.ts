@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import * as Sentry from "@sentry/nextjs";
 
 export function useNotifications() {
   const [isSupported, setIsSupported] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission>("default");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const supported =
@@ -30,8 +32,12 @@ export function useNotifications() {
         const OneSignal = (await import("react-onesignal")).default;
         const optedIn = OneSignal.User.PushSubscription.optedIn;
         setIsSubscribed(optedIn ?? false);
-      } catch {
+      } catch (err) {
         setIsSubscribed(Notification.permission === "granted");
+        setError("onesignal_unavailable");
+        Sentry.captureException(err instanceof Error ? err : new Error("OneSignal subscription check failed"), {
+          tags: { feature: "push-notifications", operation: "check-subscription" },
+        });
       } finally {
         setLoading(false);
       }
@@ -53,10 +59,17 @@ export function useNotifications() {
       if (result === "granted") {
         import("react-onesignal")
           .then((mod) => mod.default.User.PushSubscription.optIn())
-          .catch(() => {});
+          .catch((err) => {
+            Sentry.captureException(err, {
+              tags: { feature: "push-notifications", operation: "onesignal-sync" },
+              level: "warning",
+            });
+          });
       }
-    } catch {
-      // Permission request itself failed
+    } catch (err) {
+      Sentry.captureException(err instanceof Error ? err : new Error("Permission request failed"), {
+        tags: { feature: "push-notifications", operation: "request-permission" },
+      });
     } finally {
       setLoading(false);
     }
@@ -72,7 +85,12 @@ export function useNotifications() {
         setIsSubscribed(false);
         import("react-onesignal")
           .then((mod) => mod.default.User.PushSubscription.optOut())
-          .catch(() => {});
+          .catch((err) => {
+            Sentry.captureException(err, {
+              tags: { feature: "push-notifications", operation: "onesignal-sync" },
+              level: "warning",
+            });
+          });
       } else {
         // Opt in: request permission via native API first
         let perm = Notification.permission;
@@ -86,15 +104,22 @@ export function useNotifications() {
           // Best-effort OneSignal sync
           import("react-onesignal")
             .then((mod) => mod.default.User.PushSubscription.optIn())
-            .catch(() => {});
+            .catch((err) => {
+              Sentry.captureException(err, {
+                tags: { feature: "push-notifications", operation: "onesignal-sync" },
+                level: "warning",
+              });
+            });
         }
       }
-    } catch {
-      // Shouldn't happen with native API, but guard just in case
+    } catch (err) {
+      Sentry.captureException(err instanceof Error ? err : new Error("Toggle subscription failed"), {
+        tags: { feature: "push-notifications", operation: "toggle-subscription" },
+      });
     } finally {
       setLoading(false);
     }
   }, [isSupported, isSubscribed]);
 
-  return { isSupported, permission, isSubscribed, requestPermission, toggleSubscription, loading };
+  return { isSupported, permission, isSubscribed, requestPermission, toggleSubscription, loading, error };
 }
