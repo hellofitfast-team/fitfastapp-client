@@ -577,6 +577,26 @@
       "title": "TRACKING ERROR",
       "description": "We couldn't load your tracking data. Please try again.",
       "retry": "TRY AGAIN"
+    },
+    "adminSettings": {
+      "title": "SETTINGS ERROR",
+      "description": "We couldn't load the admin settings. Please try again.",
+      "retry": "TRY AGAIN"
+    },
+    "adminSignups": {
+      "title": "SIGNUPS ERROR",
+      "description": "We couldn't load the signups page. Please try again.",
+      "retry": "TRY AGAIN"
+    },
+    "adminTickets": {
+      "title": "TICKETS ERROR",
+      "description": "We couldn't load the admin tickets. Please try again.",
+      "retry": "TRY AGAIN"
+    },
+    "adminPanel": {
+      "title": "ADMIN ERROR",
+      "description": "Something went wrong in the admin panel. Please try again.",
+      "retry": "TRY AGAIN"
     }
   }
 }
