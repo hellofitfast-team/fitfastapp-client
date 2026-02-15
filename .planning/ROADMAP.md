@@ -192,11 +192,11 @@ Note: PERF-03 (progress chart date range filter) is already implemented with 30/
 **Plans:** 5 plans
 
 Plans:
-- [ ] 08-01-PLAN.md — Split check-in page (668 lines) with FormProvider pattern + useCheckInLock hook
-- [ ] 08-02-PLAN.md — Split initial-assessment page (594 lines) + extract BrutalistMultiSelect to shared UI
-- [ ] 08-03-PLAN.md — Split tracking page (547 lines) into meal/workout/reflection sub-components
-- [ ] 08-04-PLAN.md — Split progress page (495 lines) into stats/photos/history sub-components
-- [ ] 08-05-PLAN.md — Route segment error boundaries (5 routes) + final 400-line verification
+- [x] 08-01-PLAN.md — Split check-in page (668 lines) with FormProvider pattern + useCheckInLock hook
+- [x] 08-02-PLAN.md — Split initial-assessment page (594 lines) + extract BrutalistMultiSelect to shared UI
+- [x] 08-03-PLAN.md — Split tracking page (547 lines) into meal/workout/reflection sub-components
+- [x] 08-04-PLAN.md — Split progress page (495 lines) into stats/photos/history sub-components
+- [x] 08-05-PLAN.md — Route segment error boundaries (5 routes) + final 400-line verification
 
 ### Phase 9: Admin/Coach Polish
 **Goal**: Coach admin panel handles errors gracefully with clear feedback
@@ -253,10 +253,10 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 | 5. API Routes | 4/4 | ✓ Complete | 2026-02-13 |
 | 6. UX Polish | 5/5 | ✓ Complete | 2026-02-13 |
 | 7. Performance | 1/1 | ✓ Complete | 2026-02-13 |
-| 8. Refactoring | 0/5 | Planned | - |
+| 8. Refactoring | 5/5 | ✓ Complete | 2026-02-15 |
 | 9. Admin Polish | 0/TBD | Not started | - |
 | 10. RTL Audit | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-13 (Phase 8 planned)*
+*Last updated: 2026-02-15 (Phase 8 complete)*
