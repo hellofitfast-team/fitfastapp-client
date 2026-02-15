@@ -16,7 +16,7 @@ type WorkoutDay = GeneratedWorkoutPlan["weeklyPlan"][string];
 interface WorkoutCompletion {
   workout_index: number;
   completed: boolean;
-  notes?: string;
+  notes?: string | null;
 }
 
 interface WorkoutTrackingProps {

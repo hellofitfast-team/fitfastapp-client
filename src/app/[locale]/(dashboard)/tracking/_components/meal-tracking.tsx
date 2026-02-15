@@ -16,7 +16,7 @@ type Meal = GeneratedMealPlan["weeklyPlan"][string]["meals"][number];
 interface MealCompletion {
   meal_index: number;
   completed: boolean;
-  notes?: string;
+  notes?: string | null;
 }
 
 interface MealTrackingProps {
