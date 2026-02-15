@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 
 ## Current Position
 
-Phase: 8 of 10 (Component Refactoring) — Not yet planned
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-02-13 — Completed Phase 6 (UX Polish) & Phase 7 (Performance Optimization) — both verified passed
+Phase: 8 of 10 (Component Refactoring) — In progress
+Plan: 2 of ~4 in current phase
+Status: Executing
+Last activity: 2026-02-15 — Completed 08-02: Initial Assessment Component Refactoring (594 → 254 lines)
 
-Progress: [█████████░] 90%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
-- Average duration: 4.7 minutes
-- Total execution time: 1.46 hours
+- Total plans completed: 19
+- Average duration: 4.8 minutes
+- Total execution time: 1.52 hours
 
 **By Phase:**
 
@@ -34,12 +34,13 @@ Progress: [█████████░] 90%
 | 05 | 4 | 489s (8.2m) | 122s |
 | 06 | 4 | 1272s (21.2m) | 318s |
 | 07 | 1 | 406s (6.8m) | 406s |
+| 08 | 1 | 345s (5.8m) | 345s |
 | extra | 2 | — | — (logout fix + admin rebrand) |
 
 **Recent Trend:**
-- Last plan: 06-05 (388s, 2 tasks, 4 files)
-- Previous: 06-04 (314s, 2 tasks, 2 files)
-- Trend: Touch target accessibility fixes for mobile PWA
+- Last plan: 08-02 (345s, 2 tasks, 8 files)
+- Previous: 07-01 (406s, 2 tasks, 6 files)
+- Trend: Component refactoring to reduce page sizes and improve maintainability
 
 *Updated after each plan completion*
 | Phase 07 P01 | 406 | 2 tasks | 6 files |
@@ -48,6 +49,7 @@ Progress: [█████████░] 90%
 | Phase 06 P02 | 402 | 2 tasks | 6 files |
 | Phase 06 P04 | 314 | 2 tasks | 2 files |
 | Phase 06 P05 | 388 | 2 tasks | 4 files |
+| Phase 08 P02 | 345 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -103,6 +105,12 @@ Recent decisions affecting current work:
 - [Phase 4/5] Progress notes and safety tips stored in English in DB — same AI prompt issue
 - [Phase 10] Western numerals (0-9) displayed in Arabic view instead of Eastern Arabic numerals (٠-٩)
 - [Phase 10] Number formatting (times, stats, percentages) not locale-aware in Arabic mode
+- [New] Push notifications hardcoded in English — should send bilingual (en/ar) based on user locale
+- [New] AI model names hardcoded — move to env vars (OPENROUTER_MODEL, OPENROUTER_VISION_MODEL)
+- [New] localhost:3000 fallback in OpenRouter headers — use NEXT_PUBLIC_APP_URL or fail gracefully
+- [New] Date formatting uses hardcoded "en-US" in settings, progress, check-in — should use user locale
+- [New] AI parameters (temperature, max_tokens, timeout) hardcoded — move to env vars
+- [New] Ticket system is single-response — needs thread-style conversation (ticket_messages table, reply UI for both client and coach)
 
 ### Blockers/Concerns
 
@@ -110,10 +118,10 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-13
-Stopped at: Phase 6 & 7 verified and complete. Ready for Phase 8 planning.
+Last session: 2026-02-15
+Stopped at: Completed 08-02-PLAN.md
 Resume file: None
 
 ---
 *State initialized: 2026-02-12*
-*Last updated: 2026-02-13*
+*Last updated: 2026-02-15*
