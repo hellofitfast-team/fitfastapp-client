@@ -3,10 +3,38 @@ export { cn } from "./cn";
 // Date utilities
 export function formatDate(date: Date | string, locale: string = "en"): string {
   const d = typeof date === "string" ? new Date(date) : date;
-  return d.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
+  return d.toLocaleDateString(locale === "ar" ? "ar-u-nu-latn" : "en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
+  });
+}
+
+// Short date format (e.g., "Feb 15" / "15 فبراير")
+export function formatDateShort(date: Date | string, locale: string = "en"): string {
+  const d = typeof date === "string" ? new Date(date) : date;
+  return d.toLocaleDateString(locale === "ar" ? "ar-u-nu-latn" : "en-US", {
+    month: "short",
+    day: "numeric",
+  });
+}
+
+// Date with weekday (e.g., "Sat, Feb 15" / "السبت، 15 فبراير")
+export function formatDateWithWeekday(date: Date | string, locale: string = "en"): string {
+  const d = typeof date === "string" ? new Date(date) : date;
+  return d.toLocaleDateString(locale === "ar" ? "ar-u-nu-latn" : "en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+// Time format (e.g., "02:30 PM" / "2:30 م")
+export function formatTime(date: Date | string, locale: string = "en"): string {
+  const d = typeof date === "string" ? new Date(date) : date;
+  return d.toLocaleTimeString(locale === "ar" ? "ar-u-nu-latn" : "en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
@@ -29,7 +57,7 @@ export function formatRelativeDate(
 
 // Number utilities
 export function formatNumber(num: number, locale: string = "en"): string {
-  return num.toLocaleString(locale === "ar" ? "ar-EG" : "en-US");
+  return num.toLocaleString(locale === "ar" ? "ar-u-nu-latn" : "en-US");
 }
 
 // Calculate days until a date
