@@ -232,11 +232,14 @@ Plans:
   4. All translation keys present with no missing keys or raw fallback text visible
   5. Both client and coach flows work identically well in English and Arabic
 
-**Plans**: TBD (estimated 7-10 plans)
+**Plans:** 5 plans
 
 Plans:
-- [ ] 10-01: TBD after planning
-- [ ] 10-02: TBD after planning
+- [ ] 10-01-PLAN.md — shadcn/ui component RTL migration (logical CSS properties)
+- [ ] 10-02-PLAN.md — Locale-aware date/number formatting across all pages
+- [ ] 10-03-PLAN.md — Auth + onboarding physical-to-logical properties + directional icons
+- [ ] 10-04-PLAN.md — Dashboard + admin properties + progress bar RTL + chart wrapping
+- [ ] 10-05-PLAN.md — Automated audit sweep + visual verification checkpoint
 
 ## Progress
 
@@ -255,8 +258,8 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 | 7. Performance | 1/1 | ✓ Complete | 2026-02-13 |
 | 8. Refactoring | 5/5 | ✓ Complete | 2026-02-15 |
 | 9. Admin Polish | 2/2 | ✓ Complete | 2026-02-15 |
-| 10. RTL Audit | 0/TBD | Not started | - |
+| 10. RTL Audit | 0/5 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-15 (Phase 9 complete)*
+*Last updated: 2026-02-15 (Phase 10 planned)*
