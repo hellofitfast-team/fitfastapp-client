@@ -5,163 +5,15 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Check, ArrowRight, ChevronDown } from "lucide-react";
-
-// Predefined options for deterministic AI generation
-const FITNESS_GOALS = [
-  { id: "lose_weight", label: "LOSE WEIGHT" },
-  { id: "build_muscle", label: "BUILD MUSCLE" },
-  { id: "improve_endurance", label: "IMPROVE ENDURANCE" },
-  { id: "increase_strength", label: "INCREASE STRENGTH" },
-  { id: "improve_flexibility", label: "IMPROVE FLEXIBILITY" },
-  { id: "general_fitness", label: "GENERAL FITNESS" },
-  { id: "body_recomposition", label: "BODY RECOMPOSITION" },
-  { id: "athletic_performance", label: "ATHLETIC PERFORMANCE" },
-];
-
-const FOOD_PREFERENCES = [
-  { id: "mediterranean", label: "MEDITERRANEAN" },
-  { id: "high_protein", label: "HIGH PROTEIN" },
-  { id: "low_carb", label: "LOW CARB" },
-  { id: "balanced", label: "BALANCED DIET" },
-  { id: "middle_eastern", label: "MIDDLE EASTERN" },
-  { id: "asian", label: "ASIAN CUISINE" },
-  { id: "vegetarian", label: "VEGETARIAN" },
-  { id: "vegan", label: "VEGAN" },
-];
-
-const COMMON_ALLERGIES = [
-  { id: "none", label: "NONE" },
-  { id: "nuts", label: "NUTS" },
-  { id: "dairy", label: "DAIRY" },
-  { id: "eggs", label: "EGGS" },
-  { id: "shellfish", label: "SHELLFISH" },
-  { id: "gluten", label: "GLUTEN" },
-  { id: "soy", label: "SOY" },
-  { id: "fish", label: "FISH" },
-];
-
-const DIETARY_RESTRICTIONS = [
-  { id: "none", label: "NONE" },
-  { id: "halal", label: "HALAL" },
-  { id: "kosher", label: "KOSHER" },
-  { id: "no_pork", label: "NO PORK" },
-  { id: "no_beef", label: "NO BEEF" },
-  { id: "lactose_free", label: "LACTOSE FREE" },
-  { id: "low_sodium", label: "LOW SODIUM" },
-  { id: "diabetic_friendly", label: "DIABETIC FRIENDLY" },
-];
-
-const EQUIPMENT_OPTIONS = [
-  { id: "full_gym", label: "FULL GYM ACCESS" },
-  { id: "home_basic", label: "HOME (BASIC: DUMBBELLS, MAT)" },
-  { id: "home_advanced", label: "HOME (ADVANCED: BENCH, BARBELL)" },
-  { id: "bodyweight", label: "BODYWEIGHT ONLY" },
-  { id: "resistance_bands", label: "RESISTANCE BANDS" },
-  { id: "other", label: "OTHER" },
-];
-
-const DAYS = [
-  { id: "Mon", label: "M" },
-  { id: "Tue", label: "T" },
-  { id: "Wed", label: "W" },
-  { id: "Thu", label: "T" },
-  { id: "Fri", label: "F" },
-  { id: "Sat", label: "S" },
-  { id: "Sun", label: "S" },
-];
-
-// Brutalist Multi-select checkbox component
-function BrutalistMultiSelect({
-  options,
-  selected,
-  onChange,
-  otherValue,
-  onOtherChange,
-  disabled,
-  columns = 2,
-  hasNoneOption = false,
-}: {
-  options: { id: string; label: string }[];
-  selected: string[];
-  onChange: (selected: string[]) => void;
-  otherValue: string;
-  onOtherChange: (value: string) => void;
-  disabled?: boolean;
-  columns?: number;
-  hasNoneOption?: boolean;
-}) {
-  const toggle = (id: string) => {
-    if (id === "none") {
-      onChange(selected.includes("none") ? [] : ["none"]);
-      onOtherChange("");
-    } else if (id === "other") {
-      const newSelected = selected.filter((s) => s !== "none");
-      if (newSelected.includes("other")) {
-        onChange(newSelected.filter((s) => s !== "other"));
-        onOtherChange("");
-      } else {
-        onChange([...newSelected, "other"]);
-      }
-    } else {
-      const newSelected = selected.filter((s) => s !== "none");
-      if (newSelected.includes(id)) {
-        onChange(newSelected.filter((s) => s !== id));
-      } else {
-        onChange([...newSelected, id]);
-      }
-    }
-  };
-
-  const allOptions = [...options, { id: "other", label: "OTHER" }];
-
-  return (
-    <div className="space-y-3">
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: "0" }}>
-        {allOptions.map((option) => (
-          <button
-            key={option.id}
-            type="button"
-            onClick={() => toggle(option.id)}
-            disabled={disabled || (hasNoneOption && selected.includes("none") && option.id !== "none")}
-            className={`flex items-center gap-3 border-2 border-black p-4 text-left text-sm font-bold transition-colors -mt-0.5 -ml-0.5 first:mt-0 first:ml-0 ${
-              selected.includes(option.id)
-                ? "bg-black text-primary"
-                : "bg-cream text-black hover:bg-neutral-100"
-            } ${disabled || (hasNoneOption && selected.includes("none") && option.id !== "none") ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-          >
-            <div
-              className={`flex h-6 w-6 shrink-0 items-center justify-center border-2 border-black ${
-                selected.includes(option.id)
-                  ? "bg-primary"
-                  : "bg-white"
-              }`}
-            >
-              {selected.includes(option.id) && (
-                <Check className="h-4 w-4 text-black" strokeWidth={3} />
-              )}
-            </div>
-            <span className="tracking-wide">{option.label}</span>
-          </button>
-        ))}
-      </div>
-      {selected.includes("other") && (
-        <input
-          type="text"
-          placeholder="PLEASE SPECIFY..."
-          value={otherValue}
-          onChange={(e) => onOtherChange(e.target.value)}
-          disabled={disabled}
-          className="w-full h-12 px-4 border-4 border-black bg-cream font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
-        />
-      )}
-    </div>
-  );
-}
+import { ArrowRight } from "lucide-react";
+import { GoalsSection } from "./_components/goals-section";
+import { BasicInfoSection } from "./_components/basic-info-section";
+import { ScheduleSection } from "./_components/schedule-section";
+import { DietarySection } from "./_components/dietary-section";
+import { MedicalSection } from "./_components/medical-section";
 
 export default function InitialAssessmentPage() {
   const t = useTranslations("onboarding.assessment");
-  const tUnits = useTranslations("units");
   const tCommon = useTranslations("common");
   const tErrors = useTranslations("errors");
   const router = useRouter();
@@ -331,247 +183,55 @@ export default function InitialAssessmentPage() {
           </div>
         )}
 
-        {/* Fitness Goals */}
-        <div className="border-4 border-black">
-          <div className="border-b-4 border-black bg-primary p-4">
-            <h2 className="font-black text-xl text-white">FITNESS GOALS</h2>
-            <p className="font-mono text-xs text-white/80 mt-1">SELECT ALL THAT APPLY</p>
-          </div>
-          <div className="p-4 bg-cream">
-            <BrutalistMultiSelect
-              options={FITNESS_GOALS}
-              selected={selectedGoals}
-              onChange={setSelectedGoals}
-              otherValue={goalsOther}
-              onOtherChange={setGoalsOther}
-              disabled={isLoading}
-            />
-          </div>
-        </div>
+        <GoalsSection
+          selectedGoals={selectedGoals}
+          setSelectedGoals={setSelectedGoals}
+          goalsOther={goalsOther}
+          setGoalsOther={setGoalsOther}
+          isLoading={isLoading}
+        />
 
-        {/* Basic Info */}
-        <div className="border-4 border-black">
-          <div className="border-b-4 border-black bg-black p-4">
-            <h2 className="font-black text-xl text-cream">BASIC INFORMATION</h2>
-          </div>
-          <div className="p-4 bg-cream">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="block font-bold text-sm uppercase tracking-wide mb-2">
-                  CURRENT WEIGHT
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    step="0.1"
-                    placeholder="75"
-                    value={currentWeight}
-                    onChange={(e) => setCurrentWeight(e.target.value)}
-                    disabled={isLoading}
-                    className="flex-1 h-12 px-4 border-4 border-black bg-cream font-mono text-lg placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
-                  />
-                  <span className="font-black text-lg">{tUnits("kg").toUpperCase()}</span>
-                </div>
-              </div>
-              <div>
-                <label className="block font-bold text-sm uppercase tracking-wide mb-2">
-                  HEIGHT
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    placeholder="175"
-                    value={height}
-                    onChange={(e) => setHeight(e.target.value)}
-                    disabled={isLoading}
-                    className="flex-1 h-12 px-4 border-4 border-black bg-cream font-mono text-lg placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
-                  />
-                  <span className="font-black text-lg">{tUnits("cm").toUpperCase()}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <BasicInfoSection
+          currentWeight={currentWeight}
+          setCurrentWeight={setCurrentWeight}
+          height={height}
+          setHeight={setHeight}
+          experienceLevel={experienceLevel}
+          setExperienceLevel={setExperienceLevel}
+          equipment={equipment}
+          setEquipment={setEquipment}
+          equipmentOther={equipmentOther}
+          setEquipmentOther={setEquipmentOther}
+          isLoading={isLoading}
+        />
 
-        {/* Experience Level */}
-        <div className="border-4 border-black">
-          <div className="border-b-4 border-black bg-black p-4">
-            <h2 className="font-black text-xl text-cream">EXPERIENCE LEVEL</h2>
-          </div>
-          <div className="grid grid-cols-3">
-            {(["beginner", "intermediate", "advanced"] as const).map((level, index) => (
-              <button
-                key={level}
-                type="button"
-                onClick={() => setExperienceLevel(level)}
-                disabled={isLoading}
-                className={`p-6 text-center transition-colors ${
-                  index < 2 ? "border-r-4 border-black" : ""
-                } ${
-                  experienceLevel === level
-                    ? "bg-primary text-black"
-                    : "bg-cream text-black hover:bg-neutral-100"
-                } ${isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-              >
-                <span className="block font-black text-lg uppercase">{level}</span>
-                <span className="block font-mono text-xs text-neutral-500 mt-1">
-                  {level === "beginner" && "NEW TO FITNESS"}
-                  {level === "intermediate" && "1-2 YEARS"}
-                  {level === "advanced" && "3+ YEARS"}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
+        <ScheduleSection
+          selectedDays={selectedDays}
+          setSelectedDays={setSelectedDays}
+          isLoading={isLoading}
+        />
 
-        {/* Equipment */}
-        <div className="border-4 border-black">
-          <div className="border-b-4 border-black bg-black p-4">
-            <h2 className="font-black text-xl text-cream">AVAILABLE EQUIPMENT</h2>
-          </div>
-          <div className="p-4 bg-cream space-y-3">
-            <div className="relative">
-              <select
-                value={equipment}
-                onChange={(e) => setEquipment(e.target.value)}
-                disabled={isLoading}
-                className="w-full h-14 px-4 pr-12 border-4 border-black bg-cream font-bold text-sm uppercase appearance-none focus:outline-none focus:bg-white transition-colors cursor-pointer"
-              >
-                <option value="">SELECT YOUR EQUIPMENT ACCESS</option>
-                {EQUIPMENT_OPTIONS.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 pointer-events-none" />
-            </div>
-            {equipment === "other" && (
-              <input
-                type="text"
-                placeholder="DESCRIBE YOUR EQUIPMENT..."
-                value={equipmentOther}
-                onChange={(e) => setEquipmentOther(e.target.value)}
-                disabled={isLoading}
-                className="w-full h-12 px-4 border-4 border-black bg-cream font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
-              />
-            )}
-          </div>
-        </div>
+        <DietarySection
+          selectedFoodPrefs={selectedFoodPrefs}
+          setSelectedFoodPrefs={setSelectedFoodPrefs}
+          foodPrefsOther={foodPrefsOther}
+          setFoodPrefsOther={setFoodPrefsOther}
+          selectedAllergies={selectedAllergies}
+          setSelectedAllergies={setSelectedAllergies}
+          allergiesOther={allergiesOther}
+          setAllergiesOther={setAllergiesOther}
+          selectedRestrictions={selectedRestrictions}
+          setSelectedRestrictions={setSelectedRestrictions}
+          restrictionsOther={restrictionsOther}
+          setRestrictionsOther={setRestrictionsOther}
+          isLoading={isLoading}
+        />
 
-        {/* Schedule */}
-        <div className="border-4 border-black">
-          <div className="border-b-4 border-black bg-primary p-4">
-            <h2 className="font-black text-xl text-white">WEEKLY SCHEDULE</h2>
-            <p className="font-mono text-xs text-white/80 mt-1">SELECT YOUR WORKOUT DAYS</p>
-          </div>
-          <div className="p-4 bg-cream">
-            <div className="flex gap-0">
-              {DAYS.map((day, index) => (
-                <button
-                  key={day.id}
-                  type="button"
-                  onClick={() => {
-                    if (selectedDays.includes(day.id)) {
-                      setSelectedDays(selectedDays.filter((d) => d !== day.id));
-                    } else {
-                      setSelectedDays([...selectedDays, day.id]);
-                    }
-                  }}
-                  disabled={isLoading}
-                  className={`flex-1 h-16 flex items-center justify-center border-4 border-black font-black text-lg transition-colors -ml-1 first:ml-0 ${
-                    selectedDays.includes(day.id)
-                      ? "bg-black text-primary"
-                      : "bg-cream text-black hover:bg-neutral-100"
-                  } ${isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-                >
-                  {day.label}
-                </button>
-              ))}
-            </div>
-            <div className="flex justify-between mt-2 px-1 font-mono text-[10px] text-neutral-400">
-              <span>MON</span>
-              <span>TUE</span>
-              <span>WED</span>
-              <span>THU</span>
-              <span>FRI</span>
-              <span>SAT</span>
-              <span>SUN</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Food Preferences */}
-        <div className="border-4 border-black">
-          <div className="border-b-4 border-black bg-black p-4">
-            <h2 className="font-black text-xl text-cream">FOOD PREFERENCES</h2>
-            <p className="font-mono text-xs text-primary mt-1">SELECT YOUR PREFERRED CUISINE STYLES</p>
-          </div>
-          <div className="p-4 bg-cream">
-            <BrutalistMultiSelect
-              options={FOOD_PREFERENCES}
-              selected={selectedFoodPrefs}
-              onChange={setSelectedFoodPrefs}
-              otherValue={foodPrefsOther}
-              onOtherChange={setFoodPrefsOther}
-              disabled={isLoading}
-            />
-          </div>
-        </div>
-
-        {/* Allergies */}
-        <div className="border-4 border-black">
-          <div className="border-b-4 border-black bg-black p-4">
-            <h2 className="font-black text-xl text-cream">FOOD ALLERGIES</h2>
-          </div>
-          <div className="p-4 bg-cream">
-            <BrutalistMultiSelect
-              options={COMMON_ALLERGIES}
-              selected={selectedAllergies}
-              onChange={setSelectedAllergies}
-              otherValue={allergiesOther}
-              onOtherChange={setAllergiesOther}
-              disabled={isLoading}
-              columns={4}
-              hasNoneOption={true}
-            />
-          </div>
-        </div>
-
-        {/* Dietary Restrictions */}
-        <div className="border-4 border-black">
-          <div className="border-b-4 border-black bg-black p-4">
-            <h2 className="font-black text-xl text-cream">DIETARY RESTRICTIONS</h2>
-          </div>
-          <div className="p-4 bg-cream">
-            <BrutalistMultiSelect
-              options={DIETARY_RESTRICTIONS}
-              selected={selectedRestrictions}
-              onChange={setSelectedRestrictions}
-              otherValue={restrictionsOther}
-              onOtherChange={setRestrictionsOther}
-              disabled={isLoading}
-              hasNoneOption={true}
-            />
-          </div>
-        </div>
-
-        {/* Medical Notes */}
-        <div className="border-4 border-black">
-          <div className="border-b-4 border-black bg-neutral-100 p-4">
-            <h2 className="font-black text-xl text-black">MEDICAL NOTES</h2>
-            <p className="font-mono text-xs text-neutral-500 mt-1">OPTIONAL: INJURIES, CONDITIONS, OR LIMITATIONS</p>
-          </div>
-          <div className="bg-cream">
-            <textarea
-              className="w-full min-h-[120px] p-4 border-0 bg-transparent font-mono text-sm placeholder:text-neutral-400 focus:outline-none resize-none"
-              placeholder="E.G., KNEE INJURY, BACK PAIN, DIABETES, HIGH BLOOD PRESSURE..."
-              value={medicalNotes}
-              onChange={(e) => setMedicalNotes(e.target.value)}
-              disabled={isLoading}
-            />
-          </div>
-        </div>
+        <MedicalSection
+          medicalNotes={medicalNotes}
+          setMedicalNotes={setMedicalNotes}
+          isLoading={isLoading}
+        />
 
         {/* Submit Button */}
         <button
