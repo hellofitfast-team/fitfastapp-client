@@ -15,7 +15,7 @@ const ToastViewport = React.forwardRef<
   <ToastPrimitives.Viewport
     ref={ref}
     className={cn(
-      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
+      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:end-0 sm:top-auto sm:flex-col md:max-w-[420px]",
       className
     )}
     {...props}
@@ -24,7 +24,7 @@ const ToastViewport = React.forwardRef<
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
 
 const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden border-4 border-black p-6 pr-10 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full",
+  "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 rtl:space-x-reverse overflow-hidden border-4 border-black p-6 pe-10 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all data-[swipe=cancel]:translate-x-0 rtl:data-[swipe=cancel]:-translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] rtl:data-[swipe=end]:-translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] rtl:data-[swipe=move]:-translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full",
   {
     variants: {
       variant: {
@@ -76,7 +76,7 @@ const ToastClose = React.forwardRef<
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
-      "absolute right-2 top-2 h-8 w-8 flex items-center justify-center border-2 border-black bg-transparent transition-colors hover:bg-black hover:text-cream focus:outline-none focus:ring-2 focus:ring-primary group-[.destructive]:border-white group-[.destructive]:text-white group-[.destructive]:hover:bg-white group-[.destructive]:hover:text-error-500",
+      "absolute end-2 top-2 h-8 w-8 flex items-center justify-center border-2 border-black bg-transparent transition-colors hover:bg-black hover:text-cream focus:outline-none focus:ring-2 focus:ring-primary group-[.destructive]:border-white group-[.destructive]:text-white group-[.destructive]:hover:bg-white group-[.destructive]:hover:text-error-500",
       className
     )}
     toast-close=""

@@ -56,7 +56,7 @@ export function BrutalistMultiSelect({
             type="button"
             onClick={() => toggle(option.id)}
             disabled={disabled || (hasNoneOption && selected.includes("none") && option.id !== "none")}
-            className={`flex items-center gap-3 border-2 border-black p-4 text-left text-sm font-bold transition-colors -mt-0.5 -ml-0.5 first:mt-0 first:ml-0 ${
+            className={`flex items-center gap-3 border-2 border-black p-4 text-start text-sm font-bold transition-colors -mt-0.5 -ms-0.5 first:mt-0 first:ms-0 ${
               selected.includes(option.id)
                 ? "bg-black text-primary"
                 : "bg-cream text-black hover:bg-neutral-100"
