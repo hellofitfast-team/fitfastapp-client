@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 
 ## Current Position
 
-Phase: 8 of 10 (Component Refactoring) — Complete
-Plan: 5 of 5 in current phase
+Phase: 9 of 10 (Admin Coach Polish) — In Progress
+Plan: 2 of 2 in current phase
 Status: Phase Complete
-Last activity: 2026-02-15 — Completed 08-05: Route Segment Error Boundaries + Phase 8 Final Verification
+Last activity: 2026-02-15 — Completed 09-02: Admin Error Handling & Toast Feedback
 
 Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 24
-- Average duration: 5.6 minutes
-- Total execution time: 2.24 hours
+- Total plans completed: 25
+- Average duration: 5.5 minutes
+- Total execution time: 2.29 hours
 
 **By Phase:**
 
@@ -35,12 +35,13 @@ Progress: [██████████] 100%
 | 06 | 4 | 1272s (21.2m) | 318s |
 | 07 | 1 | 406s (6.8m) | 406s |
 | 08 | 5 | 2257s (37.6m) | 451s |
+| 09 | 2 | 303s (5.1m) | 152s |
 | extra | 2 | — | — (logout fix + admin rebrand) |
 
 **Recent Trend:**
-- Last plan: 08-05 (814s, 2 tasks, 7 files)
-- Previous: 08-04 (366s, 2 tasks, 5 files)
-- Trend: Phase 8 complete - all components under 400 lines, error boundaries added
+- Last plan: 09-02 (303s, 2 tasks, 11 files)
+- Previous: 08-05 (814s, 2 tasks, 7 files)
+- Trend: Phase 9 complete - admin error handling polished, toast feedback added
 
 *Updated after each plan completion*
 | Phase 08 P05 | 814 | 2 tasks | 7 files |
@@ -54,6 +55,8 @@ Progress: [██████████] 100%
 | Phase 06 P01 | 334 | 2 tasks | 5 files |
 | Phase 06 P04 | 314 | 2 tasks | 2 files |
 | Phase 08 P05 | 814 | 2 tasks | 7 files |
+| Phase 09 P02 | 303 | 2 tasks | 11 files |
+| Phase 09 P01 | 346 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -113,6 +116,11 @@ Recent decisions affecting current work:
 - [Phase 08-05]: Route segment error boundaries use brutalist styling for brand consistency
 - [Phase 08-05]: Sentry logging includes route-specific tags (feature, route path) for granular debugging
 - [Phase 08-05]: routeErrors i18n namespace separates route-level errors from generic app errors
+- [Phase 09-02]: Toast replaces saved state for better UX feedback in admin forms
+- [Phase 09-02]: Promise.all results must be explicitly checked for Supabase errors (doesn't throw automatically)
+- [Phase 09-02]: Admin error boundaries use brutalist pattern (same as dashboard) for brand consistency
+- [Phase 09-01]: Use module-scoped error state in hook instead of React context for OneSignal errors (simpler, no extra provider)
+- [Phase 09-01]: Log best-effort OneSignal syncs at warning level (not errors) since they're non-critical
 
 ### Pending Todos
 
