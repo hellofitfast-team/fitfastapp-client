@@ -244,7 +244,7 @@ export default function InitialAssessmentPage() {
           ) : (
             <>
               COMPLETE ASSESSMENT
-              <ArrowRight className="h-6 w-6" />
+              <ArrowRight className="h-6 w-6 rtl:rotate-180" />
             </>
           )}
         </button>

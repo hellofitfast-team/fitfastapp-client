@@ -33,7 +33,7 @@ export function ScheduleSection({
                 }
               }}
               disabled={isLoading}
-              className={`flex-1 h-16 flex items-center justify-center border-4 border-black font-black text-lg transition-colors -ml-1 first:ml-0 ${
+              className={`flex-1 h-16 flex items-center justify-center border-4 border-black font-black text-lg transition-colors -ms-1 first:ms-0 ${
                 selectedDays.includes(day.id)
                   ? "bg-black text-primary"
                   : "bg-cream text-black hover:bg-neutral-100"

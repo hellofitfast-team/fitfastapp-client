@@ -62,7 +62,7 @@ function WelcomeContent() {
         {features.map((feature, index) => (
           <div
             key={index}
-            className="border-4 border-black p-6 hover:bg-black hover:text-cream transition-colors group -mt-1 sm:-mt-0 sm:-ml-1 first:mt-0 first:ml-0"
+            className="border-4 border-black p-6 hover:bg-black hover:text-cream transition-colors group -mt-1 sm:-mt-0 sm:-ms-1 first:mt-0 first:ms-0"
           >
             <div className="flex items-start gap-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center bg-primary group-hover:bg-primary-light">
@@ -86,7 +86,7 @@ function WelcomeContent() {
         <Link href="/initial-assessment">
           <button className="inline-flex items-center gap-3 h-16 px-12 bg-primary text-white font-black text-xl uppercase tracking-wide hover:bg-black transition-colors">
             {t("getStarted").toUpperCase()}
-            <ArrowRight className="h-6 w-6" />
+            <ArrowRight className="h-6 w-6 rtl:rotate-180" />
           </button>
         </Link>
         <p className="font-mono text-xs tracking-[0.15em] text-neutral-500">

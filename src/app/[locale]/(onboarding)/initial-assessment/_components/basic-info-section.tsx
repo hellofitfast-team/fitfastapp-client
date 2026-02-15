@@ -92,7 +92,7 @@ export function BasicInfoSection({
               onClick={() => setExperienceLevel(level)}
               disabled={isLoading}
               className={`p-6 text-center transition-colors ${
-                index < 2 ? "border-r-4 border-black" : ""
+                index < 2 ? "border-e-4 border-black" : ""
               } ${
                 experienceLevel === level
                   ? "bg-primary text-black"
@@ -121,7 +121,7 @@ export function BasicInfoSection({
               value={equipment}
               onChange={(e) => setEquipment(e.target.value)}
               disabled={isLoading}
-              className="w-full h-14 px-4 pr-12 border-4 border-black bg-cream font-bold text-sm uppercase appearance-none focus:outline-none focus:bg-white transition-colors cursor-pointer"
+              className="w-full h-14 px-4 pe-12 border-4 border-black bg-cream font-bold text-sm uppercase appearance-none focus:outline-none focus:bg-white transition-colors cursor-pointer"
             >
               <option value="">SELECT YOUR EQUIPMENT ACCESS</option>
               {EQUIPMENT_OPTIONS.map((option) => (
@@ -130,7 +130,7 @@ export function BasicInfoSection({
                 </option>
               ))}
             </select>
-            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 pointer-events-none" />
+            <ChevronDown className="absolute end-4 top-1/2 -translate-y-1/2 h-5 w-5 pointer-events-none" />
           </div>
           {equipment === "other" && (
             <input
