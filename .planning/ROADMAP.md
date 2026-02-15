@@ -212,11 +212,11 @@ Plans:
   4. Settings page errors logged to Sentry (no silent swallowing)
   5. Admin panel provides clear feedback for all error states
 
-**Plans**: TBD (estimated 5-7 plans)
+**Plans:** 2 plans
 
 Plans:
-- [ ] 09-01: TBD after planning
-- [ ] 09-02: TBD after planning
+- [ ] 09-01-PLAN.md — OneSignal graceful degradation with Sentry logging + disabled notification UI
+- [ ] 09-02-PLAN.md — Admin settings form error handling with toast + admin route error boundaries
 
 ### Phase 10: RTL Audit
 **Goal**: Arabic/RTL experience is polished and complete across all user flows
@@ -254,9 +254,9 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 | 6. UX Polish | 5/5 | ✓ Complete | 2026-02-13 |
 | 7. Performance | 1/1 | ✓ Complete | 2026-02-13 |
 | 8. Refactoring | 5/5 | ✓ Complete | 2026-02-15 |
-| 9. Admin Polish | 0/TBD | Not started | - |
+| 9. Admin Polish | 0/2 | In Progress | - |
 | 10. RTL Audit | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-15 (Phase 8 complete)*
+*Last updated: 2026-02-15 (Phase 9 planned)*
