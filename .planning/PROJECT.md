@@ -1,8 +1,27 @@
-# FitFast — Polish & Rebrand Milestone
+# FitFast — AI-Powered Fitness Coaching PWA
 
 ## What This Is
 
-A polish and refinement milestone for FitFast, an AI-powered fitness coaching PWA for the Egyptian/MENA market. The app is functionally complete — this milestone is about auditing every user flow end-to-end (client + coach, English + Arabic), fixing bugs, hardening error handling, optimizing UX, and rebranding from orange/green to Royal Blue. The goal is demo-ready quality: walk a coach through it and nothing embarrasses you.
+An AI-powered fitness coaching PWA for the Egyptian/MENA market, polished and demo-ready. The app handles the full client lifecycle: signup, onboarding, AI-generated meal/workout plans, check-ins with photo uploads, progress tracking, and coach administration. Fully bilingual (English + Arabic/RTL) with Royal Blue branding.
+
+## Current State
+
+**Shipped:** v1.0 Polish & Rebrand (2026-02-16)
+**Codebase:** 16,905 LOC TypeScript across 218 files
+**Stack:** Next.js 16.1.6, React 19, Supabase SSR 0.8, Tailwind v4, shadcn/ui
+
+**What's working:**
+- Client flow: login → onboarding → dashboard → check-in → AI plans → tracking
+- Coach flow: admin login → signups → clients → tickets → settings
+- Arabic/RTL: 490/490 translation keys, logical CSS, locale-aware formatting
+- Reliability: Zod validation on all 13 API endpoints, retry logic, Sentry error tracking
+- UX: Skeleton loading, empty states, inline validation, 48px touch targets, error boundaries
+
+**Known limitations (tech debt from v1.0):**
+- AI-generated plans in English only regardless of locale
+- Push notifications in English only
+- Ticket system is single-response (no thread conversations)
+- AI model names and parameters hardcoded (not env vars)
 
 ## Core Value
 
@@ -12,75 +31,63 @@ Every user flow — from signup to plan generation to coach approval — works r
 
 ### Validated
 
-- ✓ Client auth (magic link signup, login, session persistence) — existing
-- ✓ Onboarding flow (profile creation, initial assessment) — existing
-- ✓ AI meal plan generation via OpenRouter/DeepSeek V3 — existing
-- ✓ AI workout plan generation via OpenRouter/DeepSeek V3 — existing
-- ✓ Check-in flow with photo uploads — existing
-- ✓ Client dashboard with streaks, progress, schedule — existing
-- ✓ Weight/measurement tracking with charts — existing
-- ✓ Support ticket system — existing
-- ✓ Coach admin panel (signup approval, client management, tickets) — existing
-- ✓ OCR payment verification via Qwen VL — existing
-- ✓ Push notifications via OneSignal — existing
-- ✓ PWA with service worker and offline fallback — existing
-- ✓ Bilingual support (English + Arabic/RTL) — existing
-- ✓ Sentry error tracking — existing
-- ✓ RLS on all tables — existing
+- ✓ THEME-01: Primary CSS variables swapped to Royal Blue — v1.0
+- ✓ THEME-02: WCAG AA contrast ratio verified — v1.0
+- ✓ THEME-03: PWA manifest/meta tags updated — v1.0
+- ✓ RELY-01: JSON.parse wrapped with error handling — v1.0
+- ✓ RELY-02: OpenRouter retry (3x, exponential backoff) — v1.0
+- ✓ RELY-03: Silent .catch() replaced with Sentry — v1.0
+- ✓ RELY-04: AI output validated with Zod — v1.0
+- ✓ RELY-05: Plan generation failure warning to user — v1.0
+- ✓ UX-01: Skeleton loading states — v1.0
+- ✓ UX-02: Empty states with guidance — v1.0
+- ✓ UX-03: Inline form validation on blur — v1.0
+- ✓ UX-04: 48x48px touch targets — v1.0
+- ✓ PERF-01: Check-in parallel data fetching — v1.0
+- ✓ PERF-02: Admin clients pagination — v1.0
+- ✓ PERF-03: Progress chart date range filter — v1.0 (pre-existing)
+- ✓ RTL-01: All pages audited in Arabic — v1.0
+- ✓ RTL-02: Progress bars respect RTL — v1.0
+- ✓ RTL-03: Locale-aware date/number formatting — v1.0
+- ✓ RTL-04: Translation key parity (490/490) — v1.0
+- ✓ ADMIN-01: OneSignal failure visibility — v1.0
+- ✓ ADMIN-02: OCR Zod validation — v1.0
+- ✓ ADMIN-03: Settings error toast + Sentry — v1.0
 
 ### Active
 
-- [ ] Swap color theme from orange/green to Royal Blue (primary color swap only)
-- [ ] Audit and fix client flow end-to-end (signup → onboarding → dashboard → check-in → plans)
-- [ ] Audit and fix coach/admin flow end-to-end (login → signups → clients → tickets → notifications)
-- [ ] Audit and fix Arabic/RTL experience in both flows
-- [ ] Fix JSON.parse calls without error handling in AI pipeline
-- [ ] Add retry logic to OpenRouter API calls (3 retries, exponential backoff)
-- [ ] Fix silent error swallowing (.catch(() => {}) patterns)
-- [ ] Fix plan generation silent failure on check-in (log to DB, show user warning)
-- [ ] Validate AI plan output with Zod before database save
-- [ ] Add pagination to admin clients list (scales to 1000 clients)
-- [ ] Fix OneSignal initialization failure visibility (Sentry + user feedback)
-- [ ] Harden OCR data validation (Zod schema before storage)
-- [ ] Optimize check-in page performance (reduce sequential Supabase calls)
-- [ ] Fix unhandled promise rejections in settings page
-- [ ] General UX polish: loading states, error messages, empty states, consistency
+(None — next milestone requirements TBD via `/gsd:new-milestone`)
 
 ### Out of Scope
 
-- New features (token usage dashboard, plan versioning, email notifications) — future milestone
-- Test suite creation — separate effort, not blocking demo-readiness
-- Reducing `as any`/`as never` casts — type system cleanup is separate from UX polish
 - Multi-coach support — single coach per deployment is the model
-- Marketing landing page — next milestone after this
-- Mobile app — web PWA only
-
-## Context
-
-- App is functionally complete but hasn't been thoroughly tested end-to-end recently
-- Codebase mapping (`.planning/codebase/`) identified 382 lines of concerns including bugs, tech debt, security, and performance issues
-- The CONCERNS.md flagged: silent error swallowing, missing JSON error handling, no retry logic, pagination gaps, fragile AI pipeline
-- This is a brownfield milestone — all code exists, we're refining not building
-- After this milestone: marketing landing page (separate project/milestone)
-- Target audience for demo: potential coach buyers who need to see a polished product
+- Mobile native app — Web PWA only
+- Dark mode — not needed for demo
+- Real-time features — high complexity, not core to demo value
+- Test suite — separate effort, not blocking demo-readiness
 
 ## Constraints
 
-- **Color change**: Primary swap only (orange/green → Royal Blue). Don't redesign components or layout.
-- **No new features**: Only fix and polish what exists. Resist scope creep.
-- **Both languages**: Every fix must work in English AND Arabic/RTL.
-- **Demo-ready bar**: A coach walking through the app should see zero broken states, zero ugly screens, zero confusing flows.
-- **Existing stack**: Next.js 16 / React 19 / Supabase / Tailwind v4 / shadcn/ui — no stack changes.
+- **Single coach per instance** — not SaaS, sold as one-off to individual coaches
+- **Both languages equally** — MENA market requires Arabic/RTL quality
+- **Cost efficiency** — <$0.20 USD per client per month for AI
+- **Demo-ready bar** — coach walking through app sees zero broken states
+- **Existing stack** — Next.js 16 / React 19 / Supabase / Tailwind v4 / shadcn/ui
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Royal Blue as primary color | User preference for rebrand | — Pending |
-| Polish over new features | Get existing app solid before expanding | — Pending |
-| Both languages equally | MENA market requires Arabic/RTL quality | — Pending |
-| Demo-ready as done criteria | Next step is selling to coaches | — Pending |
-| Skip test suite for now | Focus on visible UX, not infrastructure | — Pending |
+| Royal Blue as primary color | User preference for rebrand | ✓ Good — clean professional look |
+| Polish over new features | Get existing app solid before expanding | ✓ Good — 22/22 requirements met |
+| Both languages equally | MENA market requires Arabic/RTL quality | ✓ Good — 490/490 keys, Playwright verified |
+| Demo-ready as done criteria | Next step is selling to coaches | ✓ Good — all flows functional |
+| Skip test suite for now | Focus on visible UX, not infrastructure | ⚠️ Revisit — consider for v1.1 |
+| Semantic Tailwind classes over hex | Maintainability and theme consistency | ✓ Good — zero hardcoded colors |
+| Zod for all validation | Consistent validation at API boundaries | ✓ Good — 13 endpoints covered |
+| FormProvider pattern for large forms | Avoid prop drilling through 5+ steps | ✓ Good — clean component hierarchy |
+| ar-u-nu-latn for Arabic numbers | Western numerals (0-9) for readability | — Pending user feedback |
+| Error boundaries per route segment | Isolate failures, prevent cascading crashes | ✓ Good — 5 routes protected |
 
 ---
-*Last updated: 2026-02-12 after initialization*
+*Last updated: 2026-02-16 after v1.0 milestone*
