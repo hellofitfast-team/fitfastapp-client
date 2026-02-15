@@ -347,7 +347,7 @@ export default function SettingsPage() {
                 {t("daysRemaining")}
               </p>
               <p className="text-4xl font-black">{daysRemaining}</p>
-              <div className="mt-3 h-4 border-2 border-black bg-cream">
+              <div className="mt-3 h-4 border-2 border-black bg-cream" dir={locale === "ar" ? "rtl" : "ltr"}>
                 <div
                   className="h-full bg-primary"
                   style={{ width: `${progressPercentage.toFixed(1)}%` }}
