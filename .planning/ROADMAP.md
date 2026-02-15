@@ -23,7 +23,7 @@ This milestone transforms FitFast from functionally complete to demo-ready. We s
 - [ ] **Phase 6: UX Polish** - Consistent loading states, empty states, form validation, touch targets
 - [ ] **Phase 7: Performance Optimization** - Admin pagination, chart filters for scalability
 - [ ] **Phase 8: Component Refactoring** - Extract hooks, split large components, add error boundaries
-- [ ] **Phase 9: Admin/Coach Polish** - OneSignal error handling, settings error surfacing
+- [x] **Phase 9: Admin/Coach Polish** - OneSignal error handling, settings error surfacing
 - [ ] **Phase 10: RTL Audit** - Comprehensive Arabic/bilingual experience verification
 
 ## Phase Details
@@ -215,8 +215,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — OneSignal graceful degradation with Sentry logging + disabled notification UI
-- [ ] 09-02-PLAN.md — Admin settings form error handling with toast + admin route error boundaries
+- [x] 09-01-PLAN.md — OneSignal graceful degradation with Sentry logging + disabled notification UI
+- [x] 09-02-PLAN.md — Admin settings form error handling with toast + admin route error boundaries
 
 ### Phase 10: RTL Audit
 **Goal**: Arabic/RTL experience is polished and complete across all user flows
@@ -254,9 +254,9 @@ Parallel opportunities: Phase 1 with Phase 3, Phase 6 with Phase 7
 | 6. UX Polish | 5/5 | ✓ Complete | 2026-02-13 |
 | 7. Performance | 1/1 | ✓ Complete | 2026-02-13 |
 | 8. Refactoring | 5/5 | ✓ Complete | 2026-02-15 |
-| 9. Admin Polish | 0/2 | In Progress | - |
+| 9. Admin Polish | 2/2 | ✓ Complete | 2026-02-15 |
 | 10. RTL Audit | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-15 (Phase 9 planned)*
+*Last updated: 2026-02-15 (Phase 9 complete)*
