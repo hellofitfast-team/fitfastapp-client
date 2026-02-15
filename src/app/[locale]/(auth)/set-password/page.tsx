@@ -197,7 +197,7 @@ export default function SetPasswordPage() {
               {t("password")}
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none border-r-4 border-black w-12">
+              <div className="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none border-e-4 border-black w-12">
                 <Lock className="h-5 w-5" />
               </div>
               <input
@@ -205,7 +205,7 @@ export default function SetPasswordPage() {
                 type="password"
                 placeholder="••••••••"
                 autoComplete="new-password"
-                className="w-full h-14 pl-16 pr-4 border-4 border-black bg-cream font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
+                className="w-full h-14 ps-16 pe-4 border-4 border-black bg-cream font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
                 {...register("password")}
                 disabled={isLoading}
               />
@@ -237,7 +237,7 @@ export default function SetPasswordPage() {
               {t("confirmPassword")}
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none border-r-4 border-black w-12">
+              <div className="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none border-e-4 border-black w-12">
                 <Lock className="h-5 w-5" />
               </div>
               <input
@@ -245,7 +245,7 @@ export default function SetPasswordPage() {
                 type="password"
                 placeholder="••••••••"
                 autoComplete="new-password"
-                className="w-full h-14 pl-16 pr-4 border-4 border-black bg-cream font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
+                className="w-full h-14 ps-16 pe-4 border-4 border-black bg-cream font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
                 {...register("confirmPassword")}
                 disabled={isLoading}
               />
@@ -265,7 +265,7 @@ export default function SetPasswordPage() {
             ) : (
               <>
                 {t("setPassword").toUpperCase()}
-                <ArrowRight className="h-5 w-5" />
+                <ArrowRight className="h-5 w-5 rtl:rotate-180" />
               </>
             )}
           </button>

@@ -90,7 +90,7 @@ export default function MagicLinkPage() {
 
           <Link href="/login" className="block">
             <button className="w-full h-14 border-4 border-black bg-cream font-black text-lg uppercase tracking-wide hover:bg-black hover:text-cream transition-colors flex items-center justify-center gap-3">
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
               {tCommon("back").toUpperCase()} TO {t("login").toUpperCase()}
             </button>
           </Link>
@@ -128,7 +128,7 @@ export default function MagicLinkPage() {
               {t("email")}
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none border-r-4 border-black w-12">
+              <div className="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none border-e-4 border-black w-12">
                 <Mail className="h-5 w-5" />
               </div>
               <input
@@ -136,7 +136,7 @@ export default function MagicLinkPage() {
                 type="email"
                 placeholder="YOU@EXAMPLE.COM"
                 autoComplete="email"
-                className="w-full h-14 pl-16 pr-4 border-4 border-black bg-cream font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
+                className="w-full h-14 ps-16 pe-4 border-4 border-black bg-cream font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
                 {...register("email")}
                 disabled={isLoading}
               />
@@ -165,7 +165,7 @@ export default function MagicLinkPage() {
         <div className="mt-6">
           <Link href="/login">
             <button className="w-full h-12 border-4 border-black bg-cream font-bold text-sm uppercase tracking-wide hover:bg-black hover:text-cream transition-colors flex items-center justify-center gap-2">
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
               {tCommon("back").toUpperCase()} TO {t("login").toUpperCase()}
             </button>
           </Link>

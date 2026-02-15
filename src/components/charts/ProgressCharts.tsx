@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Weight } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 // Theme colors for charts - must match globals.css
 const CHART_COLORS = {
@@ -50,6 +50,7 @@ export default function ProgressCharts({
   adherenceStats,
 }: ProgressChartsProps) {
   const t = useTranslations("progress");
+  const locale = useLocale();
 
   return (
     <div className="space-y-6">
@@ -68,22 +69,24 @@ export default function ProgressCharts({
         </div>
         <div className="p-6">
           {weightChartData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={weightChartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.black} strokeOpacity={0.1} />
-                <XAxis dataKey="date" stroke={CHART_COLORS.black} fontSize={12} tickLine={false} />
-                <YAxis stroke={CHART_COLORS.black} fontSize={12} tickLine={false} domain={["dataMin - 2", "dataMax + 2"]} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: CHART_COLORS.cream,
-                    border: `4px solid ${CHART_COLORS.black}`,
-                    borderRadius: "0",
-                    fontWeight: "bold",
-                  }}
-                />
-                <Line type="monotone" dataKey="weight" stroke={CHART_COLORS.primary} strokeWidth={4} dot={{ fill: CHART_COLORS.primary, r: 6, strokeWidth: 2, stroke: CHART_COLORS.black }} activeDot={{ r: 8 }} />
-              </LineChart>
-            </ResponsiveContainer>
+            <div dir="ltr">
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={weightChartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.black} strokeOpacity={0.1} />
+                  <XAxis dataKey="date" stroke={CHART_COLORS.black} fontSize={12} tickLine={false} />
+                  <YAxis stroke={CHART_COLORS.black} fontSize={12} tickLine={false} domain={["dataMin - 2", "dataMax + 2"]} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: CHART_COLORS.cream,
+                      border: `4px solid ${CHART_COLORS.black}`,
+                      borderRadius: "0",
+                      fontWeight: "bold",
+                    }}
+                  />
+                  <Line type="monotone" dataKey="weight" stroke={CHART_COLORS.primary} strokeWidth={4} dot={{ fill: CHART_COLORS.primary, r: 6, strokeWidth: 2, stroke: CHART_COLORS.black }} activeDot={{ r: 8 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           ) : (
             <div className="flex h-[300px] items-center justify-center border-4 border-dashed border-black">
               <div className="text-center">
@@ -105,8 +108,15 @@ export default function ProgressCharts({
             <div className="flex items-center justify-between mb-4">
               <span className="text-5xl font-black">{adherenceStats.mealAdherence.toFixed(0)}%</span>
             </div>
-            <div className="h-6 border-4 border-black bg-neutral-100">
-              <div className="h-full bg-success-500 transition-all" style={{ width: `${adherenceStats.mealAdherence}%` }} />
+            <div className="h-6 border-4 border-black bg-neutral-100" dir={locale === "ar" ? "rtl" : "ltr"}>
+              <div
+                className="h-full bg-success-500 transition-all"
+                style={{
+                  width: `${adherenceStats.mealAdherence}%`,
+                  marginInlineStart: 0,
+                  marginInlineEnd: "auto"
+                }}
+              />
             </div>
           </div>
         </div>
@@ -119,8 +129,15 @@ export default function ProgressCharts({
             <div className="flex items-center justify-between mb-4">
               <span className="text-5xl font-black">{adherenceStats.workoutAdherence.toFixed(0)}%</span>
             </div>
-            <div className="h-6 border-4 border-black bg-neutral-100">
-              <div className="h-full bg-primary transition-all" style={{ width: `${adherenceStats.workoutAdherence}%` }} />
+            <div className="h-6 border-4 border-black bg-neutral-100" dir={locale === "ar" ? "rtl" : "ltr"}>
+              <div
+                className="h-full bg-primary transition-all"
+                style={{
+                  width: `${adherenceStats.workoutAdherence}%`,
+                  marginInlineStart: 0,
+                  marginInlineEnd: "auto"
+                }}
+              />
             </div>
           </div>
         </div>

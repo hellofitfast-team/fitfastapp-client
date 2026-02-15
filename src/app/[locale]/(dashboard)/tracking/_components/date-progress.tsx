@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Calendar, CheckCircle2 } from "lucide-react";
 
 interface DateProgressProps {
@@ -11,6 +11,9 @@ interface DateProgressProps {
 
 export function DateProgress({ selectedDate, onDateChange, completionPercentage }: DateProgressProps) {
   const t = useTranslations("tracking");
+  // Note: useLocale imported for future RTL awareness.
+  // Circular progress: No RTL flip needed. Circle fills counterclockwise
+  // from top in both LTR and RTL, which is the expected behavior.
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">

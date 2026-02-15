@@ -122,14 +122,14 @@ export default function AdminLoginPage() {
                   {t("email")}
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+                  <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
                     <Mail className="h-4 w-4 text-stone-400" />
                   </div>
                   <input
                     id="email"
                     type="email"
                     placeholder="coach@fitfast.app"
-                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-stone-200 bg-stone-50 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    className="w-full h-11 ps-10 pe-4 rounded-xl border border-stone-200 bg-stone-50 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                     {...register("email")}
                     disabled={isLoading}
                   />
@@ -149,14 +149,14 @@ export default function AdminLoginPage() {
                   {t("password")}
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+                  <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
                     <Lock className="h-4 w-4 text-stone-400" />
                   </div>
                   <input
                     id="password"
                     type="password"
                     placeholder="••••••••"
-                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-stone-200 bg-stone-50 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    className="w-full h-11 ps-10 pe-4 rounded-xl border border-stone-200 bg-stone-50 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                     {...register("password")}
                     disabled={isLoading}
                   />
@@ -178,7 +178,7 @@ export default function AdminLoginPage() {
                 ) : (
                   <>
                     {t("signIn")}
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="h-4 w-4 rtl:rotate-180" />
                   </>
                 )}
               </button>

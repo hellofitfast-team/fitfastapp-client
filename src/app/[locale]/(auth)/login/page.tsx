@@ -107,14 +107,14 @@ export default function LoginPage() {
               {t("email")}
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none border-r-4 border-black w-12">
+              <div className="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none border-e-4 border-black w-12">
                 <Mail className="h-5 w-5" />
               </div>
               <input
                 id="email"
                 type="email"
                 placeholder="YOU@EXAMPLE.COM"
-                className="w-full h-14 pl-16 pr-4 border-4 border-black bg-cream font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
+                className="w-full h-14 ps-16 pe-4 border-4 border-black bg-cream font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
                 {...register("email")}
                 disabled={isLoading}
               />
@@ -137,14 +137,14 @@ export default function LoginPage() {
               </Link>
             </div>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none border-r-4 border-black w-12">
+              <div className="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none border-e-4 border-black w-12">
                 <Lock className="h-5 w-5" />
               </div>
               <input
                 id="password"
                 type="password"
                 placeholder="••••••••"
-                className="w-full h-14 pl-16 pr-4 border-4 border-black bg-cream font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
+                className="w-full h-14 ps-16 pe-4 border-4 border-black bg-cream font-mono text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white transition-colors"
                 {...register("password")}
                 disabled={isLoading}
               />
@@ -164,7 +164,7 @@ export default function LoginPage() {
             ) : (
               <>
                 {t("signIn").toUpperCase()}
-                <ArrowRight className="h-5 w-5" />
+                <ArrowRight className="h-5 w-5 rtl:rotate-180" />
               </>
             )}
           </button>
