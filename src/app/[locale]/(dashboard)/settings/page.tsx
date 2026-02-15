@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { User, Bell, Shield, CreditCard, ChevronDown, LogOut } from "lucide-react";
+import { User, Bell, Shield, CreditCard, ChevronDown, LogOut, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
 import { createClient } from "@/lib/supabase/client";
@@ -22,7 +22,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 export default function SettingsPage() {
   const t = useTranslations("settings");
   const { profile, signOut, user, refetch } = useAuth();
-  const { isSupported, isSubscribed, permission, toggleSubscription, loading: notifLoading } = useNotifications();
+  const { isSupported, isSubscribed, permission, toggleSubscription, loading: notifLoading, error: notifError } = useNotifications();
 
   // React Hook Form for profile settings
   const { register, handleSubmit, formState: { errors }, reset } = useForm<ProfileFormData>({
@@ -208,56 +208,76 @@ export default function SettingsPage() {
           </h2>
         </div>
         <div className="p-6 space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-black uppercase">{t("enableNotifications")}</p>
-              <p className="font-mono text-xs text-neutral-500 mt-1">
-                {isSupported
-                  ? permission === "denied"
-                    ? t("notificationsDenied").toUpperCase()
-                    : t("notificationsDescription").toUpperCase()
-                  : t("notificationsUnsupported").toUpperCase()}
-              </p>
+          {notifError ? (
+            <div className="border-4 border-black bg-amber-50 p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-amber-500">
+                  <AlertTriangle className="h-5 w-5 text-black" strokeWidth={3} />
+                </div>
+                <div className="space-y-1">
+                  <p className="font-black text-sm uppercase text-amber-900">
+                    {t("notificationsUnavailableTitle")}
+                  </p>
+                  <p className="font-mono text-xs text-amber-700">
+                    {t("notificationsUnavailableDescription")}
+                  </p>
+                </div>
+              </div>
             </div>
-            {notifLoading ? (
-              <Skeleton className="h-8 w-16" />
-            ) : (
-              <button
-                onClick={() => toggleSubscription()}
-                disabled={!isSupported || (permission === "denied" && !isSubscribed)}
-                className={`relative h-8 w-16 border-4 border-black transition-colors ${
-                  isSubscribed ? "bg-primary" : "bg-neutral-200"
-                } ${(!isSupported || permission === "denied") ? "opacity-50 cursor-not-allowed" : ""}`}
-                role="switch"
-                aria-checked={isSubscribed}
-              >
-                <span
-                  className={`absolute top-0 h-full w-1/2 bg-black transition-transform ${
-                    isSubscribed ? "translate-x-full" : "translate-x-0"
-                  }`}
+          ) : (
+            <>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-black uppercase">{t("enableNotifications")}</p>
+                  <p className="font-mono text-xs text-neutral-500 mt-1">
+                    {isSupported
+                      ? permission === "denied"
+                        ? t("notificationsDenied").toUpperCase()
+                        : t("notificationsDescription").toUpperCase()
+                      : t("notificationsUnsupported").toUpperCase()}
+                  </p>
+                </div>
+                {notifLoading ? (
+                  <Skeleton className="h-8 w-16" />
+                ) : (
+                  <button
+                    onClick={() => toggleSubscription()}
+                    disabled={!isSupported || (permission === "denied" && !isSubscribed)}
+                    className={`relative h-8 w-16 border-4 border-black transition-colors ${
+                      isSubscribed ? "bg-primary" : "bg-neutral-200"
+                    } ${(!isSupported || permission === "denied") ? "opacity-50 cursor-not-allowed" : ""}`}
+                    role="switch"
+                    aria-checked={isSubscribed}
+                  >
+                    <span
+                      className={`absolute top-0 h-full w-1/2 bg-black transition-transform ${
+                        isSubscribed ? "translate-x-full" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                )}
+              </div>
+              <div>
+                <label className="block font-bold text-xs uppercase tracking-wide mb-2">
+                  {t("reminderTime")}
+                </label>
+                <input
+                  type="time"
+                  value={reminderTime}
+                  onChange={(e) => {
+                    const newTime = e.target.value;
+                    setReminderTime(newTime);
+                    fetch("/api/notifications/reminder-time", {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ reminder_time: newTime }),
+                    }).catch(() => {});
+                  }}
+                  className="h-12 px-4 border-4 border-black bg-cream font-mono text-sm focus:outline-none focus:bg-white transition-colors"
                 />
-              </button>
-            )}
-          </div>
-          <div>
-            <label className="block font-bold text-xs uppercase tracking-wide mb-2">
-              {t("reminderTime")}
-            </label>
-            <input
-              type="time"
-              value={reminderTime}
-              onChange={(e) => {
-                const newTime = e.target.value;
-                setReminderTime(newTime);
-                fetch("/api/notifications/reminder-time", {
-                  method: "PUT",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ reminder_time: newTime }),
-                }).catch(() => {});
-              }}
-              className="h-12 px-4 border-4 border-black bg-cream font-mono text-sm focus:outline-none focus:bg-white transition-colors"
-            />
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
