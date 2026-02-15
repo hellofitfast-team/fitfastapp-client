@@ -318,7 +318,19 @@
     "subjectPlaceholder": "Brief description of your issue",
     "descriptionPlaceholder": "Describe your issue in detail...",
     "uploadHint": "Click to upload screenshot",
-    "noTicketsTitle": "No Tickets Yet"
+    "noTicketsTitle": "No Tickets Yet",
+    "backToTickets": "Back to Tickets",
+    "you": "You",
+    "coach": "Coach",
+    "viewScreenshot": "View Screenshot",
+    "replyToTicket": "Reply",
+    "replyPlaceholder": "Type your reply...",
+    "sendReply": "Send Reply",
+    "sending": "Sending...",
+    "clientReply": "Client Reply",
+    "ticketClosed": "This ticket has been closed",
+    "ticketNotFound": "Ticket not found",
+    "fetchError": "Failed to load ticket"
   },
   "faq": {
     "title": "Frequently Asked Questions",
@@ -533,5 +545,32 @@
     "equipmentSpecify": "Please specify your equipment",
     "signInRequired": "Please sign in to continue",
     "unexpectedError": "An unexpected error occurred"
+  },
+  "routeErrors": {
+    "checkIn": {
+      "title": "CHECK-IN ERROR",
+      "description": "We couldn't load the check-in form. Please try again.",
+      "retry": "TRY AGAIN"
+    },
+    "settings": {
+      "title": "SETTINGS ERROR",
+      "description": "We couldn't load your settings. Please try again.",
+      "retry": "TRY AGAIN"
+    },
+    "tickets": {
+      "title": "TICKETS ERROR",
+      "description": "We couldn't load your tickets. Please try again.",
+      "retry": "TRY AGAIN"
+    },
+    "progress": {
+      "title": "PROGRESS ERROR",
+      "description": "We couldn't load your progress data. Please try again.",
+      "retry": "TRY AGAIN"
+    },
+    "tracking": {
+      "title": "TRACKING ERROR",
+      "description": "We couldn't load your tracking data. Please try again.",
+      "retry": "TRY AGAIN"
+    }
   }
 }

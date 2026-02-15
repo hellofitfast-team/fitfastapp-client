@@ -318,7 +318,19 @@
     "subjectPlaceholder": "وصف مختصر لمشكلتك",
     "descriptionPlaceholder": "صف مشكلتك بالتفصيل...",
     "uploadHint": "اضغط لرفع صورة الشاشة",
-    "noTicketsTitle": "لا توجد تذاكر بعد"
+    "noTicketsTitle": "لا توجد تذاكر بعد",
+    "backToTickets": "العودة للتذاكر",
+    "you": "أنت",
+    "coach": "المدرب",
+    "viewScreenshot": "عرض الصورة",
+    "replyToTicket": "الرد",
+    "replyPlaceholder": "اكتب ردك...",
+    "sendReply": "إرسال الرد",
+    "sending": "جاري الإرسال...",
+    "clientReply": "رد العميل",
+    "ticketClosed": "تم إغلاق هذه التذكرة",
+    "ticketNotFound": "التذكرة غير موجودة",
+    "fetchError": "فشل تحميل التذكرة"
   },
   "faq": {
     "title": "الأسئلة الشائعة",
@@ -533,5 +545,32 @@
     "equipmentSpecify": "يرجى تحديد المعدات الخاصة بك",
     "signInRequired": "يرجى تسجيل الدخول للمتابعة",
     "unexpectedError": "حدث خطأ غير متوقع"
+  },
+  "routeErrors": {
+    "checkIn": {
+      "title": "خطأ في المتابعة",
+      "description": "لم نتمكن من تحميل نموذج المتابعة. يرجى المحاولة مرة أخرى.",
+      "retry": "حاول مرة أخرى"
+    },
+    "settings": {
+      "title": "خطأ في الإعدادات",
+      "description": "لم نتمكن من تحميل إعداداتك. يرجى المحاولة مرة أخرى.",
+      "retry": "حاول مرة أخرى"
+    },
+    "tickets": {
+      "title": "خطأ في التذاكر",
+      "description": "لم نتمكن من تحميل تذاكرك. يرجى المحاولة مرة أخرى.",
+      "retry": "حاول مرة أخرى"
+    },
+    "progress": {
+      "title": "خطأ في التقدم",
+      "description": "لم نتمكن من تحميل بيانات تقدمك. يرجى المحاولة مرة أخرى.",
+      "retry": "حاول مرة أخرى"
+    },
+    "tracking": {
+      "title": "خطأ في التتبع",
+      "description": "لم نتمكن من تحميل بيانات التتبع. يرجى المحاولة مرة أخرى.",
+      "retry": "حاول مرة أخرى"
+    }
   }
 }
