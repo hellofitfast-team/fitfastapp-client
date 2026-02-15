@@ -5,6 +5,8 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Save, CreditCard, Calendar, Tag } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import * as Sentry from "@sentry/nextjs";
 
 interface AdminSettingsFormProps {
   config: Record<string, unknown>;
@@ -14,7 +16,6 @@ export function AdminSettingsForm({ config }: AdminSettingsFormProps) {
   const t = useTranslations("admin");
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [saved, setSaved] = useState(false);
 
   const instapay = (config.coach_instapay_account ?? {
     name: "",
@@ -40,32 +41,65 @@ export function AdminSettingsForm({ config }: AdminSettingsFormProps) {
   const handleSave = async () => {
     const supabase = createClient();
 
-    await Promise.all([
-      supabase
-        .from("system_config")
-        .update({ value: checkInDays } as never)
-        .eq("key", "check_in_frequency_days"),
-      supabase
-        .from("system_config")
-        .update({
-          value: JSON.stringify({ name: instapayName, number: instapayNumber }),
-        } as never)
-        .eq("key", "coach_instapay_account"),
-      supabase
-        .from("system_config")
-        .update({
-          value: JSON.stringify({
-            "3_months": Number(price3) || 0,
-            "6_months": Number(price6) || 0,
-            "12_months": Number(price12) || 0,
-          }),
-        } as never)
-        .eq("key", "plan_pricing"),
-    ]);
+    try {
+      const results = await Promise.all([
+        supabase
+          .from("system_config")
+          .update({ value: checkInDays } as never)
+          .eq("key", "check_in_frequency_days"),
+        supabase
+          .from("system_config")
+          .update({
+            value: JSON.stringify({ name: instapayName, number: instapayNumber }),
+          } as never)
+          .eq("key", "coach_instapay_account"),
+        supabase
+          .from("system_config")
+          .update({
+            value: JSON.stringify({
+              "3_months": Number(price3) || 0,
+              "6_months": Number(price6) || 0,
+              "12_months": Number(price12) || 0,
+            }),
+          } as never)
+          .eq("key", "plan_pricing"),
+      ]);
 
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-    startTransition(() => router.refresh());
+      // Check for Supabase errors in any update
+      const errors = results.filter((r) => r.error);
+      if (errors.length > 0) {
+        throw new Error(
+          `Failed to update ${errors.length} setting(s): ${errors.map((e) => e.error?.message).join(", ")}`
+        );
+      }
+
+      // Success feedback
+      toast({
+        title: t("saveSuccess"),
+        description: t("saveSuccessDescription"),
+      });
+
+      startTransition(() => router.refresh());
+    } catch (error) {
+      // Log to Sentry with admin context
+      Sentry.captureException(error, {
+        tags: {
+          feature: "admin-settings",
+          operation: "update-config",
+          panel: "admin",
+        },
+        extra: {
+          configKeys: ["check_in_frequency_days", "coach_instapay_account", "plan_pricing"],
+        },
+      });
+
+      // Error feedback via toast
+      toast({
+        title: t("saveError"),
+        description: error instanceof Error ? error.message : t("saveErrorGeneric"),
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -177,7 +211,7 @@ export function AdminSettingsForm({ config }: AdminSettingsFormProps) {
         className="flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-primary/90 transition-colors disabled:opacity-50 shadow-lg shadow-primary/20"
       >
         <Save className="h-4 w-4" />
-        {saved ? t("saved") : isPending ? t("saving") : t("save")}
+        {isPending ? t("saving") : t("save")}
       </button>
     </div>
   );

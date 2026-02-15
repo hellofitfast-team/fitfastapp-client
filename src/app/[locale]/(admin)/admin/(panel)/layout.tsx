@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { Toaster } from "@/components/ui/toaster";
 
 export default async function AdminPanelLayout({
   children,
@@ -35,12 +36,15 @@ export default async function AdminPanelLayout({
   ]);
 
   return (
-    <AdminShell
-      coachName={profileResult.data?.full_name ?? "Coach"}
-      pendingSignups={signupsResult.count ?? 0}
-      openTickets={ticketsResult.count ?? 0}
-    >
-      {children}
-    </AdminShell>
+    <>
+      <AdminShell
+        coachName={profileResult.data?.full_name ?? "Coach"}
+        pendingSignups={signupsResult.count ?? 0}
+        openTickets={ticketsResult.count ?? 0}
+      >
+        {children}
+      </AdminShell>
+      <Toaster />
+    </>
   );
 }
