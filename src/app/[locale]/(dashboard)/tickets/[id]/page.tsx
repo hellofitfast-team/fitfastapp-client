@@ -135,7 +135,7 @@ export default function TicketDetailPage() {
           href="/tickets"
           className="inline-flex items-center gap-2 font-bold text-sm uppercase hover:text-primary transition-colors h-12"
         >
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
           {t("backToTickets")}
         </Link>
         <div className="border-4 border-black bg-cream p-12 text-center">
@@ -160,7 +160,7 @@ export default function TicketDetailPage() {
         href="/tickets"
         className="inline-flex items-center gap-2 font-bold text-sm uppercase hover:text-primary transition-colors h-12"
       >
-        <ArrowLeft className="h-5 w-5" />
+        <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
         {t("backToTickets")}
       </Link>
 

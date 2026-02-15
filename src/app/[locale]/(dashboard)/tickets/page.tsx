@@ -175,7 +175,7 @@ export default function TicketsPage() {
             <div className="relative">
               <select
                 {...register("category")}
-                className="w-full h-12 px-4 pr-10 border-4 border-black bg-cream font-bold text-sm uppercase appearance-none cursor-pointer focus:outline-none focus:bg-white transition-colors"
+                className="w-full h-12 px-4 pe-10 border-4 border-black bg-cream font-bold text-sm uppercase appearance-none cursor-pointer focus:outline-none focus:bg-white transition-colors"
                 disabled={isSubmitting}
               >
                 <option value="meal_issue">{t("categories.mealIssue").toUpperCase()}</option>
@@ -331,7 +331,7 @@ export default function TicketsPage() {
                     <span className={`inline-flex items-center border-4 px-3 py-1 font-black text-xs uppercase ${getStatusStyle(ticket.status)}`}>
                       {t(`status.${ticket.status === "coach_responded" ? "coachResponded" : ticket.status}`).toUpperCase()}
                     </span>
-                    <ChevronRight className="h-5 w-5 text-neutral-400" />
+                    <ChevronRight className="h-5 w-5 text-neutral-400 rtl:rotate-180" />
                   </div>
                 </div>
               </Link>

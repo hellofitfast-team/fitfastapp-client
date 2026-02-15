@@ -93,7 +93,7 @@ function StatCard({
         </div>
       </div>
       <div className="mt-3 flex items-center gap-1 text-xs font-medium text-stone-400 group-hover:text-primary transition-colors">
-        View <ArrowRight className="h-3 w-3" />
+        View <ArrowRight className="h-3 w-3 rtl:rotate-180" />
       </div>
     </Link>
   );

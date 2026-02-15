@@ -126,7 +126,7 @@ export function ClientsList({ clients }: { clients: Client[] }) {
                       href={`/admin/clients/${client.id}`}
                       className="flex h-8 w-8 items-center justify-center rounded-lg border border-stone-200 text-stone-400 hover:border-primary/30 hover:text-primary transition-colors"
                     >
-                      <ArrowRight className="h-4 w-4" />
+                      <ArrowRight className="h-4 w-4 rtl:rotate-180" />
                     </Link>
                   </td>
                 </tr>

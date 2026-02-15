@@ -180,7 +180,7 @@ export default function SettingsPage() {
             <div className="relative">
               <select
                 {...register("language")}
-                className="w-full h-12 px-4 pr-10 border-4 border-black bg-cream font-bold text-sm uppercase appearance-none cursor-pointer focus:outline-none focus:bg-white transition-colors"
+                className="w-full h-12 px-4 pe-10 border-4 border-black bg-cream font-bold text-sm uppercase appearance-none cursor-pointer focus:outline-none focus:bg-white transition-colors"
               >
                 <option value="en">ENGLISH</option>
                 <option value="ar">العربية</option>

@@ -23,7 +23,7 @@ export function StepNavigation({ currentStep, totalSteps, isSubmitting, onBack, 
         disabled={currentStep === 1 || isSubmitting}
         className="h-14 px-6 border-4 border-black bg-cream font-black text-sm uppercase tracking-wide hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
       >
-        <ArrowLeft className="h-4 w-4" />
+        <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
         {tCommon("back").toUpperCase()}
       </button>
 
@@ -35,7 +35,7 @@ export function StepNavigation({ currentStep, totalSteps, isSubmitting, onBack, 
           className="h-14 px-6 bg-black text-cream font-black text-sm uppercase tracking-wide hover:bg-primary disabled:opacity-50 transition-colors flex items-center gap-2"
         >
           {tCommon("next").toUpperCase()}
-          <ArrowRight className="h-4 w-4" />
+          <ArrowRight className="h-4 w-4 rtl:rotate-180" />
         </button>
       ) : (
         <button

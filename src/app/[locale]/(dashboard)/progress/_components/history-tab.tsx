@@ -58,7 +58,7 @@ export function HistoryTab({ checkIns }: HistoryTabProps) {
                   {checkIn.weight && (
                     <div className="border-4 border-primary bg-primary/10 px-3 py-1">
                       <span className="text-2xl font-black text-primary">{checkIn.weight}</span>
-                      <span className="font-mono text-xs text-primary ml-1">{tUnits("kg") || "KG"}</span>
+                      <span className="font-mono text-xs text-primary ms-1">{tUnits("kg") || "KG"}</span>
                     </div>
                   )}
                 </div>
