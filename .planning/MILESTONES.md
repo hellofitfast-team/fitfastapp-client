@@ -12,7 +12,7 @@
 - Component refactoring — 4 large pages split (56% avg reduction), error boundaries on all routes
 - RTL/Arabic completeness — 490/490 translation keys, logical CSS properties, locale-aware formatting, Playwright verification
 
-**Stats:** 218 files changed, +27,204/-2,445 lines, 134 commits, 9 days (2026-02-07 → 2026-02-16)
+**Stats:** 218 files changed, +27,204/-2,445 lines, 134 commits, 9 days (2026-02-07 -> 2026-02-16)
 **Tech debt:** 10 items (0 critical, 2 medium, 8 low) — see milestones/v1.0-MILESTONE-AUDIT.md
 
 ---
@@ -21,7 +21,32 @@
 
 **Goal:** Transform brutalist desktop-first UI into modern, clean, mobile-native experience.
 **Scope:** UI-only — no backend, API, or business logic changes. Same functionality, new look.
-**Status:** Research phase
+**Requirements:** 65 total across 17 categories
+
+### Phases
+
+| Phase | Name | Requirements | Plans |
+|-------|------|-------------|-------|
+| 11 | Foundation — Shell and Navigation | NAV-01..07, DS-04, DS-05, DESK-01 | 4 |
+| 12 | Design Tokens and Core Primitives | DS-01..03, DS-06, PRIM-01..05 | 3 |
+| 13 | Page-Level Renovation | HOME-01..05, MEAL-01..04, WORK-01..05, TRACK-01..02, TICKET-01..02, SET-01..02, FAQ-01, EMPTY-01..06, AUTH-01..02, DESK-02..03 | 7 |
+| 14 | Check-in Wizard and Onboarding | CHECK-01..05, ONBOARD-01..03 | 3 |
+| 15 | RTL Audit and Polish | RTL-05..08, VERIFY-01..03 | 3 |
+
+**Totals:** 5 phases, 20 plans, 65 requirements
+
+### Dependency Graph
+
+```
+Phase 11 (Shell/Nav)
+    |
+Phase 12 (Tokens/Primitives)
+    |
+    +---> Phase 13 (Page Renovation)  --+
+    |                                    |
+    +---> Phase 14 (Check-in/Onboard) --+
+                                         |
+                                    Phase 15 (RTL/Polish)
+```
 
 ---
-

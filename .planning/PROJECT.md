@@ -78,9 +78,102 @@ Every user flow — from signup to plan generation to coach approval — works r
 - ✓ ADMIN-02: OCR Zod validation — v1.0
 - ✓ ADMIN-03: Settings error toast + Sentry — v1.0
 
-### Active
+### Active (v1.1 Mobile UI Renovation)
 
-(v1.1 requirements TBD — research phase in progress)
+**Navigation & Layout**
+- NAV-01: Floating pill-shaped bottom nav bar (Home, Meals, Workout, Check-in, More) — visible below `lg` breakpoint
+- NAV-02: Desktop horizontal top navbar replacing sidebar — visible at `lg+` breakpoint
+- NAV-03: Simplified mobile header (page title + action icons, no hamburger)
+- NAV-04: Bottom sheet "More" menu for secondary pages (Tracking, Progress, Tickets, FAQ)
+- NAV-05: Active state indicators on nav items (highlight + accent color)
+- NAV-06: Badge indicators on nav items (check-in due, unread coach message)
+- NAV-07: Hide bottom nav when virtual keyboard is open
+
+**Design System**
+- DS-01: Extend @theme tokens — modern rounded corners, soft shadows, spacing scale
+- DS-02: Soften brutalist palette — white background, subtle borders, modern feel
+- DS-03: Typography — normal case (drop uppercase), readable fonts, proper hierarchy
+- DS-04: Safe area handling — iOS notch/home indicator via env(safe-area-inset-*)
+- DS-05: Animation keyframes — fadeIn, slideUp, slideDown, scaleIn (CSS-only, GPU-composited)
+- DS-06: Respect prefers-reduced-motion media query
+
+**Core Primitives**
+- PRIM-01: WidgetCard — compact stat/widget card for dashboard grid
+- PRIM-02: PageHeader — consistent page title + breadcrumb component
+- PRIM-03: Skeleton loading variants — home cards, meal cards, workout cards, ticket list
+- PRIM-04: Button press feedback — active:scale-95 + transition on all interactive elements
+- PRIM-05: Empty state component — SVG illustration + message + CTA button
+
+**Auth Pages**
+- AUTH-01: Login page — modern clean layout, mobile-optimized form
+- AUTH-02: Signup page — matching design, social proof elements
+
+**Onboarding**
+- ONBOARD-01: Guided wizard — one question per screen, large inputs, back/next navigation
+- ONBOARD-02: Step progress indicator at top
+- ONBOARD-03: Smooth transitions between steps
+
+**Home / Dashboard**
+- HOME-01: Greeting header with time-of-day context ("Good morning, Ahmed")
+- HOME-02: Today's plan at-a-glance card (meal or workout focus)
+- HOME-03: Quick stats widget cards (weight trend, streak, next check-in)
+- HOME-04: Coach message banner when unread ticket reply exists
+- HOME-05: Plan cycle countdown ("Day 8 of 14")
+
+**Meal Plan**
+- MEAL-01: Horizontal scrollable day selector (1-14) with current day highlighted
+- MEAL-02: Collapsed meal cards (name, calories, ingredient preview) — tap to expand
+- MEAL-03: Daily nutrition summary bar (calories, protein/carbs/fat)
+- MEAL-04: Meal swap indicator surfacing AI alternatives
+
+**Workout Plan**
+- WORK-01: Day selector matching meal plan pattern (reuse component)
+- WORK-02: Exercise cards with sets/reps/weight in clean grid
+- WORK-03: Muscle group tags (color-coded pills)
+- WORK-04: Collapsible exercise detail (summary → full set breakdown)
+- WORK-05: Daily workout summary card (type, exercise count, est. duration)
+
+**Check-in**
+- CHECK-01: Step-by-step wizard (Weight → Measurements → Photos → Notes → Review)
+- CHECK-02: Swipe between steps via react-swipeable
+- CHECK-03: Segmented progress bar at top
+- CHECK-04: Pre-fill last check-in's weight as smart default
+- CHECK-05: Review summary screen before submit
+
+**Tracking & Progress**
+- TRACK-01: Renovated tracking page with modern card layout
+- TRACK-02: Renovated progress charts page
+
+**Tickets**
+- TICKET-01: Chat bubble conversation view (client right/blue, coach left/gray)
+- TICKET-02: Ticket list with modern card styling
+
+**Settings & FAQ**
+- SET-01: Gear icon access from header
+- SET-02: Settings page with modern form layout
+- FAQ-01: FAQ page with collapsible question cards
+
+**Empty States**
+- EMPTY-01: Home — "Coach is preparing your first plan" / "Account under review"
+- EMPTY-02: Meal Plan — "No meal plan yet, complete check-in"
+- EMPTY-03: Workout Plan — "No workout plan yet"
+- EMPTY-04: Check-in — "Next check-in on [date]"
+- EMPTY-05: Tickets — "No messages yet"
+- EMPTY-06: Tracking/Progress — "Complete check-ins to see data"
+
+**Desktop**
+- DESK-01: Top navbar with all nav items visible
+- DESK-02: Content area with max-width constraint and centered layout
+- DESK-03: Responsive card grids (2-3 columns on desktop)
+
+**RTL & Verification**
+- RTL-05: All renovated components use logical properties (start/end, not left/right)
+- RTL-06: Swipe directions inverted in Arabic mode
+- RTL-07: Day selector scroll starts from right in RTL
+- RTL-08: All renovated pages verified in Arabic at 390px and 1440px viewports
+- VERIFY-01: No functionality regressions — all existing features work identically
+- VERIFY-02: 44px minimum touch targets on all interactive elements
+- VERIFY-03: PWA standalone mode tested (safe areas, no overlapping chrome)
 
 ### Out of Scope
 
@@ -89,6 +182,12 @@ Every user flow — from signup to plan generation to coach approval — works r
 - Dark mode — not needed for demo
 - Real-time features — high complexity, not core to demo value
 - Test suite — separate effort, not blocking demo-readiness
+- Grocery list aggregation — defer to v1.2
+- Live workout tracking / timers — different product category
+- Page-level route transitions — wait for stable View Transitions API
+- Exercise illustration icons — requires asset licensing
+- Social feed / community features — not the product model
+- Calorie logging — FitFast prescribes plans, doesn't track intake
 
 ## Constraints
 
@@ -114,4 +213,4 @@ Every user flow — from signup to plan generation to coach approval — works r
 | Error boundaries per route segment | Isolate failures, prevent cascading crashes | ✓ Good — 5 routes protected |
 
 ---
-*Last updated: 2026-02-16 after v1.0 milestone*
+*Last updated: 2026-02-17 — v1.1 requirements defined*
