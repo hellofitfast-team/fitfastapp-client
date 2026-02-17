@@ -63,10 +63,10 @@ function NavLink({
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors",
+        "flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
         isActive
-          ? "bg-black text-primary"
-          : "hover:bg-black hover:text-cream"
+          ? "bg-primary/10 text-primary"
+          : "text-muted-foreground hover:bg-neutral-100 hover:text-foreground"
       )}
     >
       <Icon className="h-4 w-4 shrink-0" />
@@ -100,7 +100,7 @@ export function DesktopTopNav({ userName }: DesktopTopNavProps) {
   };
 
   return (
-    <nav className="hidden lg:flex h-[var(--height-desktop-nav)] border-b-4 border-black bg-cream items-center justify-between px-4">
+    <nav className="hidden lg:flex h-[var(--height-desktop-nav)] border-b border-border bg-card items-center justify-between px-4">
       {/* Left: Logo + Nav Links */}
       <div className="flex items-center gap-1">
         <Link href="/" className="flex items-center gap-2 me-4">
@@ -111,7 +111,7 @@ export function DesktopTopNav({ userName }: DesktopTopNavProps) {
             height={32}
             className="h-8 w-8"
           />
-          <span className="font-black text-lg tracking-tight">FITFAST</span>
+          <span className="font-bold text-lg tracking-tight">FitFast</span>
         </Link>
 
         {NAV_ITEMS.map((item) => {
@@ -132,10 +132,10 @@ export function DesktopTopNav({ userName }: DesktopTopNavProps) {
       </div>
 
       {/* Right: Lang switch, notifications, user menu */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         {/* Language Switcher */}
         <button
-          className="flex h-10 w-10 items-center justify-center border-4 border-black bg-cream font-mono text-xs font-bold hover:bg-black hover:text-primary transition-colors"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-xs font-semibold text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
           onClick={switchLocale}
           aria-label="Switch language"
         >
@@ -144,7 +144,7 @@ export function DesktopTopNav({ userName }: DesktopTopNavProps) {
 
         {/* Notifications */}
         <button
-          className="flex h-10 w-10 items-center justify-center border-4 border-black bg-cream hover:bg-primary hover:text-white hover:border-primary transition-colors"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
           aria-label="Notifications"
         >
           <Bell className="h-4 w-4" />
@@ -154,34 +154,31 @@ export function DesktopTopNav({ userName }: DesktopTopNavProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center gap-2 border-4 border-black bg-cream px-3 h-10 hover:bg-black hover:text-cream transition-colors"
+              className="flex items-center gap-2 rounded-lg px-3 h-9 text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
               aria-label="User menu"
             >
               <User className="h-4 w-4" />
               {userName && (
-                <span className="font-bold text-sm uppercase tracking-wide">
+                <span className="text-sm font-medium">
                   {userName}
                 </span>
               )}
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            className="w-48 border-4 border-black rounded-none bg-cream p-0 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-          >
-            <DropdownMenuItem asChild className="rounded-none">
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem asChild>
               <Link
                 href="/settings"
-                className="flex items-center gap-2 px-4 py-3 font-bold uppercase text-sm hover:bg-black hover:text-cream cursor-pointer"
+                className="flex items-center gap-2 cursor-pointer"
               >
                 <Settings className="h-4 w-4" />
                 {t("nav.settings")}
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-black h-[2px] m-0" />
+            <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-3 font-bold uppercase text-sm text-primary hover:bg-primary hover:text-white cursor-pointer rounded-none"
+              className="flex items-center gap-2 text-error-500 cursor-pointer focus:text-error-500"
             >
               <LogOut className="h-4 w-4" />
               {t("auth.logout")}

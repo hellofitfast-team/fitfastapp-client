@@ -51,18 +51,18 @@ export function MobileHeader({ userName }: MobileHeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-[var(--z-header)] h-[var(--height-header)] border-b-4 border-black bg-cream lg:hidden">
+    <header className="sticky top-0 z-[var(--z-header)] h-[var(--height-header)] border-b border-border bg-card/95 backdrop-blur-md lg:hidden">
       <div className="flex h-full items-center justify-between px-4">
         {/* Page title */}
-        <h1 className="text-lg font-black uppercase tracking-tight truncate">
+        <h1 className="text-lg font-bold tracking-tight truncate">
           {t(titleKey)}
         </h1>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {/* Language Switcher */}
           <button
-            className="flex h-10 w-10 items-center justify-center border-4 border-black bg-cream font-mono text-xs font-bold hover:bg-black hover:text-primary transition-colors"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-xs font-semibold text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
             onClick={switchLocale}
             aria-label="Switch language"
           >
@@ -71,7 +71,7 @@ export function MobileHeader({ userName }: MobileHeaderProps) {
 
           {/* Notifications */}
           <button
-            className="flex h-10 w-10 items-center justify-center border-4 border-black bg-cream hover:bg-primary hover:text-white hover:border-primary transition-colors"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
             aria-label="Notifications"
           >
             <Bell className="h-4 w-4" />
@@ -81,36 +81,31 @@ export function MobileHeader({ userName }: MobileHeaderProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="flex h-10 w-10 items-center justify-center border-4 border-black bg-cream hover:bg-black hover:text-cream transition-colors"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
                 aria-label="User menu"
               >
                 <User className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="w-48 border-4 border-black rounded-none bg-cream p-0 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-            >
+            <DropdownMenuContent align="end" className="w-48">
               {userName && (
-                <>
-                  <div className="px-4 py-3 font-bold text-sm border-b-2 border-black/10">
-                    {userName}
-                  </div>
-                </>
+                <div className="px-3 py-2 text-sm font-medium text-muted-foreground">
+                  {userName}
+                </div>
               )}
-              <DropdownMenuItem asChild className="rounded-none">
+              <DropdownMenuItem asChild>
                 <Link
                   href="/settings"
-                  className="flex items-center gap-2 px-4 py-3 font-bold uppercase text-sm hover:bg-black hover:text-cream cursor-pointer"
+                  className="flex items-center gap-2 cursor-pointer"
                 >
                   <Settings className="h-4 w-4" />
                   {t("nav.settings")}
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-black h-[2px] m-0" />
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-3 font-bold uppercase text-sm text-primary hover:bg-primary hover:text-white cursor-pointer rounded-none"
+                className="flex items-center gap-2 text-error-500 cursor-pointer focus:text-error-500"
               >
                 <LogOut className="h-4 w-4" />
                 {t("auth.logout")}

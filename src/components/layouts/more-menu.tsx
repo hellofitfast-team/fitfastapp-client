@@ -61,14 +61,14 @@ export function MoreMenu({ open, onOpenChange }: MoreMenuProps) {
                   href={item.href}
                   onClick={() => onOpenChange(false)}
                   className={cn(
-                    "flex items-center gap-3 border-4 border-black p-4 transition-colors min-h-[60px]",
+                    "flex items-center gap-3 rounded-xl border p-4 transition-all min-h-[60px] active:scale-[0.97]",
                     isActive
-                      ? "bg-black text-primary"
-                      : "bg-cream hover:bg-black hover:text-cream"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-card hover:bg-neutral-50"
                   )}
                 >
                   <Icon className="h-5 w-5 shrink-0" />
-                  <span className="font-bold text-sm uppercase tracking-wide">
+                  <span className="font-medium text-sm">
                     {t(item.labelKey)}
                   </span>
                 </Link>

@@ -17,7 +17,7 @@ export function DashboardShell({ children, userName }: DashboardShellProps) {
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
   return (
-    <div className="flex min-h-dvh flex-col bg-cream text-black selection:bg-black selection:text-cream">
+    <div className="flex min-h-dvh flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
       {/* Noise texture overlay */}
       <div
         className="fixed inset-0 pointer-events-none opacity-[0.03] z-0"

@@ -1,6 +1,7 @@
 "use client";
 
 import { Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface BrutalistMultiSelectProps {
   options: { id: string; label: string }[];
@@ -45,46 +46,51 @@ export function BrutalistMultiSelect({
     }
   };
 
-  const allOptions = [...options, { id: "other", label: "OTHER" }];
+  const allOptions = [...options, { id: "other", label: "Other" }];
 
   return (
     <div className="space-y-3">
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: "0" }}>
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: "8px" }}>
         {allOptions.map((option) => (
           <button
             key={option.id}
             type="button"
             onClick={() => toggle(option.id)}
             disabled={disabled || (hasNoneOption && selected.includes("none") && option.id !== "none")}
-            className={`flex items-center gap-3 border-2 border-black p-4 text-start text-sm font-bold transition-colors -mt-0.5 -ms-0.5 first:mt-0 first:ms-0 ${
+            className={cn(
+              "flex items-center gap-3 rounded-lg border p-3.5 text-start text-sm font-medium transition-all",
               selected.includes(option.id)
-                ? "bg-black text-primary"
-                : "bg-cream text-black hover:bg-neutral-100"
-            } ${disabled || (hasNoneOption && selected.includes("none") && option.id !== "none") ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                ? "border-primary bg-primary/5 text-primary"
+                : "border-border bg-card text-foreground hover:bg-neutral-50",
+              (disabled || (hasNoneOption && selected.includes("none") && option.id !== "none"))
+                ? "opacity-50 cursor-not-allowed"
+                : "cursor-pointer active:scale-[0.97]"
+            )}
           >
             <div
-              className={`flex h-6 w-6 shrink-0 items-center justify-center border-2 border-black ${
+              className={cn(
+                "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors",
                 selected.includes(option.id)
-                  ? "bg-primary"
-                  : "bg-white"
-              }`}
+                  ? "border-primary bg-primary"
+                  : "border-input bg-card"
+              )}
             >
               {selected.includes(option.id) && (
-                <Check className="h-4 w-4 text-black" strokeWidth={3} />
+                <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />
               )}
             </div>
-            <span className="tracking-wide">{option.label}</span>
+            <span>{option.label}</span>
           </button>
         ))}
       </div>
       {selected.includes("other") && (
         <input
           type="text"
-          placeholder="PLEASE SPECIFY..."
+          placeholder="Please specify..."
           value={otherValue}
           onChange={(e) => onOtherChange(e.target.value)}
           disabled={disabled}
-          className="w-full h-12 px-4 border-4 border-black bg-cream font-mono text-sm uppercase placeholder:text-neutral-400 focus:outline-none focus:bg-white transition-colors"
+          className="w-full h-11 px-3 rounded-lg border border-input bg-card text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 transition-colors"
         />
       )}
     </div>

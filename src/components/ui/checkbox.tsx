@@ -28,9 +28,9 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         />
         <div
           className={cn(
-            "h-6 w-6 border-4 border-black bg-cream transition-all",
-            "peer-checked:border-black peer-checked:bg-primary",
-            "peer-focus-visible:outline-none peer-focus-visible:ring-4 peer-focus-visible:ring-primary",
+            "h-5 w-5 rounded-md border border-input bg-card transition-all",
+            "peer-checked:border-primary peer-checked:bg-primary",
+            "peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2",
             "peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
             "cursor-pointer flex items-center justify-center",
             className
@@ -38,8 +38,8 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         >
           {checked && (
             <Check
-              className="h-4 w-4 text-black"
-              strokeWidth={4}
+              className="h-3.5 w-3.5 text-white"
+              strokeWidth={3}
             />
           )}
         </div>

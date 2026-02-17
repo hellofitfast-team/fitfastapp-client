@@ -25,16 +25,16 @@ export function EmptyState({
   className,
 }: EmptyStateProps) {
   return (
-    <div className={cn("border-4 border-black bg-cream p-12 text-center", className)}>
-      <div className="flex h-16 w-16 items-center justify-center mx-auto bg-neutral-100 border-4 border-black">
-        <Icon className="h-8 w-8 text-neutral-400" />
+    <div className={cn("rounded-xl border border-border bg-card p-10 text-center", className)}>
+      <div className="flex h-14 w-14 items-center justify-center mx-auto rounded-full bg-neutral-100">
+        <Icon className="h-7 w-7 text-muted-foreground" />
       </div>
-      <h3 className="mt-6 font-black text-xl uppercase tracking-tight">{title}</h3>
-      <p className="mt-2 font-mono text-xs text-neutral-500 max-w-md mx-auto">
+      <h3 className="mt-5 font-semibold text-lg">{title}</h3>
+      <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
         {description}
       </p>
       {action && (
-        <Button onClick={action.onClick} className="mt-6">
+        <Button onClick={action.onClick} className="mt-5">
           {action.label}
         </Button>
       )}
