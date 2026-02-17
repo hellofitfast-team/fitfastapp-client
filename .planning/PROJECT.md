@@ -7,6 +7,7 @@ An AI-powered fitness coaching PWA for the Egyptian/MENA market, polished and de
 ## Current State
 
 **Shipped:** v1.0 Polish & Rebrand (2026-02-16)
+**Active:** v1.1 Mobile UI Renovation (started 2026-02-17)
 **Codebase:** 16,905 LOC TypeScript across 218 files
 **Stack:** Next.js 16.1.6, React 19, Supabase SSR 0.8, Tailwind v4, shadcn/ui
 
@@ -22,6 +23,29 @@ An AI-powered fitness coaching PWA for the Egyptian/MENA market, polished and de
 - Push notifications in English only
 - Ticket system is single-response (no thread conversations)
 - AI model names and parameters hardcoded (not env vars)
+
+## Current Milestone: v1.1 Mobile UI Renovation
+
+**Goal:** Transform the brutalist desktop-first UI into a modern, clean, mobile-native experience. UI-only milestone — no backend, API, or business logic changes. Same functionality, completely new look and feel.
+
+**Design Decisions:**
+
+| Decision | Choice |
+|----------|--------|
+| Style direction | Modern & clean (rounded corners, subtle shadows, soft transitions — like Fitbod/Apple Health) |
+| Color palette | Keep Royal Blue as primary, soften the brutalist black/cream scheme |
+| Typography | Normal case (drop all-uppercase), modern readable fonts |
+| Mobile nav | Pill-shaped floating bottom nav: Home, Meals, Workout, Check-in |
+| Desktop nav | Top navbar (replace current sidebar) |
+| Settings access | Gear icon in header |
+| Secondary pages | Bottom sheet "more menu" for Tracking, Progress, Tickets, FAQ |
+| Home page | Widget-style scrollable cards (stats, today's meals, today's workout, quick actions) |
+| Meal plan | Collapsed cards (tap to expand ingredients/instructions) |
+| Check-in form | Swipe between steps with progress bar at top |
+| Onboarding assessment | Guided wizard (one question per screen, large inputs) |
+| Tickets | Chat bubbles (client right/blue, coach left/gray) |
+| Empty states | SVG illustrations + friendly message + CTA button |
+| Scope | Full renovation: auth + onboarding + all dashboard pages |
 
 ## Core Value
 
@@ -56,7 +80,7 @@ Every user flow — from signup to plan generation to coach approval — works r
 
 ### Active
 
-(None — next milestone requirements TBD via `/gsd:new-milestone`)
+(v1.1 requirements TBD — research phase in progress)
 
 ### Out of Scope
 

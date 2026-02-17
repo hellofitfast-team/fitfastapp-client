@@ -17,3 +17,11 @@
 
 ---
 
+## v1.1 Mobile UI Renovation (Started: 2026-02-17)
+
+**Goal:** Transform brutalist desktop-first UI into modern, clean, mobile-native experience.
+**Scope:** UI-only — no backend, API, or business logic changes. Same functionality, new look.
+**Status:** Research phase
+
+---
+

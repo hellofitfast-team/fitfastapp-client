@@ -3,6 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 Polish & Rebrand** — Phases 1-10 (shipped 2026-02-16) — [archive](milestones/v1.0-ROADMAP.md)
+- 🔄 **v1.1 Mobile UI Renovation** — Phases 11+ (started 2026-02-17)
 
 ## Phases
 
