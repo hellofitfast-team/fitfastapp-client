@@ -26,6 +26,7 @@
 ### v1.1 Mobile UI Renovation
 
 - [ ] **Phase 11: Foundation — Shell and Navigation** - New responsive layout shell with bottom nav, top nav, mobile header, and safe area handling
+- [ ] **Phase 11.1: Auth, Authorization, and Marketing Landing Page** - Clerk roles (coach/client), admin coach detection fix, marketing site with checkout, client subscription journey (INSERTED)
 - [ ] **Phase 12: Design Tokens and Core Primitives** - Extended theme tokens, animation keyframes, and reusable UI primitives
 - [ ] **Phase 13: Page-Level Renovation** - Renovate all dashboard pages, auth pages, and empty states using new shell and primitives
 - [ ] **Phase 14: Check-in Wizard and Onboarding** - Multi-step swipeable check-in form and guided onboarding assessment
@@ -50,6 +51,26 @@ Plans:
 - [ ] 11-02: Bottom navigation bar with active states and badges
 - [ ] 11-03: Desktop top navbar
 - [ ] 11-04: Bottom sheet "More" menu, keyboard hiding, and safe area handling
+
+### Phase 11.1: Auth, Authorization, and Marketing Landing Page (INSERTED)
+
+**Goal:** The full client acquisition circle works end-to-end: prospect lands on marketing site → picks a plan → submits payment screenshot (InstaPay/Vodafone Cash) → receives credentials via email → awaits coach approval → logs in → completes initial assessment. Coach users are properly identified via Clerk roles and can access the admin panel. Client users are gated by approval status and plan tier.
+**Depends on:** None (infrastructure — can run in parallel with Phase 11)
+**Scope:**
+  - **Marketing Landing Page** (`apps/marketing/`): 3rd monorepo app — hero, pricing plans, trust signals, checkout form with payment screenshot upload. Royal blue theme consistent with client/admin apps. Mobile-first, conversion-optimized.
+  - **Clerk Role System**: `coach` vs `client` roles via Clerk public metadata. Admin panel gated to `coach` role. Client PWA gated to approved `client` role.
+  - **Client Subscription Journey**: Checkout → Convex stores signup + payment proof → Coach receives notification → Coach approves in admin panel → Clerk account created → Client gets credentials via email → First login triggers initial assessment.
+  - **Admin Coach Detection Fix**: Admin login correctly identifies coach users via Clerk metadata instead of failing with "This account does not have coach access."
+**Plans:** 7 plans
+
+Plans:
+- [ ] 11.1-01-PLAN.md — Convex backend: schema updates, Clerk actions, HTTP upload, plans config
+- [ ] 11.1-02-PLAN.md — Marketing app scaffolding (Next.js, i18n, Convex, design tokens)
+- [ ] 11.1-03-PLAN.md — Marketing landing page (Hero, Features, Pricing, Trust signals)
+- [ ] 11.1-04-PLAN.md — Admin RBAC middleware, accept-invite page, pending page real-time
+- [ ] 11.1-05-PLAN.md — Checkout drawer with form, file upload, and confirmation page
+- [ ] 11.1-06-PLAN.md — Admin signup detail, rejection reason, plans & payment methods settings
+- [ ] 11.1-07-PLAN.md — End-to-end verification checkpoint
 
 ### Phase 12: Design Tokens and Core Primitives
 **Goal**: A consistent design vocabulary exists so every renovated page shares the same visual language
@@ -128,6 +149,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 11. Foundation — Shell and Navigation | v1.1 | 0/4 | Not started | - |
+| 11.1. Auth, Authorization, and Marketing Landing Page | v1.1 | 0/7 | Not started | - |
 | 12. Design Tokens and Core Primitives | v1.1 | 0/3 | Not started | - |
 | 13. Page-Level Renovation | v1.1 | 0/7 | Not started | - |
 | 14. Check-in Wizard and Onboarding | v1.1 | 0/3 | Not started | - |
