@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-17)
 Milestone: v1.1 Mobile UI Renovation
 Status: In progress — Phase 11.1 executing
 Phase: Phase 11.1 — Auth, Authorization, and Marketing Landing Page
-Plan: 01 and 02 complete (backend infra + marketing app scaffold)
-Progress: [##..................] 2/20 plans (10%)
+Plan: 01, 02, and 03 complete (backend infra + marketing app scaffold + marketing landing page)
+Progress: [###.................] 3/20 plans (15%)
 Started: 2026-02-17
 
 ## Previous Milestone
@@ -65,6 +65,9 @@ Total: 5 phases, 20 plans, 65 requirements
 - [11.1-01] rejectSignup stays as mutation, schedules Clerk cleanup as separate action — avoids converting mutation to action which would break existing callers
 - [11.1-01] sendInvitation stores clerkInvitationId back on signup record for revocation on rejection
 - [11.1-01] @clerk/backend installed at root workspace level for Convex Node.js actions
+- [11.1-03] Language switcher uses usePathname() segment swap — avoids next-intl router dependency on marketing app
+- [11.1-03] Hero sticky header embeds language switcher — reduces component count
+- [11.1-03] Pricing badges resolve to translation keys — avoids hardcoded English in AR mode
 
 ### Roadmap Evolution
 
@@ -80,9 +83,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 11.1-01-PLAN.md (Convex backend infrastructure for Clerk invitation flow)
+Stopped at: Completed 11.1-03-PLAN.md (Marketing landing page with Hero, Features, Pricing, Trust signals)
 Resume file: None
 
 ---
 *State initialized: 2026-02-12*
-*Last updated: 2026-02-20 — Phase 11.1 plan 01 complete: Convex backend infra (Clerk invitations, rejection flow, marketing upload, plans config)*
+*Last updated: 2026-02-20 — Phase 11.1 plan 03 complete: Marketing landing page (Hero, Features, Pricing from Convex, Trust signals, EN/AR bilingual)*
