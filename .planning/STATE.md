@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-17)
 Milestone: v1.1 Mobile UI Renovation
 Status: In progress — Phase 11.1 executing
 Phase: Phase 11.1 — Auth, Authorization, and Marketing Landing Page
-Plan: 01, 02, and 03 complete (backend infra + marketing app scaffold + marketing landing page)
-Progress: [###.................] 3/20 plans (15%)
+Plan: 01, 02, 03, and 04 complete (backend infra + marketing app scaffold + marketing landing page + admin RBAC + accept-invite + real-time pending)
+Progress: [####................] 4/20 plans (20%)
 Started: 2026-02-17
 
 ## Previous Milestone
@@ -68,6 +68,9 @@ Total: 5 phases, 20 plans, 65 requirements
 - [11.1-03] Language switcher uses usePathname() segment swap — avoids next-intl router dependency on marketing app
 - [11.1-03] Hero sticky header embeds language switcher — reduces component count
 - [11.1-03] Pricing badges resolve to translation keys — avoids hardcoded English in AR mode
+- [11.1-04] Admin middleware uses Clerk JWT sessionClaims.metadata.role for coach check — fast, no DB query
+- [11.1-04] Pending page trusts Convex real-time entirely — no manual refresh button needed
+- [11.1-04] ClerkProvider cssLayerName: 'clerk' + @layer declaration in globals.css resolves Tailwind v4 cascade conflict
 
 ### Roadmap Evolution
 
@@ -83,9 +86,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 11.1-03-PLAN.md (Marketing landing page with Hero, Features, Pricing, Trust signals)
+Stopped at: Completed 11.1-04-PLAN.md (Admin RBAC + Accept-Invite + Real-Time Pending)
 Resume file: None
 
 ---
 *State initialized: 2026-02-12*
-*Last updated: 2026-02-20 — Phase 11.1 plan 03 complete: Marketing landing page (Hero, Features, Pricing from Convex, Trust signals, EN/AR bilingual)*
+*Last updated: 2026-02-20 — Phase 11.1 plan 04 complete: Admin RBAC via Clerk JWT role, accept-invite page with ticket strategy, real-time pending page with Convex auto-redirect*
