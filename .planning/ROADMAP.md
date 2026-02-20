@@ -64,8 +64,8 @@ Plans:
 **Plans:** 2/7 plans executed
 
 Plans:
-- [ ] 11.1-01-PLAN.md — Convex backend: schema updates, Clerk actions, HTTP upload, plans config
-- [ ] 11.1-02-PLAN.md — Marketing app scaffolding (Next.js, i18n, Convex, design tokens)
+- [x] 11.1-01-PLAN.md — Convex backend: schema updates, Clerk actions, HTTP upload, plans config
+- [x] 11.1-02-PLAN.md — Marketing app scaffolding (Next.js, i18n, Convex, design tokens)
 - [ ] 11.1-03-PLAN.md — Marketing landing page (Hero, Features, Pricing, Trust signals)
 - [ ] 11.1-04-PLAN.md — Admin RBAC middleware, accept-invite page, pending page real-time
 - [ ] 11.1-05-PLAN.md — Checkout drawer with form, file upload, and confirmation page
