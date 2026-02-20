@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-17)
 Milestone: v1.1 Mobile UI Renovation
 Status: In progress — Phase 11.1 executing
 Phase: Phase 11.1 — Auth, Authorization, and Marketing Landing Page
-Plan: 01, 02, 03, 04, and 06 complete (backend infra + marketing app scaffold + marketing landing page + admin RBAC + accept-invite + real-time pending + signup detail + plans/payment-methods manager)
-Progress: [#####...............] 5/20 plans (25%)
+Plan: 01, 02, 03, 04, 05, and 06 complete (backend infra + marketing scaffold + landing page + admin RBAC + checkout flow + signup detail + plans/payment-methods manager)
+Progress: [######..............] 6/20 plans (30%)
 Started: 2026-02-17
 
 ## Previous Milestone
@@ -71,6 +71,10 @@ Total: 5 phases, 20 plans, 65 requirements
 - [11.1-04] Admin middleware uses Clerk JWT sessionClaims.metadata.role for coach check — fast, no DB query
 - [11.1-04] Pending page trusts Convex real-time entirely — no manual refresh button needed
 - [11.1-04] ClerkProvider cssLayerName: 'clerk' + @layer declaration in globals.css resolves Tailwind v4 cascade conflict
+- [11.1-05] Pricing section owns drawer state — no changes to landing page.tsx required; CheckoutDrawer self-contained
+- [11.1-05] NEXT_PUBLIC_CONVEX_SITE_URL (ending in .convex.site) added as separate env var for Convex HTTP action URLs
+- [11.1-05] Screenshot upload is optional — createSignup can be called without paymentScreenshotId
+- [11.1-05] Zod v4 uses "zod/v4" subpath import; @hookform/resolvers v5 supports zod v4
 - [11.1-06] Signup detail page uses api.storage.getFileUrl query to resolve payment screenshot from Convex storageId
 - [11.1-06] Reject action uses inline textarea expansion in signups-table (no modal) — faster UX
 - [11.1-06] PlansManager uses local state + single Save button — avoids partial saves on every keystroke
@@ -90,9 +94,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 11.1-06-PLAN.md (Signup Detail + Plans Manager + Payment Methods Manager)
+Stopped at: Completed 11.1-05-PLAN.md (Checkout Flow — Vaul drawer, form, file upload, confirmation page)
 Resume file: None
 
 ---
 *State initialized: 2026-02-12*
-*Last updated: 2026-02-20 — Phase 11.1 plan 06 complete: Signup detail page with payment screenshot, rejection reason flow, bilingual pricing plans CRUD, payment methods CRUD in admin settings*
+*Last updated: 2026-02-20 — Phase 11.1 plan 05 complete: Checkout drawer with react-hook-form + zod v4, Convex file upload to storage, PaymentInstructions from systemConfig, bilingual confirmation page*

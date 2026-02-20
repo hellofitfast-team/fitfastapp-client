@@ -61,15 +61,15 @@ Plans:
   - **Clerk Role System**: `coach` vs `client` roles via Clerk public metadata. Admin panel gated to `coach` role. Client PWA gated to approved `client` role.
   - **Client Subscription Journey**: Checkout → Convex stores signup + payment proof → Coach receives notification → Coach approves in admin panel → Clerk account created → Client gets credentials via email → First login triggers initial assessment.
   - **Admin Coach Detection Fix**: Admin login correctly identifies coach users via Clerk metadata instead of failing with "This account does not have coach access."
-**Plans:** 5/7 plans executed
+**Plans:** 6/7 plans executed
 
 Plans:
 - [x] 11.1-01-PLAN.md — Convex backend: schema updates, Clerk actions, HTTP upload, plans config
 - [x] 11.1-02-PLAN.md — Marketing app scaffolding (Next.js, i18n, Convex, design tokens)
-- [ ] 11.1-03-PLAN.md — Marketing landing page (Hero, Features, Pricing, Trust signals)
-- [ ] 11.1-04-PLAN.md — Admin RBAC middleware, accept-invite page, pending page real-time
-- [ ] 11.1-05-PLAN.md — Checkout drawer with form, file upload, and confirmation page
-- [ ] 11.1-06-PLAN.md — Admin signup detail, rejection reason, plans & payment methods settings
+- [x] 11.1-03-PLAN.md — Marketing landing page (Hero, Features, Pricing, Trust signals)
+- [x] 11.1-04-PLAN.md — Admin RBAC middleware, accept-invite page, pending page real-time
+- [x] 11.1-05-PLAN.md — Checkout drawer with form, file upload, and confirmation page
+- [x] 11.1-06-PLAN.md — Admin signup detail, rejection reason, plans & payment methods settings
 - [ ] 11.1-07-PLAN.md — End-to-end verification checkpoint
 
 ### Phase 12: Design Tokens and Core Primitives
