@@ -61,7 +61,7 @@ Plans:
   - **Clerk Role System**: `coach` vs `client` roles via Clerk public metadata. Admin panel gated to `coach` role. Client PWA gated to approved `client` role.
   - **Client Subscription Journey**: Checkout → Convex stores signup + payment proof → Coach receives notification → Coach approves in admin panel → Clerk account created → Client gets credentials via email → First login triggers initial assessment.
   - **Admin Coach Detection Fix**: Admin login correctly identifies coach users via Clerk metadata instead of failing with "This account does not have coach access."
-**Plans:** 4/7 plans executed
+**Plans:** 5/7 plans executed
 
 Plans:
 - [x] 11.1-01-PLAN.md — Convex backend: schema updates, Clerk actions, HTTP upload, plans config
@@ -149,7 +149,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 11. Foundation — Shell and Navigation | v1.1 | 0/4 | Not started | - |
-| 11.1. Auth, Authorization, and Marketing Landing Page | 4/7 | In Progress|  | - |
+| 11.1. Auth, Authorization, and Marketing Landing Page | 5/7 | In Progress|  | - |
 | 12. Design Tokens and Core Primitives | v1.1 | 0/3 | Not started | - |
 | 13. Page-Level Renovation | v1.1 | 0/7 | Not started | - |
 | 14. Check-in Wizard and Onboarding | v1.1 | 0/3 | Not started | - |
