@@ -12,6 +12,7 @@
     "type-check": "turbo type-check"
   },
   "dependencies": {
+    "@clerk/backend": "^2.32.0",
     "@convex-dev/action-cache": "^0.3.0",
     "@convex-dev/action-retrier": "^0.3.0",
     "@convex-dev/aggregate": "^0.2.1",
