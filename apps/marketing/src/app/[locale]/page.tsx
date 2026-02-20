@@ -1,42 +1,38 @@
 import { getTranslations } from "next-intl/server";
-import { Button } from "@fitfast/ui/button";
+import { Hero } from "@/components/sections/hero";
+import { Features } from "@/components/sections/features";
+import { Pricing } from "@/components/sections/pricing";
+import { Testimonials } from "@/components/sections/testimonials";
 
 export default async function LandingPage() {
   const t = await getTranslations("landing");
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
-      <div className="text-center space-y-6 max-w-lg animate-fade-in">
-        {/* Logo / Brand */}
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary mb-2">
-          <span className="text-2xl font-bold text-primary-foreground">FF</span>
-        </div>
+    <main className="min-h-screen bg-[var(--color-background)]">
+      {/* Hero — includes sticky header with language switcher */}
+      <Hero />
 
-        {/* Title */}
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold text-foreground tracking-tight">
-            {t("title")}
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            {t("subtitle")}
-          </p>
-        </div>
+      {/* Features */}
+      <Features />
 
-        {/* Coming Soon Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          <span className="text-sm font-medium text-primary">
-            {t("comingSoon")}
-          </span>
-        </div>
+      {/* Pricing — id="pricing" for smooth scroll target */}
+      <Pricing />
 
-        {/* CTA Button — verifies @fitfast/ui integration */}
-        <div className="pt-4">
-          <Button size="lg" className="w-full sm:w-auto">
-            {t("getStarted")}
-          </Button>
+      {/* Trust Signals / Testimonials */}
+      <Testimonials />
+
+      {/* Footer */}
+      <footer className="py-8 px-4 border-t border-[var(--color-border)] bg-[var(--color-background)]">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[var(--color-muted-foreground)]">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-md bg-[var(--color-primary)] flex items-center justify-center">
+              <span className="text-xs font-bold text-white">FF</span>
+            </div>
+            <span className="font-semibold text-[var(--color-foreground)]">FitFast</span>
+          </div>
+          <p>© {t("footerRights")}</p>
         </div>
-      </div>
+      </footer>
     </main>
   );
 }
