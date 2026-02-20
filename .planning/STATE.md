@@ -10,10 +10,10 @@ See: .planning/PROJECT.md (updated 2026-02-17)
 ## Current Position
 
 Milestone: v1.1 Mobile UI Renovation
-Status: Roadmap complete — ready for Phase 11 planning
-Phase: Phase 11 — Foundation: Shell and Navigation
-Plan: Not started
-Progress: [....................] 0/20 plans (0%)
+Status: In progress — Phase 11.1 executing
+Phase: Phase 11.1 — Auth, Authorization, and Marketing Landing Page
+Plan: 01 and 02 complete (backend infra + marketing app scaffold)
+Progress: [##..................] 2/20 plans (10%)
 Started: 2026-02-17
 
 ## Previous Milestone
@@ -59,6 +59,19 @@ Total: 5 phases, 20 plans, 65 requirements
 - Vaul for bottom sheets (via shadcn drawer) — canonical choice, ~3-5KB
 - react-swipeable for check-in wizard swipe — 1.5KB, hook-based
 - Parallel build + swap for layout shell — zero-risk rollback
+- Marketing app uses plain ConvexProvider (not ConvexProviderWithClerk) — fully public, no auth
+- getTranslations (server-side) for landing page — preserves server component benefits over useTranslations
+- [11.1-01] approveSignup schedules Clerk invitation via scheduler.runAfter — Clerk API requires Node.js runtime which mutations don't have
+- [11.1-01] rejectSignup stays as mutation, schedules Clerk cleanup as separate action — avoids converting mutation to action which would break existing callers
+- [11.1-01] sendInvitation stores clerkInvitationId back on signup record for revocation on rejection
+- [11.1-01] @clerk/backend installed at root workspace level for Convex Node.js actions
+
+### Roadmap Evolution
+
+- Phase 11.1 inserted after Phase 11: Auth, Authorization, and Marketing Landing Page (URGENT)
+  - Expanded scope: includes 3rd monorepo app (`apps/marketing/`) with checkout flow, pricing plans, royal blue theme
+  - Full circle: marketing site → checkout → payment screenshot → coach approval → client credentials → initial assessment
+  - Skills to use during planning/execution: /brainstorming, /frontend-design, marketing-skills
 
 ### Blockers/Concerns
 
@@ -66,10 +79,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-17
-Stopped at: Roadmap created for v1.1 — ready for Phase 11 planning
+Last session: 2026-02-20
+Stopped at: Completed 11.1-01-PLAN.md (Convex backend infrastructure for Clerk invitation flow)
 Resume file: None
 
 ---
 *State initialized: 2026-02-12*
-*Last updated: 2026-02-17 — v1.1 roadmap complete*
+*Last updated: 2026-02-20 — Phase 11.1 plan 01 complete: Convex backend infra (Clerk invitations, rejection flow, marketing upload, plans config)*
