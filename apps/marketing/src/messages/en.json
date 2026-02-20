@@ -38,5 +38,33 @@
     "bestValue": "Best Value",
     "plansComing": "Pricing plans coming soon. Check back shortly.",
     "footerRights": "2026 FitFast. All rights reserved."
+  },
+  "checkout": {
+    "formTitle": "Complete Your Subscription",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Enter your full name",
+    "email": "Email Address",
+    "emailPlaceholder": "you@example.com",
+    "phone": "Phone Number",
+    "phonePlaceholder": "+20 1XX XXX XXXX",
+    "uploadScreenshot": "Payment Screenshot",
+    "optional": "optional",
+    "dragDrop": "Drag & drop your payment screenshot here, or click to browse",
+    "tapUpload": "Tap to upload your payment screenshot",
+    "uploadHint": "PNG, JPG, WEBP up to 5MB",
+    "submit": "Submit Signup",
+    "submitting": "Submitting...",
+    "submitError": "Something went wrong. Please try again.",
+    "fileTooLarge": "File is too large. Maximum size is 5MB.",
+    "invalidFileType": "Please upload an image file (PNG, JPG, WEBP).",
+    "paymentInstructions": "Send Payment To",
+    "noPaymentMethods": "Contact us for payment details."
+  },
+  "confirmation": {
+    "title": "Signup Submitted Successfully!",
+    "subtitle": "Check your email to complete your account setup",
+    "explanation": "We've sent you an email with a link to set your password. After setting up your account, your payment will be reviewed by the coach.",
+    "timeline": "Approval typically takes 24–48 hours.",
+    "backToHome": "Back to Home"
   }
 }

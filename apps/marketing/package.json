@@ -12,6 +12,7 @@
   "dependencies": {
     "@fitfast/i18n": "workspace:*",
     "@fitfast/ui": "workspace:*",
+    "@hookform/resolvers": "^5.2.2",
     "clsx": "^2.1.1",
     "convex": "^1.31.7",
     "lucide-react": "^0.563.0",
@@ -19,7 +20,9 @@
     "next-intl": "^4.8.2",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "tailwind-merge": "^3.4.0"
+    "react-hook-form": "^7.71.1",
+    "tailwind-merge": "^3.4.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@fitfast/config": "workspace:*",

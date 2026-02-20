@@ -38,5 +38,33 @@
     "bestValue": "أفضل قيمة",
     "plansComing": "الباقات التسعيرية قريباً. تحقق لاحقاً.",
     "footerRights": "2026 فيت فاست. جميع الحقوق محفوظة."
+  },
+  "checkout": {
+    "formTitle": "أكمل اشتراكك",
+    "fullName": "الاسم الكامل",
+    "fullNamePlaceholder": "أدخل اسمك الكامل",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "example@email.com",
+    "phone": "رقم الهاتف",
+    "phonePlaceholder": "01XX XXX XXXX",
+    "uploadScreenshot": "صورة الدفع",
+    "optional": "اختياري",
+    "dragDrop": "اسحب وأفلت صورة الدفع هنا، أو انقر للتصفح",
+    "tapUpload": "انقر لرفع صورة الدفع",
+    "uploadHint": "PNG، JPG، WEBP حتى 5 ميغابايت",
+    "submit": "إرسال الطلب",
+    "submitting": "جارٍ الإرسال...",
+    "submitError": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "fileTooLarge": "حجم الملف كبير جداً. الحد الأقصى 5 ميغابايت.",
+    "invalidFileType": "يرجى رفع صورة (PNG، JPG، WEBP).",
+    "paymentInstructions": "أرسل الدفعة إلى",
+    "noPaymentMethods": "تواصل معنا للحصول على تفاصيل الدفع."
+  },
+  "confirmation": {
+    "title": "تم إرسال طلبك بنجاح!",
+    "subtitle": "تحقق من بريدك الإلكتروني لإكمال إعداد حسابك",
+    "explanation": "لقد أرسلنا لك بريداً إلكترونياً يحتوي على رابط لتعيين كلمة المرور. بعد إعداد حسابك، سيقوم المدرب بمراجعة دفعتك.",
+    "timeline": "تستغرق الموافقة عادةً من 24 إلى 48 ساعة.",
+    "backToHome": "العودة إلى الصفحة الرئيسية"
   }
 }
