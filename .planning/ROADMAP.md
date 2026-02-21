@@ -26,7 +26,7 @@
 ### v1.1 Mobile UI Renovation
 
 - [ ] **Phase 11: Foundation — Shell and Navigation** - New responsive layout shell with bottom nav, top nav, mobile header, and safe area handling
-- [ ] **Phase 11.1: Auth, Authorization, and Marketing Landing Page** - Clerk roles (coach/client), admin coach detection fix, marketing site with checkout, client subscription journey (INSERTED)
+- [x] **Phase 11.1: Auth, Authorization, and Marketing Landing Page** - Clerk roles (coach/client), admin coach detection fix, marketing site with checkout, client subscription journey (INSERTED) (completed 2026-02-21)
 - [ ] **Phase 12: Design Tokens and Core Primitives** - Extended theme tokens, animation keyframes, and reusable UI primitives
 - [ ] **Phase 13: Page-Level Renovation** - Renovate all dashboard pages, auth pages, and empty states using new shell and primitives
 - [ ] **Phase 14: Check-in Wizard and Onboarding** - Multi-step swipeable check-in form and guided onboarding assessment
@@ -61,7 +61,7 @@ Plans:
   - **Clerk Role System**: `coach` vs `client` roles via Clerk public metadata. Admin panel gated to `coach` role. Client PWA gated to approved `client` role.
   - **Client Subscription Journey**: Checkout → Convex stores signup + payment proof → Coach receives notification → Coach approves in admin panel → Clerk account created → Client gets credentials via email → First login triggers initial assessment.
   - **Admin Coach Detection Fix**: Admin login correctly identifies coach users via Clerk metadata instead of failing with "This account does not have coach access."
-**Plans:** 6/7 plans executed
+**Plans:** 7/7 plans complete
 
 Plans:
 - [x] 11.1-01-PLAN.md — Convex backend: schema updates, Clerk actions, HTTP upload, plans config
@@ -149,7 +149,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 11. Foundation — Shell and Navigation | v1.1 | 0/4 | Not started | - |
-| 11.1. Auth, Authorization, and Marketing Landing Page | 5/7 | In Progress|  | - |
+| 11.1. Auth, Authorization, and Marketing Landing Page | 7/7 | Complete   | 2026-02-21 | - |
 | 12. Design Tokens and Core Primitives | v1.1 | 0/3 | Not started | - |
 | 13. Page-Level Renovation | v1.1 | 0/7 | Not started | - |
 | 14. Check-in Wizard and Onboarding | v1.1 | 0/3 | Not started | - |
