@@ -100,7 +100,7 @@ export default function CheckInPage() {
     const uploadedIds: Id<"_storage">[] = [];
 
     for (const photo of uploadedPhotos) {
-      const uploadUrl = await generateUploadUrl();
+      const uploadUrl = await generateUploadUrl({});
       const result = await fetch(uploadUrl, {
         method: "POST",
         headers: { "Content-Type": photo.type },
