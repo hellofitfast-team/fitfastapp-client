@@ -1,7 +1,7 @@
 import createMiddleware from "next-intl/middleware";
 import { type NextRequest, NextResponse } from "next/server";
 import { routing } from "@fitfast/i18n/routing";
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { clerkClient, clerkMiddleware } from "@clerk/nextjs/server";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -43,8 +43,19 @@ export default clerkMiddleware(
       return NextResponse.redirect(new URL(`/${locale}/login`, origin));
     }
 
-    // Gate admin on Clerk role — fast JWT check, no DB query
-    const role = (sessionClaims as CustomJwtSessionClaims)?.metadata?.role;
+    // Check role: first try JWT claims (fast), then fall back to API (reliable)
+    let role = (sessionClaims as CustomJwtSessionClaims)?.metadata?.role;
+
+    if (!role) {
+      // Session token not customized — fetch from Clerk Backend API
+      const client = await clerkClient();
+      const user = await client.users.getUser(userId);
+      role = (user.publicMetadata as { role?: string })?.role as
+        | "coach"
+        | "client"
+        | undefined;
+    }
+
     if (role !== "coach") {
       return NextResponse.redirect(
         new URL(`/${locale}/login?error=not_coach`, origin),
