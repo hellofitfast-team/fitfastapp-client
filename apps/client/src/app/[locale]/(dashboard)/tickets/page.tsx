@@ -45,7 +45,7 @@ export default function TicketsPage() {
     if (!screenshotFile) return undefined;
     setIsUploading(true);
     try {
-      const uploadUrl = await generateUploadUrl();
+      const uploadUrl = await generateUploadUrl({});
       const result = await fetch(uploadUrl, {
         method: "POST",
         headers: { "Content-Type": screenshotFile.type },
