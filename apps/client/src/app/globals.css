@@ -49,15 +49,16 @@
   --color-routine: #8B5CF6;      /* Violet — tracking, calendar */
 
   /* Background/Foreground — Modern Clean */
-  --color-background: #FFFEF5;
+  --color-background: #FAFAFA;
   --color-foreground: #171717;
   --color-card: #FFFFFF;
   --color-card-foreground: #171717;
+  --color-surface-elevated: #FFFFFF;
   --color-popover: #FFFFFF;
   --color-popover-foreground: #171717;
   --color-muted: var(--color-neutral-100);
   --color-muted-foreground: var(--color-neutral-500);
-  --color-border: #e5e5e5;
+  --color-border: #E8EAED;
   --color-input: #d4d4d4;
   --color-ring: #4169E1;
 
@@ -87,18 +88,37 @@
   --z-drawer: 50;
   --z-toast: 60;
 
-  /* Shadows — elevated, visible on cream */
+  /* Shadows — elevated, visible on white */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.06);
   --shadow-card: 0 2px 8px 0 rgba(0, 0, 0, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
   --shadow-lifted: 0 8px 32px 0 rgba(0, 0, 0, 0.08), 0 2px 8px 0 rgba(0, 0, 0, 0.04);
+
+  /* Spacing Scale — consistent layout rhythm */
+  --spacing-page-x: 1rem;        /* Horizontal page padding (mobile) */
+  --spacing-page-x-lg: 1.5rem;   /* Horizontal page padding (desktop) */
+  --spacing-section-gap: 1.25rem; /* Gap between sections/widget groups */
+  --spacing-card-padding: 1rem;   /* Internal card padding */
+  --spacing-card-gap: 0.75rem;    /* Gap between cards in a grid */
+
+  /* Typography Scale (reference — use Tailwind utility classes)
+   * --------------------------------------------------
+   * Page title:    text-xl  font-semibold (20px/28px)  — PageHeader h1
+   * Section title: text-lg  font-semibold (18px/28px)  — card group headings
+   * Card title:    text-base font-medium  (16px/24px)  — WidgetCard, meal card headings
+   * Body:          text-sm               (14px/20px)  — general text
+   * Caption:       text-xs               (12px/16px)  — labels, timestamps, subtitles
+   * --------------------------------------------------
+   * All headings: normal case (no text-transform: uppercase)
+   * Weight: semibold (600) for titles, medium (500) for card titles, normal for body
+   */
 }
 
 /* IMPORTANT: Override dark mode - design is always the same */
 @media (prefers-color-scheme: dark) {
   @theme inline {
-    --color-background: #FFFEF5;
+    --color-background: #FAFAFA;
     --color-foreground: #171717;
     --color-card: #FFFFFF;
     --color-card-foreground: #171717;
@@ -106,7 +126,7 @@
     --color-popover-foreground: #171717;
     --color-muted: var(--color-neutral-100);
     --color-muted-foreground: var(--color-neutral-500);
-    --color-border: #e5e5e5;
+    --color-border: #E8EAED;
     --color-input: #d4d4d4;
   }
 }
