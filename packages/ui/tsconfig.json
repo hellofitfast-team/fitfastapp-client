@@ -1,0 +1,10 @@
+{
+  "extends": "@fitfast/config/typescript/base.json",
+  "compilerOptions": {
+    "paths": {
+      "@fitfast/ui/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,8 @@
+{
+  "extends": "@fitfast/config/typescript/base.json",
+  "compilerOptions": {
+    "plugins": []
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}
