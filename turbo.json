@@ -9,6 +9,8 @@
         "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
         "CLERK_SECRET_KEY",
         "SENTRY_AUTH_TOKEN",
+        "SENTRY_PROJECT",
+        "SENTRY_ORG",
         "NEXT_PUBLIC_ONESIGNAL_APP_ID"
       ]
     },
