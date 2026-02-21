@@ -149,7 +149,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 11. Foundation — Shell and Navigation | v1.1 | 0/4 | Not started | - |
-| 11.1. Auth, Authorization, and Marketing Landing Page | 7/7 | Complete   | 2026-02-21 | - |
+| 11.1. Auth, Authorization, and Marketing Landing Page | 7/7 | Complete    | 2026-02-21 | - |
 | 12. Design Tokens and Core Primitives | v1.1 | 0/3 | Not started | - |
 | 13. Page-Level Renovation | v1.1 | 0/7 | Not started | - |
 | 14. Check-in Wizard and Onboarding | v1.1 | 0/3 | Not started | - |

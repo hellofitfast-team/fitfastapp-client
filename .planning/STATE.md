@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-17)
 Milestone: v1.1 Mobile UI Renovation
 Status: In progress — Phase 11.1 executing
 Phase: Phase 11.1 — Auth, Authorization, and Marketing Landing Page
-Plan: 01, 02, 03, 04, 05, and 06 complete (backend infra + marketing scaffold + landing page + admin RBAC + checkout flow + signup detail + plans/payment-methods manager)
-Progress: [######..............] 6/20 plans (30%)
+Plan: 01–07 complete (backend infra + marketing scaffold + landing page + admin RBAC + checkout flow + signup detail + plans/payment-methods manager + E2E verification checkpoint)
+Progress: [#######.............] 7/20 plans (35%)
 Started: 2026-02-17
 
 ## Previous Milestone
@@ -93,10 +93,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-20
-Stopped at: Completed 11.1-05-PLAN.md (Checkout Flow — Vaul drawer, form, file upload, confirmation page)
+Last session: 2026-02-21
+Stopped at: Phase 11.1 complete — all 7 plans executed + E2E verification passed
 Resume file: None
 
 ---
 *State initialized: 2026-02-12*
-*Last updated: 2026-02-20 — Phase 11.1 plan 05 complete: Checkout drawer with react-hook-form + zod v4, Convex file upload to storage, PaymentInstructions from systemConfig, bilingual confirmation page*
+*Last updated: 2026-02-21 — Phase 11.1 complete: E2E verification found 8 bugs (auth race, i18n, routing), all fixed and committed*
