@@ -47,7 +47,7 @@ export function MoreMenu({ open, onOpenChange }: MoreMenuProps) {
         <DrawerHeader>
           <DrawerTitle>{t("nav.more")}</DrawerTitle>
         </DrawerHeader>
-        <div className="px-4 pb-6 pb-[env(safe-area-inset-bottom)]">
+        <div className="px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
           <div className="grid grid-cols-2 gap-3">
             {MORE_ITEMS.map((item) => {
               const Icon = item.icon;
