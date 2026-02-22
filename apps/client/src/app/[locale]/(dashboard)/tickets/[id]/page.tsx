@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@fitfast/i18n/navigation";
@@ -9,23 +9,62 @@ import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import {
   ArrowLeft,
-  Clock,
-  CheckCircle2,
   MessageSquare,
-  User,
   Shield,
   Send,
   Loader2,
-  ImageIcon,
 } from "lucide-react";
 import { Skeleton } from "@fitfast/ui/skeleton";
 import { cn } from "@fitfast/ui/cn";
+
+interface TicketMessage {
+  sender: string;
+  message: string;
+  timestamp: number;
+}
+
+// Group messages by calendar day
+function groupMessagesByDate(messages: TicketMessage[], locale: string, t: (key: string) => string) {
+  const groups: { dateKey: string; label: string; messages: TicketMessage[] }[] = [];
+  const today = new Date().toISOString().split("T")[0];
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+
+  for (const msg of messages) {
+    const dateKey = new Date(msg.timestamp).toISOString().split("T")[0];
+    const existing = groups.find((g) => g.dateKey === dateKey);
+    if (existing) {
+      existing.messages.push(msg);
+    } else {
+      let label: string;
+      if (dateKey === today) {
+        label = t("chat.today");
+      } else if (dateKey === yesterday) {
+        label = t("chat.yesterday");
+      } else {
+        label = new Date(dateKey).toLocaleDateString(
+          locale === "ar" ? "ar-u-nu-latn" : "en-US",
+          { month: "short", day: "numeric" }
+        );
+      }
+      groups.push({ dateKey, label, messages: [msg] });
+    }
+  }
+  return groups;
+}
+
+function formatTime(timestamp: number, locale: string): string {
+  return new Date(timestamp).toLocaleTimeString(
+    locale === "ar" ? "ar-u-nu-latn" : "en-US",
+    { hour: "2-digit", minute: "2-digit" }
+  );
+}
 
 export default function TicketDetailPage() {
   const params = useParams();
   const ticketId = params.id as string;
   const t = useTranslations("tickets");
   const locale = useLocale();
+  const isRtl = locale === "ar";
 
   const ticket = useQuery(api.tickets.getTicketById, {
     ticketId: ticketId as Id<"tickets">,
@@ -36,6 +75,12 @@ export default function TicketDetailPage() {
 
   const [reply, setReply] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom on mount and new messages
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [ticket?.messages?.length]);
 
   const handleSendReply = async () => {
     if (!reply.trim() || !ticket) return;
@@ -60,26 +105,11 @@ export default function TicketDetailPage() {
     try { return t(key as any); } catch { return fallback; }
   };
 
-  const formatDateWithTime = (timestamp: number | null | undefined) => {
-    if (!timestamp) return "";
-    try {
-      const date = new Date(timestamp);
-      if (isNaN(date.getTime())) return "";
-      const d = date.toLocaleDateString(locale === "ar" ? "ar-u-nu-latn" : "en-US", {
-        year: "numeric", month: "short", day: "numeric",
-      });
-      const time = date.toLocaleTimeString(locale === "ar" ? "ar-u-nu-latn" : "en-US", {
-        hour: "2-digit", minute: "2-digit",
-      });
-      return `${d} ${time}`;
-    } catch { return ""; }
-  };
-
   const getStatusStyle = (status: string) => {
     switch (status) {
-      case "open": return "bg-primary/10 text-primary";
-      case "coach_responded": return "bg-primary/10 text-primary";
-      case "closed": return "bg-success-500/10 text-success-500";
+      case "open": return "bg-success-500/10 text-success-500";
+      case "coach_responded": return "bg-[#F59E0B]/10 text-[#F59E0B]";
+      case "closed": return "bg-neutral-100 text-muted-foreground";
       default: return "";
     }
   };
@@ -112,8 +142,14 @@ export default function TicketDetailPage() {
     );
   }
 
+  const messageGroups = groupMessagesByDate(
+    ticket.messages as TicketMessage[],
+    locale,
+    (key: string) => safeT(key, key)
+  );
+
   return (
-    <div className="px-4 py-6 space-y-4 max-w-3xl mx-auto lg:px-6">
+    <div className="px-4 py-6 space-y-4 max-w-3xl mx-auto lg:px-6 flex flex-col min-h-[calc(100vh-8rem)]">
       {/* Back button */}
       <Link
         href="/tickets"
@@ -134,9 +170,6 @@ export default function TicketDetailPage() {
                   {safeT(`categories.${toCamelCase(ticket.category)}`, ticket.category)}
                 </span>
               )}
-              <span className="text-xs text-muted-foreground">
-                {formatDateWithTime(ticket._creationTime)}
-              </span>
             </div>
           </div>
           <span className={cn(
@@ -148,61 +181,95 @@ export default function TicketDetailPage() {
         </div>
       </div>
 
-      {/* Conversation thread */}
-      <div className="space-y-3">
-        {ticket.messages.map((msg, i) => {
-          const isCoach = msg.sender === "coach";
-          return (
-            <div key={i} className="flex gap-2.5">
-              <div className={cn(
-                "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-                isCoach ? "bg-neutral-100" : "bg-primary/10"
-              )}>
-                {isCoach ? <Shield className="h-4 w-4 text-muted-foreground" /> : <User className="h-4 w-4 text-primary" />}
-              </div>
-              <div className={cn(
-                "flex-1 rounded-xl rounded-ts-none border p-3.5",
-                isCoach ? "bg-neutral-50 border-border" : "bg-primary/5 border-primary/10"
-              )}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-semibold">
-                    {isCoach ? t("coach") : t("you")}
-                  </span>
-                  <span className="text-[10px] text-muted-foreground">
-                    {formatDateWithTime(msg.timestamp)}
-                  </span>
-                </div>
-                <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
-              </div>
+      {/* Chat conversation */}
+      <div className="flex-1 space-y-1">
+        {messageGroups.map((group) => (
+          <div key={group.dateKey}>
+            {/* Date separator */}
+            <div className="flex items-center gap-3 my-4">
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-xs text-muted-foreground font-medium px-2 py-1 bg-neutral-100 rounded-full">
+                {group.label}
+              </span>
+              <div className="flex-1 h-px bg-border" />
             </div>
-          );
-        })}
+
+            {/* Messages */}
+            {group.messages.map((msg, i) => {
+              const isCoach = msg.sender === "coach";
+
+              if (isCoach) {
+                // Coach message (left/gray)
+                return (
+                  <div
+                    key={`${group.dateKey}-${i}`}
+                    className="flex items-end gap-2 justify-start mb-2 animate-slide-up"
+                    style={{ animationDelay: `${i * 30}ms` }}
+                  >
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-neutral-200 mb-1">
+                      <Shield className="h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                    <div className={cn(
+                      "max-w-[75%] rounded-2xl bg-neutral-100 text-foreground px-4 py-2.5 shadow-sm",
+                      isRtl ? "rounded-br-sm" : "rounded-bl-sm"
+                    )}>
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.message}</p>
+                      <p className="text-[10px] text-muted-foreground mt-1">{formatTime(msg.timestamp, locale)}</p>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Client message (right/blue)
+              return (
+                <div
+                  key={`${group.dateKey}-${i}`}
+                  className="flex items-end gap-2 justify-end mb-2 animate-slide-up"
+                  style={{ animationDelay: `${i * 30}ms` }}
+                >
+                  <div className={cn(
+                    "max-w-[75%] rounded-2xl bg-primary text-primary-foreground px-4 py-2.5 shadow-sm",
+                    isRtl ? "rounded-bl-sm" : "rounded-br-sm"
+                  )}>
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.message}</p>
+                    <p className="text-[10px] text-primary-foreground/70 mt-1">{formatTime(msg.timestamp, locale)}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ))}
+        <div ref={bottomRef} />
       </div>
 
-      {/* Reply input */}
+      {/* Reply area */}
       {ticket.status !== "closed" ? (
-        <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
-          <div className="p-4 space-y-3">
-            <textarea
-              value={reply}
-              onChange={(e) => setReply(e.target.value)}
-              placeholder={t("replyPlaceholder")}
-              rows={3}
-              className="w-full p-3 rounded-lg border border-input bg-card text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors resize-none"
-              disabled={isSending}
-            />
-            <button
-              onClick={handleSendReply}
-              disabled={isSending || !reply.trim()}
-              className="w-full py-2.5 rounded-lg bg-primary text-white font-semibold text-sm hover:bg-primary/90 transition-all active:scale-[0.97] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSending ? (
-                <><Loader2 className="h-4 w-4 animate-spin" />{t("sending")}</>
-              ) : (
-                <><Send className="h-4 w-4" />{t("sendReply")}</>
-              )}
-            </button>
-          </div>
+        <div className="sticky bottom-0 bg-background border-t border-border p-3 -mx-4 lg:-mx-6 px-4 lg:px-6 flex gap-2">
+          <textarea
+            value={reply}
+            onChange={(e) => setReply(e.target.value)}
+            placeholder={t("replyPlaceholder")}
+            rows={1}
+            className="flex-1 rounded-xl border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors resize-none"
+            disabled={isSending}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSendReply();
+              }
+            }}
+          />
+          <button
+            onClick={handleSendReply}
+            disabled={isSending || !reply.trim()}
+            className="h-10 w-10 shrink-0 rounded-full bg-primary text-primary-foreground flex items-center justify-center active:scale-[0.97] disabled:opacity-50 transition-all"
+          >
+            {isSending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </button>
         </div>
       ) : (
         <div className="rounded-lg bg-neutral-50 border border-border p-3 text-center">

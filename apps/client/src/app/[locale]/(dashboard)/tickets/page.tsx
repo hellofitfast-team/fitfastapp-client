@@ -14,7 +14,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { cn } from "@fitfast/ui/cn";
-import { formatDate } from "@/lib/utils";
 
 const ticketSchema = z.object({
   subject: z.string().min(3, "Subject must be at least 3 characters").max(100, "Subject must be under 100 characters"),
@@ -22,6 +21,31 @@ const ticketSchema = z.object({
   description: z.string().optional(),
 });
 type TicketFormData = z.infer<typeof ticketSchema>;
+
+// Relative time helper
+function getTimeAgo(timestamp: number, locale: string): string {
+  const now = Date.now();
+  const diff = now - timestamp;
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+
+  if (minutes < 60) return locale === "ar" ? `${minutes}د` : `${minutes}m ago`;
+  if (hours < 24) return locale === "ar" ? `${hours}س` : `${hours}h ago`;
+
+  const date = new Date(timestamp);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  if (date.toDateString() === yesterday.toDateString()) {
+    return locale === "ar" ? "أمس" : "Yesterday";
+  }
+
+  return date.toLocaleDateString(locale === "ar" ? "ar-u-nu-latn" : "en-US", {
+    month: "short", day: "numeric",
+  });
+}
 
 export default function TicketsPage() {
   const t = useTranslations("tickets");
@@ -76,21 +100,21 @@ export default function TicketsPage() {
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusStyle = (status: string) => {
+    switch (status) {
+      case "open": return "bg-success-500/10 text-success-500";
+      case "coach_responded": return "bg-[#F59E0B]/10 text-[#F59E0B]";
+      case "closed": return "bg-neutral-100 text-muted-foreground";
+      default: return "";
+    }
+  };
+
+  const getCategoryIcon = (status: string) => {
     switch (status) {
       case "open": return <Clock className="h-4 w-4" />;
       case "coach_responded": return <MessageSquare className="h-4 w-4" />;
       case "closed": return <CheckCircle2 className="h-4 w-4" />;
       default: return null;
-    }
-  };
-
-  const getStatusStyle = (status: string) => {
-    switch (status) {
-      case "open": return "bg-primary/10 text-primary";
-      case "coach_responded": return "bg-primary/10 text-primary";
-      case "closed": return "bg-success-500/10 text-success-500";
-      default: return "";
     }
   };
 
@@ -206,7 +230,7 @@ export default function TicketsPage() {
             {[0, 1, 2].map((i) => (
               <div key={i} className="rounded-xl border border-border bg-card p-4">
                 <div className="flex items-center gap-3">
-                  <Skeleton className="h-10 w-10 rounded-lg" />
+                  <Skeleton className="h-10 w-10 rounded-xl" />
                   <div className="flex-1 space-y-2">
                     <Skeleton className="h-4 w-48" />
                     <Skeleton className="h-3 w-32" />
@@ -231,51 +255,49 @@ export default function TicketsPage() {
           />
         ) : (
           <div className="space-y-2">
-            {tickets.map((ticket) => (
-              <Link
-                key={ticket._id}
-                href={`/tickets/${ticket._id}`}
-                className="block rounded-xl border border-border bg-card p-4 hover:bg-neutral-50 transition-colors active:scale-[0.99]"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
+            {tickets.map((ticket, index) => {
+              const lastMessage = ticket.messages?.[ticket.messages.length - 1];
+
+              return (
+                <Link
+                  key={ticket._id}
+                  href={`/tickets/${ticket._id}`}
+                  className="block rounded-xl border border-border bg-card p-4 hover:bg-neutral-50 transition-all active:scale-[0.97] animate-slide-up"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <div className="flex items-start gap-3">
                     <div className={cn(
-                      "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
-                      ticket.status === "open" ? "bg-primary/10 text-primary"
-                        : ticket.status === "coach_responded" ? "bg-primary/10 text-primary"
+                      "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+                      ticket.status === "open" ? "bg-success-500/10 text-success-500"
+                        : ticket.status === "coach_responded" ? "bg-[#F59E0B]/10 text-[#F59E0B]"
                         : "bg-neutral-100 text-muted-foreground"
                     )}>
-                      {getStatusIcon(ticket.status)}
+                      {getCategoryIcon(ticket.status)}
                     </div>
-                    <div className="min-w-0">
-                      <p className="font-medium text-sm truncate">{ticket.subject}</p>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        {ticket.category && (
-                          <>
-                            <span className="text-xs text-muted-foreground">
-                              {t(`categories.${ticket.category.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase()) as any}`)}
-                            </span>
-                            <span className="text-neutral-300">•</span>
-                          </>
-                        )}
-                        <span className="text-xs text-muted-foreground">
-                          {formatDate(new Date(ticket._creationTime).toISOString(), locale)}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-semibold text-sm truncate">{ticket.subject}</p>
+                        <span className={cn(
+                          "shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-medium",
+                          getStatusStyle(ticket.status)
+                        )}>
+                          {t(`status.${ticket.status === "coach_responded" ? "coachResponded" : ticket.status}`)}
                         </span>
                       </div>
+                      {lastMessage && (
+                        <p className="text-xs text-muted-foreground truncate mt-1">
+                          {lastMessage.message}
+                        </p>
+                      )}
+                      <p className="text-[10px] text-muted-foreground mt-1.5">
+                        {getTimeAgo(ticket._creationTime, locale)}
+                      </p>
                     </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 mt-1 rtl:rotate-180" />
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className={cn(
-                      "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
-                      getStatusStyle(ticket.status)
-                    )}>
-                      {t(`status.${ticket.status === "coach_responded" ? "coachResponded" : ticket.status}`)}
-                    </span>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground rtl:rotate-180" />
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
