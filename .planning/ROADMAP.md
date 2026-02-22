@@ -96,17 +96,18 @@ Plans:
   1. The home screen shows a time-of-day greeting, today's plan card, quick stats widgets, coach message banner, and plan cycle countdown
   2. Meal and workout plan pages have a horizontal day selector (1-14) and collapsible cards that expand to show full details
   3. The ticket conversation view uses chat bubbles (client right/blue, coach left/gray)
-  4. All six empty states show contextual SVG illustrations, friendly messages, and CTA buttons
+  4. All six empty states show contextual icons, friendly messages, and CTA buttons
   5. Auth pages (login/signup) have a modern clean layout optimized for mobile
-**Plans**: 7 plans
+**Plans**: 8 plans
 
 Plans:
 - [ ] 13-01-PLAN.md — Home screen renovation (rotating greeting, carousel/grid, stats widgets, coach banner, countdown)
 - [ ] 13-02-PLAN.md — Meal plan page (Day 1-14 selector, accordion cards, nutrition summary, swap indicator)
 - [ ] 13-03-PLAN.md — Workout plan page (shared DaySelector, exercise mini-cards, muscle tags, collapsible details)
 - [ ] 13-04-PLAN.md — Tickets renovation (WhatsApp-style chat bubbles, colored status badges, date separators)
-- [ ] 13-05-PLAN.md — Tracking, progress, settings, and FAQ page polish
-- [ ] 13-06-PLAN.md — Empty states (all 6 screens with CTAs) and auth pages (login/accept-invite)
+- [ ] 13-05-PLAN.md — Tracking and progress page polish
+- [ ] 13-06-PLAN.md — All i18n keys, empty states (all 6 screens with CTAs), and auth pages (login/accept-invite)
+- [ ] 13-08-PLAN.md — Settings and FAQ page polish
 - [ ] 13-07-PLAN.md — Desktop responsive layout (max-width constraints, card grids, visual verification)
 
 ### Phase 14: Check-in Wizard and Onboarding
