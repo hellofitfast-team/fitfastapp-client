@@ -12,10 +12,15 @@ import {
   ChevronRight,
   Loader2,
   AlertCircle,
+  Shield,
+  X,
 } from "lucide-react";
 import { useDashboardData } from "@/hooks/use-dashboard";
+import { WidgetCard } from "@fitfast/ui/widget-card";
+import { EmptyState } from "@fitfast/ui/empty-state";
 import { cn } from "@fitfast/ui/cn";
 import { formatDateWithWeekday } from "@/lib/utils";
+import { useState, useEffect, useRef, useCallback } from "react";
 import type { GeneratedMealPlan } from "@/lib/ai/meal-plan-generator";
 import type { GeneratedWorkoutPlan } from "@/lib/ai/workout-plan-generator";
 
@@ -23,6 +28,49 @@ export default function DashboardPage() {
   const t = useTranslations();
   const locale = useLocale();
   const { dashboardData, isLoading, error } = useDashboardData();
+
+  // Rotating motivational greeting (HOME-01)
+  const [messageIndex, setMessageIndex] = useState(0);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % 7);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Mobile carousel state (HOME-02)
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const autoScrollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const scrollToIndex = useCallback((index: number) => {
+    const card = cardRefs.current[index];
+    card?.scrollIntoView({ behavior: "smooth", inline: "center" });
+  }, []);
+
+  // Auto-scroll carousel every 4 seconds
+  useEffect(() => {
+    autoScrollRef.current = setInterval(() => {
+      setActiveCardIndex((prev) => {
+        const next = (prev + 1) % 4;
+        scrollToIndex(next);
+        return next;
+      });
+    }, 4000);
+    return () => {
+      if (autoScrollRef.current) clearInterval(autoScrollRef.current);
+    };
+  }, [scrollToIndex]);
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const index = Math.round(el.scrollLeft / el.offsetWidth);
+    setActiveCardIndex(Math.max(0, Math.min(3, Math.abs(index))));
+  }, []);
 
   if (isLoading) {
     return (
@@ -54,7 +102,7 @@ export default function DashboardPage() {
     : null;
   const nextCheckInDisplay = nextCheckInDays !== null ? `${nextCheckInDays}d` : "-";
 
-  const userName = dashboardData.profile?.fullName || (locale === "ar" ? "مستخدم" : "User");
+  const userName = dashboardData.profile?.fullName?.split(" ")[0] || (locale === "ar" ? "مستخدم" : "User");
 
   // Derive today's meals from meal plan + completions
   const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
@@ -99,198 +147,207 @@ export default function DashboardPage() {
     ? Math.round((completedItems / totalItems) * 100)
     : 0;
 
+  // Coach message banner (HOME-04)
+  const unreadCoachTicket = (dashboardData.recentTickets ?? []).find(
+    (ticket: { status: string; _id: string }) => ticket.status === "coach_responded"
+  );
+
+  // Plan countdown (HOME-05)
+  const mealPlanStartDate = dashboardData.currentMealPlan?.startDate;
+  const planCurrentDay = mealPlanStartDate
+    ? Math.min(14, Math.max(1, Math.floor((Date.now() - new Date(mealPlanStartDate).getTime()) / 86400000) + 1))
+    : null;
+
+  // No plan empty state
+  if (!dashboardData.currentMealPlan && !dashboardData.currentWorkoutPlan) {
+    return (
+      <div className="px-4 py-6 space-y-6 max-w-5xl mx-auto lg:px-6">
+        <div>
+          <p className="text-sm text-muted-foreground">
+            {formatDateWithWeekday(new Date(), locale)}
+          </p>
+          <h1 key={messageIndex} className="text-2xl font-bold mt-1 animate-fade-in">
+            {t(`dashboard.motivational.${messageIndex}`, { name: userName })}
+          </h1>
+        </div>
+        <EmptyState
+          icon={Dumbbell}
+          title={t("emptyStates.noPlan.title")}
+          description={t("emptyStates.noPlan.description")}
+        />
+      </div>
+    );
+  }
+
+  // Card content for carousel/grid
+  const cards = [
+    // Card 1: Today's Stats
+    <WidgetCard key="stats" featureColor="primary" title={t("dashboard.todaysStats")} className="h-full">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="text-center">
+          <p className="text-lg font-bold">{overallProgress}%</p>
+          <p className="text-[10px] text-muted-foreground">{t("tracking.todaysProgress")}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-lg font-bold">{nextCheckInDisplay}</p>
+          <p className="text-[10px] text-muted-foreground">{t("dashboard.upcomingCheckIn")}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-lg font-bold">{mealProgress.completed}/{mealProgress.total}</p>
+          <p className="text-[10px] text-muted-foreground">{t("dashboard.todaysMeals")}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-lg font-bold">{workoutProgress.completed}/{workoutProgress.total}</p>
+          <p className="text-[10px] text-muted-foreground">{t("dashboard.todaysWorkout")}</p>
+        </div>
+      </div>
+    </WidgetCard>,
+
+    // Card 2: Today's Meals
+    <WidgetCard key="meals" featureColor="nutrition" icon={UtensilsCrossed} title={t("dashboard.todaysMeals")} className="h-full">
+      {todaysMeals.length === 0 ? (
+        <p className="text-xs text-muted-foreground">{t("dashboard.noMealsToday")}</p>
+      ) : (
+        <div className="space-y-1.5">
+          <p className="text-lg font-bold">{t("dashboard.totalCalories")}: {todaysMeals.reduce((sum, m) => sum + m.calories, 0)}</p>
+          <p className="text-xs text-muted-foreground">{t("dashboard.mealCount", { count: todaysMeals.length })}</p>
+          <div className="space-y-1">
+            {todaysMeals.slice(0, 3).map((meal) => (
+              <p key={meal.id} className={cn("text-xs truncate", meal.done && "line-through text-muted-foreground")}>
+                {meal.name}
+              </p>
+            ))}
+            {todaysMeals.length > 3 && <p className="text-[10px] text-muted-foreground">...</p>}
+          </div>
+        </div>
+      )}
+    </WidgetCard>,
+
+    // Card 3: Today's Workout
+    <WidgetCard key="workout" featureColor="fitness" icon={Dumbbell} title={t("dashboard.todaysWorkout")} className="h-full">
+      {todaysWorkout ? (
+        <div className="space-y-1.5">
+          <p className="text-sm font-semibold">{todaysWorkout.name}</p>
+          <p className="text-xs text-muted-foreground">
+            {t("dashboard.exerciseCount", { count: todaysWorkout.exercises })} - {t("dashboard.estDuration", { duration: todaysWorkout.duration })}
+          </p>
+          {todaysWorkout.done && (
+            <span className="inline-block rounded-full bg-[#F97316]/10 text-[#F97316] px-2 py-0.5 text-[10px] font-medium">
+              {t("dashboard.completedToday")}
+            </span>
+          )}
+        </div>
+      ) : (
+        <p className="text-xs text-muted-foreground">{t("dashboard.restDayOrNoWorkout")}</p>
+      )}
+    </WidgetCard>,
+
+    // Card 4: Plan Countdown (HOME-05)
+    <WidgetCard key="countdown" featureColor="routine" icon={Calendar} title={t("dashboard.planProgress")} className="h-full">
+      {planCurrentDay ? (
+        <div className="space-y-2">
+          <p className="text-lg font-bold">
+            {t("dashboard.planDay", { current: planCurrentDay, total: 14 })}
+          </p>
+          <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden" dir={locale === "ar" ? "rtl" : "ltr"}>
+            <div
+              className="h-full bg-[#8B5CF6] rounded-full transition-all"
+              style={{ width: `${(planCurrentDay / 14) * 100}%` }}
+            />
+          </div>
+        </div>
+      ) : (
+        <p className="text-xs text-muted-foreground">-</p>
+      )}
+    </WidgetCard>,
+  ];
+
   return (
-    <div className="px-4 py-6 space-y-6 max-w-5xl mx-auto lg:px-6">
-      {/* Greeting */}
+    <div className="px-4 py-6 space-y-5 max-w-5xl mx-auto lg:px-6">
+      {/* Greeting (HOME-01) */}
       <div>
         <p className="text-sm text-muted-foreground">
           {formatDateWithWeekday(new Date(), locale)}
         </p>
-        <h1 className="text-2xl font-bold mt-1">
-          {t("dashboard.welcome")} <span className="text-primary">{userName}</span>
+        <h1 key={messageIndex} className="text-2xl font-bold mt-1 animate-fade-in">
+          {t(`dashboard.motivational.${messageIndex}`, { name: userName })}
         </h1>
       </div>
 
+      {/* Coach Message Banner (HOME-04) */}
+      {unreadCoachTicket && !bannerDismissed && (
+        <div className="bg-primary/10 border border-primary/20 rounded-xl p-3 flex items-center gap-3 animate-slide-up">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15">
+            <Shield className="h-4 w-4 text-primary" />
+          </div>
+          <p className="flex-1 text-sm font-medium">{t("dashboard.coachMessageBanner")}</p>
+          <Link
+            href={`/tickets/${unreadCoachTicket._id}`}
+            className="text-xs font-semibold text-primary hover:underline shrink-0"
+          >
+            {t("dashboard.viewTicket")}
+          </Link>
+          <button onClick={() => setBannerDismissed(true)} className="shrink-0 p-1 text-muted-foreground hover:text-foreground">
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="rounded-xl border border-border bg-card p-4 shadow-card">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#F59E0B]/12">
-              <Flame className="h-3.5 w-3.5 text-[#F59E0B]" />
-            </div>
-            <span className="text-xs text-muted-foreground">{t("tracking.streakDays")}</span>
+        {[
+          { icon: Flame, color: "streak" as const, label: t("tracking.streakDays"), value: `${overallProgress}%` },
+          { icon: UtensilsCrossed, color: "nutrition" as const, label: t("dashboard.mealProgress"), value: `${mealProgress.completed}/${mealProgress.total}` },
+          { icon: Dumbbell, color: "fitness" as const, label: t("dashboard.workoutProgress"), value: `${workoutProgress.completed}/${workoutProgress.total}` },
+          { icon: Calendar, color: "routine" as const, label: t("dashboard.upcomingCheckIn"), value: nextCheckInDisplay },
+        ].map((stat, i) => (
+          <div key={i} className="animate-slide-up" style={{ animationDelay: `${i * 50}ms` }}>
+            <WidgetCard icon={stat.icon} title={stat.label} value={stat.value} featureColor={stat.color} />
           </div>
-          <p className="text-2xl font-bold">{overallProgress}%</p>
-        </div>
+        ))}
+      </div>
 
-        <div className="rounded-xl border border-border bg-card p-4 shadow-card">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#10B981]/12">
-              <UtensilsCrossed className="h-3.5 w-3.5 text-[#10B981]" />
+      {/* Mobile Carousel (HOME-02) */}
+      <div className="lg:hidden relative -mx-4">
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+        >
+          {cards.map((card, i) => (
+            <div
+              key={i}
+              ref={(el) => { cardRefs.current[i] = el; }}
+              className="flex-shrink-0 w-full snap-center px-4"
+            >
+              <div className="animate-slide-up" style={{ animationDelay: `${i * 50}ms` }}>
+                {card}
+              </div>
             </div>
-            <span className="text-xs text-muted-foreground">{t("dashboard.mealProgress")}</span>
-          </div>
-          <p className="text-2xl font-bold">
-            {mealProgress.completed}
-            <span className="text-muted-foreground text-base">/{mealProgress.total}</span>
-          </p>
+          ))}
         </div>
-
-        <div className="rounded-xl border border-border bg-card p-4 shadow-card">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#F97316]/12">
-              <Dumbbell className="h-3.5 w-3.5 text-[#F97316]" />
-            </div>
-            <span className="text-xs text-muted-foreground">{t("dashboard.workoutProgress")}</span>
-          </div>
-          <p className="text-2xl font-bold">
-            {workoutProgress.completed}
-            <span className="text-muted-foreground text-base">/{workoutProgress.total}</span>
-          </p>
-        </div>
-
-        <div className="rounded-xl border border-border bg-card p-4 shadow-card">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#8B5CF6]/12">
-              <Calendar className="h-3.5 w-3.5 text-[#8B5CF6]" />
-            </div>
-            <span className="text-xs text-muted-foreground">{t("dashboard.upcomingCheckIn")}</span>
-          </div>
-          <p className="text-2xl font-bold">{nextCheckInDisplay}</p>
+        {/* Dot indicators */}
+        <div className="flex justify-center gap-1.5 mt-3">
+          {[0, 1, 2, 3].map((i) => (
+            <button
+              key={i}
+              onClick={() => { scrollToIndex(i); setActiveCardIndex(i); }}
+              className={cn(
+                "h-1.5 rounded-full transition-all duration-300",
+                activeCardIndex === i ? "w-4 bg-primary" : "w-1.5 bg-neutral-300"
+              )}
+            />
+          ))}
         </div>
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Today's Meals */}
-        <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
-          <div className="flex items-center justify-between p-4 border-b border-border">
-            <div className="flex items-center gap-2">
-              <UtensilsCrossed className="h-4 w-4 text-[#10B981]" />
-              <h2 className="font-semibold">{t("meals.todaysMeals")}</h2>
-            </div>
-            <Link
-              href="/meal-plan"
-              className="text-xs text-primary font-medium flex items-center gap-1 hover:underline"
-            >
-              {t("dashboard.viewPlan")}
-              <ChevronRight className="h-3 w-3 rtl:rotate-180" />
-            </Link>
+      {/* Desktop Grid (HOME-03) */}
+      <div className="hidden lg:grid lg:grid-cols-2 gap-4">
+        {cards.map((card, i) => (
+          <div key={i} className="animate-slide-up" style={{ animationDelay: `${i * 50}ms` }}>
+            {card}
           </div>
-          <div className="divide-y divide-border">
-            {todaysMeals.length === 0 ? (
-              <div className="p-6 text-center text-sm text-muted-foreground">
-                {locale === "ar" ? "لا توجد وجبات اليوم" : "No meals for today"}
-              </div>
-            ) : (
-              todaysMeals.map((meal) => (
-                <div
-                  key={meal.id}
-                  className={cn(
-                    "flex items-center gap-3 p-3.5 transition-colors",
-                    meal.done && "opacity-60"
-                  )}
-                >
-                  <div className={cn(
-                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-xs font-semibold",
-                    meal.done
-                      ? "bg-primary/10 text-primary"
-                      : "bg-neutral-100 text-muted-foreground"
-                  )}>
-                    {meal.time}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className={cn(
-                      "font-medium text-sm truncate",
-                      meal.done && "line-through"
-                    )}>
-                      {meal.name}
-                    </p>
-                  </div>
-                  <span className="text-xs text-muted-foreground shrink-0">
-                    {meal.calories} {locale === "ar" ? "سعرة" : "kcal"}
-                  </span>
-                  <div className={cn(
-                    "h-5 w-5 shrink-0 rounded-md border-2 transition-colors",
-                    meal.done
-                      ? "border-primary bg-primary"
-                      : "border-neutral-300"
-                  )}>
-                    {meal.done && (
-                      <svg className="h-full w-full text-white" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Today's Workout */}
-        <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
-          <div className="flex items-center justify-between p-4 border-b border-border">
-            <div className="flex items-center gap-2">
-              <Dumbbell className="h-4 w-4 text-[#F97316]" />
-              <h2 className="font-semibold">{t("nav.workoutPlan")}</h2>
-            </div>
-            <Link
-              href="/workout-plan"
-              className="text-xs text-primary font-medium flex items-center gap-1 hover:underline"
-            >
-              {t("dashboard.viewPlan")}
-              <ChevronRight className="h-3 w-3 rtl:rotate-180" />
-            </Link>
-          </div>
-          {todaysWorkout ? (
-            <div className="p-4">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <p className="text-xs text-muted-foreground">{todaysWorkout.type}</p>
-                  <h3 className="font-semibold text-lg mt-0.5">{todaysWorkout.name}</h3>
-                </div>
-                {todaysWorkout.done && (
-                  <span className="text-xs font-medium text-primary bg-primary/10 px-2.5 py-1 rounded-full">
-                    {t("dashboard.completedToday")}
-                  </span>
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="rounded-lg bg-neutral-50 p-3 text-center">
-                  <p className="text-xl font-bold">{todaysWorkout.duration}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{t("workouts.duration")}</p>
-                </div>
-                <div className="rounded-lg bg-neutral-50 p-3 text-center">
-                  <p className="text-xl font-bold">{todaysWorkout.exercises}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{t("workouts.exercises")}</p>
-                </div>
-              </div>
-              <Link href="/workout-plan">
-                <button className={cn(
-                  "w-full py-3 rounded-lg font-semibold text-sm transition-all active:scale-[0.97]",
-                  todaysWorkout.done
-                    ? "bg-neutral-100 text-foreground hover:bg-neutral-200"
-                    : "bg-primary text-white hover:bg-primary/90"
-                )}>
-                  {todaysWorkout.done ? t("dashboard.viewPlan") : t("dashboard.startWorkout")}
-                </button>
-              </Link>
-            </div>
-          ) : (
-            <div className="p-8 text-center">
-              <p className="text-muted-foreground text-sm">
-                {locale === "ar" ? "يوم راحة أو لا يوجد تمرين اليوم" : "Rest day or no workout today"}
-              </p>
-              <Link
-                href="/workout-plan"
-                className="inline-block mt-3 text-sm text-primary font-medium hover:underline"
-              >
-                {t("dashboard.viewPlan")}
-              </Link>
-            </div>
-          )}
-        </div>
+        ))}
       </div>
 
       {/* Quick Actions */}
