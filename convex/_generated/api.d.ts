@@ -27,6 +27,7 @@ import type * as knowledgeBase from "../knowledgeBase.js";
 import type * as knowledgeBaseActions from "../knowledgeBaseActions.js";
 import type * as mealPlans from "../mealPlans.js";
 import type * as migrations from "../migrations.js";
+import type * as navBadges from "../navBadges.js";
 import type * as notifications from "../notifications.js";
 import type * as pendingSignups from "../pendingSignups.js";
 import type * as profiles from "../profiles.js";
@@ -70,6 +71,7 @@ declare const fullApi: ApiFromModules<{
   knowledgeBaseActions: typeof knowledgeBaseActions;
   mealPlans: typeof mealPlans;
   migrations: typeof migrations;
+  navBadges: typeof navBadges;
   notifications: typeof notifications;
   pendingSignups: typeof pendingSignups;
   profiles: typeof profiles;
