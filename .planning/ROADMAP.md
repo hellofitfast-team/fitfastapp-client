@@ -116,12 +116,12 @@ Plans:
   2. Users can swipe left/right between check-in steps on mobile
   3. The review screen shows a full summary of all entered data before submission
   4. The onboarding assessment shows one question per screen with large inputs and smooth back/next transitions
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 14-01: Check-in step wizard with progress bar and swipe navigation
-- [ ] 14-02: Check-in review summary and smart defaults
-- [ ] 14-03: Onboarding guided wizard renovation
+- [ ] 14-01-PLAN.md — Segmented progress bar and swipe navigation for check-in wizard
+- [ ] 14-02-PLAN.md — Enhanced review summary and smart weight defaults
+- [ ] 14-03-PLAN.md — Onboarding assessment guided wizard conversion
 
 ### Phase 15: RTL Audit and Polish
 **Goal**: Every renovated component works flawlessly in Arabic/RTL and the app passes accessibility and PWA quality gates
@@ -155,4 +155,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-17 — v1.1 phases added*
+*Last updated: 2026-02-22 — Phase 14 plans created*
