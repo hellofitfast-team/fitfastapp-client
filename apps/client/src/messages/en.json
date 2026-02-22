@@ -293,7 +293,8 @@
     "of": "of",
     "mealsCompleted": "meals completed",
     "addWorkoutNotes": "Add workout notes (optional)...",
-    "takeTimeToRecover": "Take time to recover and prepare for your next workout"
+    "takeTimeToRecover": "Take time to recover and prepare for your next workout",
+    "complete": "complete"
   },
   "progress": {
     "title": "Your Progress",

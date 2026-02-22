@@ -127,7 +127,7 @@ export default function ProgressPage() {
   ];
 
   return (
-    <div className="px-4 py-6 space-y-5 max-w-4xl mx-auto lg:px-6">
+    <div className="px-4 py-6 space-y-5 max-w-5xl mx-auto lg:px-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
@@ -162,15 +162,15 @@ export default function ProgressPage() {
       />
 
       {/* Tabs */}
-      <div className="flex rounded-lg bg-neutral-100 p-1">
+      <div className="flex rounded-xl bg-neutral-100 p-1">
         {tabs.map(({ key, icon: Icon, label }) => (
           <button
             key={key}
             onClick={() => setActiveTab(key)}
             className={cn(
-              "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-md text-sm font-medium transition-colors",
+              "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-medium transition-colors",
               activeTab === key
-                ? "bg-card text-foreground shadow-sm"
+                ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >

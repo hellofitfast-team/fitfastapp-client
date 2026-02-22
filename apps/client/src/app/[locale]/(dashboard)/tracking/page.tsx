@@ -104,6 +104,10 @@ export default function TrackingPage() {
   };
 
   const completionPercentage = calculateCompletionPercentage();
+  const mealProgress = {
+    completed: trackingData.mealCompletions.filter((c) => c.completed).length,
+    total: (mealPlan?.planData as unknown as GeneratedMealPlan)?.weeklyPlan?.[getDayName(selectedDate)]?.meals?.length || 0,
+  };
   const dayName = getDayName(selectedDate);
   const mealPlanData = mealPlan?.planData as unknown as GeneratedMealPlan;
   const workoutPlanData = workoutPlan?.planData as unknown as GeneratedWorkoutPlan;
@@ -117,8 +121,8 @@ export default function TrackingPage() {
   // Show empty state if no plans exist
   if (!mealPlan && !workoutPlan) {
     return (
-      <div className="space-y-6">
-        <TrackingHeader />
+      <div className="px-4 py-6 space-y-5 max-w-5xl mx-auto lg:px-6">
+        <TrackingHeader completionPercentage={0} mealProgress={{ completed: 0, total: 0 }} workoutDone={false} />
         <EmptyState
           icon={Target}
           title={tEmpty("noTrackingData.title")}
@@ -133,8 +137,8 @@ export default function TrackingPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <TrackingHeader />
+    <div className="px-4 py-6 space-y-5 max-w-5xl mx-auto lg:px-6">
+      <TrackingHeader completionPercentage={completionPercentage} mealProgress={mealProgress} workoutDone={!!todaysWorkout && trackingData.workoutCompletions.some((c) => c.completed)} />
 
       <DateProgress
         selectedDate={selectedDate}
@@ -142,27 +146,29 @@ export default function TrackingPage() {
         completionPercentage={completionPercentage}
       />
 
-      <MealTracking
-        todaysMeals={todaysMeals}
-        mealCompletions={trackingData.mealCompletions}
-        isTogglingMeal={isTogglingMeal}
-        mealNotes={mealNotes}
-        onMealToggle={handleMealToggle}
-        onMealNotesChange={setMealNotes}
-        isMealsExpanded={isMealsExpanded}
-        onToggleExpand={() => setIsMealsExpanded(!isMealsExpanded)}
-      />
+      <div className="space-y-4 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
+        <MealTracking
+          todaysMeals={todaysMeals}
+          mealCompletions={trackingData.mealCompletions}
+          isTogglingMeal={isTogglingMeal}
+          mealNotes={mealNotes}
+          onMealToggle={handleMealToggle}
+          onMealNotesChange={setMealNotes}
+          isMealsExpanded={isMealsExpanded}
+          onToggleExpand={() => setIsMealsExpanded(!isMealsExpanded)}
+        />
 
-      <WorkoutTracking
-        todaysWorkout={todaysWorkout}
-        workoutCompletions={trackingData.workoutCompletions}
-        isTogglingWorkout={isTogglingWorkout}
-        workoutNotes={workoutNotes}
-        onWorkoutToggle={handleWorkoutToggle}
-        onWorkoutNotesChange={setWorkoutNotes}
-        isWorkoutsExpanded={isWorkoutsExpanded}
-        onToggleExpand={() => setIsWorkoutsExpanded(!isWorkoutsExpanded)}
-      />
+        <WorkoutTracking
+          todaysWorkout={todaysWorkout}
+          workoutCompletions={trackingData.workoutCompletions}
+          isTogglingWorkout={isTogglingWorkout}
+          workoutNotes={workoutNotes}
+          onWorkoutToggle={handleWorkoutToggle}
+          onWorkoutNotesChange={setWorkoutNotes}
+          isWorkoutsExpanded={isWorkoutsExpanded}
+          onToggleExpand={() => setIsWorkoutsExpanded(!isWorkoutsExpanded)}
+        />
+      </div>
 
       <DailyReflection
         defaultReflection={typeof trackingData.reflection === "object" ? trackingData.reflection?.reflection || "" : trackingData.reflection || ""}

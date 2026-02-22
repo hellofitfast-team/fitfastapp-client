@@ -293,7 +293,8 @@
     "of": "من",
     "mealsCompleted": "وجبات مكتملة",
     "addWorkoutNotes": "أضف ملاحظات التمرين (اختياري)...",
-    "takeTimeToRecover": "خذ وقتك للتعافي والاستعداد لتمرينك القادم"
+    "takeTimeToRecover": "خذ وقتك للتعافي والاستعداد لتمرينك القادم",
+    "complete": "مكتمل"
   },
   "progress": {
     "title": "تقدمك",

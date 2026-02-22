@@ -81,7 +81,7 @@ export function MealTracking({
               const isCompleted = completion?.completed || false;
 
               return (
-                <div key={index} className="p-4 hover:bg-neutral-50 transition-colors">
+                <div key={index} className="p-4 hover:bg-neutral-50 transition-colors animate-slide-up" style={{ animationDelay: `${index * 50}ms` }}>
                   <div className="flex items-start gap-3">
                     <button
                       onClick={() => onMealToggle(index, isCompleted)}

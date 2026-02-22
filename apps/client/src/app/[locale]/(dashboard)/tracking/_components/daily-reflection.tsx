@@ -26,7 +26,7 @@ export function DailyReflection({ defaultReflection, onSubmit }: DailyReflection
   }, [defaultReflection, reset]);
 
   return (
-    <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
+    <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden animate-slide-up" style={{ animationDelay: "100ms" }}>
       <div className="flex items-center gap-2 p-4 border-b border-border bg-[#8B5CF6]/8">
         <BookOpen className="h-4 w-4 text-[#8B5CF6]" />
         <div>
