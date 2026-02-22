@@ -106,10 +106,10 @@ export default function SettingsPage() {
       </div>
 
       {/* Profile Settings */}
-      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
-        <div className="flex items-center gap-2 p-4 border-b border-border">
+      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden animate-slide-up" style={{ animationDelay: "0ms" }}>
+        <div className="flex items-center gap-2 p-4 border-b border-border bg-neutral-50/50">
           <User className="h-4 w-4 text-primary" />
-          <h2 className="font-semibold text-sm">{t("profile")}</h2>
+          <h3 className="font-semibold text-sm">{t("profile")}</h3>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-4">
           <div>
@@ -165,10 +165,10 @@ export default function SettingsPage() {
       </div>
 
       {/* Notifications */}
-      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
-        <div className="flex items-center gap-2 p-4 border-b border-border">
+      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden animate-slide-up" style={{ animationDelay: "50ms" }}>
+        <div className="flex items-center gap-2 p-4 border-b border-border bg-neutral-50/50">
           <Bell className="h-4 w-4 text-primary" />
-          <h2 className="font-semibold text-sm">{t("notifications")}</h2>
+          <h3 className="font-semibold text-sm">{t("notifications")}</h3>
         </div>
         <div className="p-4 space-y-5">
           {notifError ? (
@@ -230,10 +230,10 @@ export default function SettingsPage() {
       </div>
 
       {/* Account */}
-      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
-        <div className="flex items-center gap-2 p-4 border-b border-border">
+      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden animate-slide-up" style={{ animationDelay: "100ms" }}>
+        <div className="flex items-center gap-2 p-4 border-b border-border bg-neutral-50/50">
           <Shield className="h-4 w-4 text-primary" />
-          <h2 className="font-semibold text-sm">{t("account")}</h2>
+          <h3 className="font-semibold text-sm">{t("account")}</h3>
         </div>
         <div className="p-4 space-y-3">
           <button className="w-full py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-neutral-50 transition-colors">
@@ -250,10 +250,10 @@ export default function SettingsPage() {
       </div>
 
       {/* Plan Details */}
-      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
-        <div className="flex items-center gap-2 p-4 border-b border-border bg-primary/5">
+      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden animate-slide-up" style={{ animationDelay: "150ms" }}>
+        <div className="flex items-center gap-2 p-4 border-b border-border bg-neutral-50/50">
           <CreditCard className="h-4 w-4 text-primary" />
-          <h2 className="font-semibold text-sm">{t("planDetails")}</h2>
+          <h3 className="font-semibold text-sm">{t("planDetails")}</h3>
         </div>
         <div className="p-4 space-y-4">
           <div className="flex justify-between items-center py-2 border-b border-border">

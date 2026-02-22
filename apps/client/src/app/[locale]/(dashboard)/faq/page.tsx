@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Search, ChevronDown, ChevronUp, MessageSquarePlus } from "lucide-react";
+import { Search, ChevronDown, MessageSquarePlus } from "lucide-react";
 import { Link } from "@fitfast/i18n/navigation";
 import { Skeleton } from "@fitfast/ui/skeleton";
 import { cn } from "@fitfast/ui/cn";
@@ -53,7 +53,7 @@ export default function FAQPage() {
           placeholder={t("searchPlaceholder")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full h-11 ps-10 pe-4 rounded-lg border border-input bg-card text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+          className="w-full h-11 ps-10 pe-4 rounded-xl border border-input bg-card text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors max-w-md"
         />
       </div>
 
@@ -74,11 +74,12 @@ export default function FAQPage() {
           {filteredFaqs.map((faq, index) => (
             <div
               key={faq.key}
-              className="rounded-xl border border-border bg-card overflow-hidden transition-colors hover:bg-neutral-50"
+              className="rounded-xl border border-border bg-card overflow-hidden animate-slide-up"
+              style={{ animationDelay: `${index * 50}ms` }}
             >
               <button
                 onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
-                className="w-full p-4 flex items-start justify-between gap-3 text-start"
+                className="w-full p-4 flex items-start justify-between gap-3 text-start hover:bg-neutral-50 transition-colors"
               >
                 <div className="flex items-start gap-3">
                   <div className={cn(
@@ -91,19 +92,21 @@ export default function FAQPage() {
                   </div>
                   <span className="font-medium text-sm pt-1">{faq.question}</span>
                 </div>
-                {expandedIndex === index ? (
-                  <ChevronUp className="h-4 w-4 shrink-0 text-muted-foreground mt-1" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground mt-1" />
-                )}
+                <ChevronDown className={cn(
+                  "h-4 w-4 shrink-0 text-muted-foreground mt-1 transition-transform duration-200",
+                  expandedIndex === index && "rotate-180"
+                )} />
               </button>
-              {expandedIndex === index && (
+              <div className={cn(
+                "overflow-hidden transition-all duration-200 ease-in-out",
+                expandedIndex === index ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0"
+              )}>
                 <div className="px-4 pb-4 pt-0">
                   <div className="ms-11 rounded-lg bg-neutral-50 p-3.5">
                     <p className="text-sm leading-relaxed">{faq.answer}</p>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           ))}
         </div>
@@ -118,7 +121,7 @@ export default function FAQPage() {
       )}
 
       {/* Still Need Help */}
-      <div className="rounded-xl bg-primary/5 border border-primary/20 p-6 text-center">
+      <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 text-center">
         <div className="flex h-12 w-12 mx-auto items-center justify-center rounded-full bg-primary/10 mb-3">
           <MessageSquarePlus className="h-6 w-6 text-primary" />
         </div>
