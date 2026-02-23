@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation, useAction } from "convex/react";
+import { useMutation, useAction, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { useAuth } from "@/hooks/use-auth";
@@ -76,6 +76,15 @@ export default function CheckInPage() {
     resolver: zodResolver(checkInSchema) as any,
     defaultValues: { energyLevel: 5, sleepQuality: 5, dietaryAdherence: 5 },
   });
+
+  // Pre-fill weight from last check-in
+  const latestCheckIn = useQuery(api.checkIns.getLatestCheckIn);
+
+  useEffect(() => {
+    if (latestCheckIn?.weight && !methods.getValues("weight")) {
+      methods.setValue("weight", latestCheckIn.weight);
+    }
+  }, [latestCheckIn, methods]);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
