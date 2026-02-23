@@ -10,14 +10,12 @@ export const metadata: Metadata = {
   description: "FitFast coaching administration panel.",
   icons: {
     icon: [{ url: "/favicon.png", sizes: "32x32", type: "image/png" }],
-    apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#4169E1",
+  themeColor: "#FF4500",
   width: "device-width",
   initialScale: 1,
 };
