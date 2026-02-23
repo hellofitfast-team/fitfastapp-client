@@ -130,7 +130,7 @@ export default function SignupDetailPage() {
           href="/signups"
           className="inline-flex items-center gap-2 text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
           {t("backToList")}
         </Link>
         <div className="rounded-xl border border-stone-200 bg-white p-12 text-center">
@@ -155,7 +155,7 @@ export default function SignupDetailPage() {
         href="/signups"
         className="inline-flex items-center gap-2 text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors"
       >
-        <ArrowLeft className="h-4 w-4" />
+        <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
         {t("backToList")}
       </Link>
 
