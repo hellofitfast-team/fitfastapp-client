@@ -65,7 +65,7 @@ export function PhotosTab({ photos }: PhotosTabProps) {
               <span className="font-semibold text-sm">{t("progressPhoto")}</span>
               <button
                 onClick={() => setSelectedPhoto(null)}
-                className="h-9 w-9 rounded-lg flex items-center justify-center hover:bg-neutral-100 transition-colors"
+                className="h-11 w-11 rounded-lg flex items-center justify-center hover:bg-neutral-100 transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>

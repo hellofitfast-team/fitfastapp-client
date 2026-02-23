@@ -32,7 +32,7 @@ export function PhotosStep({ uploadedPhotos, onPhotoChange, onRemovePhoto }: Pho
                 <button
                   type="button"
                   onClick={() => onRemovePhoto(index)}
-                  className="absolute top-2 end-2 h-8 w-8 rounded-full bg-error-500 flex items-center justify-center text-white hover:bg-error-500/80 transition-colors"
+                  className="absolute top-2 end-2 h-11 w-11 rounded-full bg-error-500 flex items-center justify-center text-white hover:bg-error-500/80 transition-colors"
                 >
                   <X className="h-4 w-4" />
                 </button>

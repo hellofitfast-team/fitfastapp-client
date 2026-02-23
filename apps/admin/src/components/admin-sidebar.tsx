@@ -38,7 +38,7 @@ function NavItem({
         href={href}
         onClick={onClick}
         className={cn(
-          "flex items-center gap-3 rounded-lg mx-3 px-3 py-2.5 text-sm font-medium transition-colors",
+          "flex items-center gap-3 rounded-lg mx-3 px-3 py-3 text-sm font-medium transition-colors min-h-11",
           isActive
             ? "bg-primary/10 text-primary"
             : "text-stone-400 hover:bg-white/5 hover:text-stone-200"
@@ -125,7 +125,7 @@ export function AdminSidebar({
             </div>
           </div>
           <button
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-stone-500 hover:bg-white/5 hover:text-stone-300 transition-colors lg:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-500 hover:bg-white/5 hover:text-stone-300 transition-colors lg:hidden"
             onClick={onClose}
           >
             <X className="h-4 w-4" />

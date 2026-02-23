@@ -87,7 +87,7 @@ export function MealTracking({
                       onClick={() => onMealToggle(index, isCompleted)}
                       disabled={isTogglingMeal === index}
                       className={cn(
-                        "h-9 w-9 shrink-0 rounded-lg border-2 flex items-center justify-center transition-colors",
+                        "h-11 w-11 shrink-0 rounded-lg border-2 flex items-center justify-center transition-colors",
                         isCompleted
                           ? "border-success-500 bg-success-500"
                           : "border-neutral-300 hover:border-primary"

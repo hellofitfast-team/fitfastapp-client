@@ -125,7 +125,7 @@ export function ClientsList({ clients }: { clients: Client[] }) {
                   <td className="px-4 py-4">
                     <Link
                       href={`/admin/clients/${client.userId}`}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-stone-200 text-stone-400 hover:border-primary/30 hover:text-primary transition-colors"
+                      className="flex h-11 w-11 items-center justify-center rounded-lg border border-stone-200 text-stone-400 hover:border-primary/30 hover:text-primary transition-colors"
                     >
                       <ArrowRight className="h-4 w-4 rtl:rotate-180" />
                     </Link>

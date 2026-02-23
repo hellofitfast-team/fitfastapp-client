@@ -198,13 +198,13 @@ export function FaqManager() {
                   <div className="flex shrink-0 gap-1">
                     <button
                       onClick={() => handleEdit(faq)}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-stone-200 text-stone-400 hover:border-primary/30 hover:text-primary transition-colors"
+                      className="flex h-11 w-11 items-center justify-center rounded-lg border border-stone-200 text-stone-400 hover:border-primary/30 hover:text-primary transition-colors"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => handleDelete(faq._id)}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-stone-200 text-stone-400 hover:border-red-300 hover:text-red-600 transition-colors"
+                      className="flex h-11 w-11 items-center justify-center rounded-lg border border-stone-200 text-stone-400 hover:border-red-300 hover:text-red-600 transition-colors"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
