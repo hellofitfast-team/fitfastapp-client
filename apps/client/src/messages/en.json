@@ -263,6 +263,13 @@
       "photos": "Progress Photos",
       "review": "Review & Submit"
     },
+    "reviewBody": "Body",
+    "reviewFitness": "Fitness",
+    "reviewDiet": "Diet",
+    "dietNotes": "Diet Notes",
+    "none": "None",
+    "photosUploaded": "{count} photos uploaded",
+    "noPhotos": "No photos",
     "placeholders": {
       "performance": "Describe your workout performance, improvements, or challenges...",
       "dietNotes": "Any challenges with your meal plan? Foods you enjoyed or disliked?",

@@ -263,6 +263,13 @@
       "photos": "صور التقدم",
       "review": "مراجعة وإرسال"
     },
+    "reviewBody": "الجسم",
+    "reviewFitness": "اللياقة",
+    "reviewDiet": "النظام الغذائي",
+    "dietNotes": "ملاحظات النظام الغذائي",
+    "none": "لا يوجد",
+    "photosUploaded": "{count} صور تم رفعها",
+    "noPhotos": "لا توجد صور",
     "placeholders": {
       "performance": "صف أداء تمارينك، التحسينات، أو التحديات...",
       "dietNotes": "أي تحديات في خطة وجباتك؟ أطعمة أعجبتك أو لم تعجبك؟",
