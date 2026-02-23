@@ -5,8 +5,8 @@ import { useCurrentMealPlan } from "@/hooks/use-meal-plans";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/hooks/use-auth";
-import { UtensilsCrossed, Calendar, TrendingUp, RefreshCw, Clock, Flame, Loader2, ChevronDown, Sparkles } from "lucide-react";
-import { useState, useMemo } from "react";
+import { UtensilsCrossed, Calendar, TrendingUp, RefreshCw, Clock, Flame, Loader2, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { cn } from "@fitfast/ui/cn";
 import { usePlanStream } from "@/hooks/use-plan-stream";
 import { EmptyState } from "@fitfast/ui/empty-state";
@@ -23,6 +23,28 @@ export default function MealPlanPage() {
   const [selectedDay, setSelectedDay] = useState(0);
   const [generatingPlan, setGeneratingPlan] = useState(false);
   const [expandedMeal, setExpandedMeal] = useState<number | null>(0);
+  const daySelectorRef = useRef<HTMLDivElement>(null);
+  const isRTL = locale === "ar";
+
+  // Scroll day selector to show day 1 on the correct edge for RTL
+  useEffect(() => {
+    const el = daySelectorRef.current;
+    if (!el) return;
+    if (isRTL) {
+      // In RTL, scroll to the end so day 1 appears on the right edge
+      el.scrollLeft = el.scrollWidth - el.clientWidth;
+    }
+  }, [isRTL]);
+
+  // Scroll selected day into view
+  useEffect(() => {
+    const el = daySelectorRef.current;
+    if (!el) return;
+    const activeBtn = el.querySelector("[data-active='true']");
+    if (activeBtn) {
+      activeBtn.scrollIntoView({ inline: "nearest", block: "nearest", behavior: "smooth" });
+    }
+  }, [selectedDay]);
 
   const generateMealPlan = useAction(api.ai.generateMealPlan);
 

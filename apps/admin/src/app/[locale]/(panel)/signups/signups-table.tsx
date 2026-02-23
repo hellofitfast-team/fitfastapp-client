@@ -212,7 +212,7 @@ export function SignupsTable() {
                         {/* View Details */}
                         <Link
                           href={`/signups/${signup._id}`}
-                          className="flex h-8 items-center gap-1.5 rounded-lg border border-stone-200 px-2.5 text-xs font-medium text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors"
+                          className="flex min-h-11 items-center gap-1.5 rounded-lg border border-stone-200 px-2.5 text-xs font-medium text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors"
                         >
                           <ExternalLink className="h-3.5 w-3.5" />
                           {t("viewDetails")}
@@ -223,7 +223,7 @@ export function SignupsTable() {
                           onClick={() =>
                             setExpandedId(isExpanded ? null : signup._id)
                           }
-                          className={`flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-colors ${
+                          className={`flex min-h-11 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-colors ${
                             isExpanded
                               ? "border-primary/30 bg-primary/10 text-primary"
                               : "border-stone-200 text-stone-500 hover:border-stone-300 hover:text-stone-700"

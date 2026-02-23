@@ -5,15 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-17)
 
 **Core value:** Every user flow works reliably, looks polished, and feels consistent in both languages
-**Current focus:** v1.1 Mobile UI Renovation — Phase 11 complete, Phase 12 done, ready for Phase 13
+**Current focus:** v1.1 Mobile UI Renovation — roadmap complete, ready for phase planning
 
 ## Current Position
 
 Milestone: v1.1 Mobile UI Renovation
+<<<<<<< HEAD
 Status: In progress — Phase 14 Plan 02 complete
 Phase: Phase 14 — Check-in Wizard and Onboarding
 Plan: 02 complete (review screen + smart weight default)
 Progress: [#############.......] 13/20 plans (65%)
+=======
+Status: In progress — Phase 11.1 executing
+Phase: Phase 11.1 — Auth, Authorization, and Marketing Landing Page
+Plan: 01–07 complete (backend infra + marketing scaffold + landing page + admin RBAC + checkout flow + signup detail + plans/payment-methods manager + E2E verification checkpoint)
+Progress: [#######.............] 7/20 plans (35%)
+>>>>>>> worktree-breezy-giggling-cascade
 Started: 2026-02-17
 
 ## Previous Milestone
@@ -25,12 +32,20 @@ v1.0 Polish & Rebrand — SHIPPED 2026-02-16
 
 | Phase | Name | Plans | Status |
 |-------|------|-------|--------|
+<<<<<<< HEAD
 | 11 | Foundation — Shell and Navigation | 2/2 | Complete |
 | 11.1 | Auth, Authorization, and Marketing Landing Page | 7/7 | Complete |
 | 12 | Design Tokens and Core Primitives | 3/3 | Complete |
 | 13 | Page-Level Renovation | 0/7 | Not started |
 | 14 | Check-in Wizard and Onboarding | 1/3 | In progress |
 | 15 | RTL Audit and Polish | 0/3 | Not started |
+=======
+| 11 | Foundation — Shell and Navigation | 4 | Not started |
+| 12 | Design Tokens and Core Primitives | 3 | Not started |
+| 13 | Page-Level Renovation | 7 | Not started |
+| 14 | Check-in Wizard and Onboarding | 3 | Plan 03 complete |
+| 15 | RTL Audit and Polish | 3 | Not started |
+>>>>>>> worktree-breezy-giggling-cascade
 
 Total: 5 phases, 20 plans, 65 requirements
 
@@ -80,6 +95,7 @@ Total: 5 phases, 20 plans, 65 requirements
 - [11.1-06] Reject action uses inline textarea expansion in signups-table (no modal) — faster UX
 - [11.1-06] PlansManager uses local state + single Save button — avoids partial saves on every keystroke
 - [11.1-06] Max 4 plans enforced in UI only (business rule, not backend constraint)
+<<<<<<< HEAD
 - [12-01] Background token changed from cream #FFFEF5 to near-white #FAFAFA — already in neutral scale, reads as white but slightly warmer
 - [12-01] Typography scale documented as CSS comment (not custom properties) — Tailwind built-in utilities handle sizing; comment serves as Phase 13 guide
 - [12-01] Only difference between three globals.css files is client's Clerk @layer declaration — all token values are identical
@@ -96,12 +112,17 @@ Total: 5 phases, 20 plans, 65 requirements
 - [11-02] Renamed dashboard-shell-v2.tsx to dashboard-shell.tsx — no v1 to distinguish from
 - [14-02] useEffect for weight pre-fill instead of defaultValues — handles async Convex query loading correctly
 - [14-02] Section cards with divide-y rows for review layout — consistent with existing SectionCard pattern
+=======
+- [14-03] Inline fadeIn animation style fallback (Phase 12 animate-fade-in not available yet)
+- [14-03] Full re-validation of all steps on final submit as safety net
+- [14-03] Swipe RTL detection reads document.dir at swipe time (matches check-in wizard pattern)
+>>>>>>> worktree-breezy-giggling-cascade
 
 ### Roadmap Evolution
 
 - Phase 11.1 inserted after Phase 11: Auth, Authorization, and Marketing Landing Page (URGENT)
   - Expanded scope: includes 3rd monorepo app (`apps/marketing/`) with checkout flow, pricing plans, royal blue theme
-  - Full circle: marketing site -> checkout -> payment screenshot -> coach approval -> client credentials -> initial assessment
+  - Full circle: marketing site → checkout → payment screenshot → coach approval → client credentials → initial assessment
   - Skills to use during planning/execution: /brainstorming, /frontend-design, marketing-skills
 
 ### Blockers/Concerns
@@ -111,9 +132,18 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-23
+<<<<<<< HEAD
 Stopped at: Completed 14-02-PLAN.md — review screen + smart weight default
 Resume file: .planning/phases/14-checkin-wizard-onboarding/14-02-SUMMARY.md
 
 ---
 *State initialized: 2026-02-12*
 *Last updated: 2026-02-23 — Phase 14 Plan 02 complete: 2 tasks, 2 commits, review screen + weight pre-fill*
+=======
+Stopped at: Completed 14-03-PLAN.md (Onboarding Assessment Step-by-Step Wizard)
+Resume file: None
+
+---
+*State initialized: 2026-02-12*
+*Last updated: 2026-02-23 — Phase 14 plan 03 complete: onboarding assessment wizard with swipe navigation*
+>>>>>>> worktree-breezy-giggling-cascade

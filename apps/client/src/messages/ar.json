@@ -483,7 +483,16 @@
         "beginner": "مبتدئ",
         "intermediate": "متوسط",
         "advanced": "متقدم"
-      }
+      },
+      "steps": {
+        "goals": "الأهداف",
+        "bodyInfo": "معلومات الجسم",
+        "schedule": "الجدول",
+        "diet": "التغذية",
+        "medical": "طبي"
+      },
+      "completeAssessment": "إكمال التقييم",
+      "submitting": "جاري إنشاء خطتك..."
     },
     "pending": {
       "title": "الحساب قيد المراجعة",

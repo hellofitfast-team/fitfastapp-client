@@ -38,7 +38,7 @@ export function PhotosTab({ photos }: PhotosTabProps) {
                     className="object-cover"
                   />
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm p-2">
+                <div className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-sm p-2">
                   <p className="text-xs font-medium text-white">{photo.date}</p>
                 </div>
               </div>
@@ -65,7 +65,7 @@ export function PhotosTab({ photos }: PhotosTabProps) {
               <span className="font-semibold text-sm">{t("progressPhoto")}</span>
               <button
                 onClick={() => setSelectedPhoto(null)}
-                className="h-9 w-9 rounded-lg flex items-center justify-center hover:bg-neutral-100 transition-colors"
+                className="h-11 w-11 rounded-lg flex items-center justify-center hover:bg-neutral-100 transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>

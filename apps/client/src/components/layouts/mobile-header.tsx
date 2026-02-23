@@ -62,8 +62,8 @@ export function MobileHeader({ userName }: MobileHeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-[var(--z-header)] h-[var(--height-header)] border-b border-border bg-card/95 backdrop-blur-md lg:hidden">
-      <div className="flex h-full items-center justify-between px-4">
+    <header className="sticky top-0 z-[var(--z-header)] border-b border-border bg-card/95 backdrop-blur-md pt-[env(safe-area-inset-top)] lg:hidden">
+      <div className="flex h-[var(--height-header)] items-center justify-between px-4">
         {/* Left side — Greeting or Title */}
         {isDashboard && userName ? (
           <div className="flex items-center gap-3">
@@ -96,7 +96,7 @@ export function MobileHeader({ userName }: MobileHeaderProps) {
         <div className="flex items-center gap-1.5">
           {/* Language Switcher */}
           <button
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-xs font-semibold text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
+            className="flex h-11 w-11 items-center justify-center rounded-lg text-xs font-semibold text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
             onClick={switchLocale}
             aria-label="Switch language"
           >
@@ -105,7 +105,7 @@ export function MobileHeader({ userName }: MobileHeaderProps) {
 
           {/* Notifications */}
           <button
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
+            className="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
             aria-label="Notifications"
           >
             <Bell className="h-4 w-4" />
@@ -115,7 +115,7 @@ export function MobileHeader({ userName }: MobileHeaderProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
+                className="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
                 aria-label="User menu"
               >
                 <User className="h-4 w-4" />

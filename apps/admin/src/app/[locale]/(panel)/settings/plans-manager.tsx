@@ -390,7 +390,7 @@ export function PlansManager() {
                       {plan.features.length > 1 && (
                         <button
                           onClick={() => handleRemoveFeature(plan.id, fi)}
-                          className="h-9 w-9 shrink-0 flex items-center justify-center rounded-lg border border-stone-200 text-stone-400 hover:border-red-200 hover:text-red-600 transition-colors"
+                          className="h-11 w-11 shrink-0 flex items-center justify-center rounded-lg border border-stone-200 text-stone-400 hover:border-red-200 hover:text-red-600 transition-colors"
                         >
                           <Trash2 className="h-3 w-3" />
                         </button>

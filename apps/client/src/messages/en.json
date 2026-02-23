@@ -483,7 +483,16 @@
         "beginner": "Beginner",
         "intermediate": "Intermediate",
         "advanced": "Advanced"
-      }
+      },
+      "steps": {
+        "goals": "Goals",
+        "bodyInfo": "Body Info",
+        "schedule": "Schedule",
+        "diet": "Diet",
+        "medical": "Medical"
+      },
+      "completeAssessment": "Complete Assessment",
+      "submitting": "Creating your plan..."
     },
     "pending": {
       "title": "Account Pending Approval",

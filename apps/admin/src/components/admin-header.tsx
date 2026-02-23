@@ -34,7 +34,7 @@ export function AdminHeader({ onMenuClick, coachName }: AdminHeaderProps) {
       <div className="flex h-full items-center justify-between px-4 lg:px-8">
         {/* Left - Menu button (mobile) */}
         <button
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-100 hover:text-stone-700 transition-colors lg:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-100 hover:text-stone-700 transition-colors lg:hidden"
           onClick={onMenuClick}
           aria-label="Toggle menu"
         >
@@ -54,7 +54,7 @@ export function AdminHeader({ onMenuClick, coachName }: AdminHeaderProps) {
 
           {/* Language Switcher */}
           <button
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-100 hover:text-stone-700 transition-colors"
+            className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-100 hover:text-stone-700 transition-colors"
             onClick={switchLocale}
             aria-label="Switch language"
           >
@@ -63,7 +63,7 @@ export function AdminHeader({ onMenuClick, coachName }: AdminHeaderProps) {
 
           {/* Sign Out */}
           <button
-            className="flex items-center gap-2 rounded-lg border border-stone-200 px-3 h-9 text-sm font-medium text-stone-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+            className="flex items-center gap-2 rounded-lg border border-stone-200 px-3 h-11 text-sm font-medium text-stone-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
             onClick={handleSignOut}
           >
             <LogOut className="h-4 w-4" />

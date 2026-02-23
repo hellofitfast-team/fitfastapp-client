@@ -94,7 +94,7 @@ export function PaginationControls({
       {/* Left: Page size selector */}
       <div className="flex items-center gap-2">
         <Select value={pageSize.toString()} onValueChange={updatePageSize}>
-          <SelectTrigger className="h-9 w-[110px] border-stone-200 bg-white text-sm">
+          <SelectTrigger className="h-11 w-[110px] border-stone-200 bg-white text-sm">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

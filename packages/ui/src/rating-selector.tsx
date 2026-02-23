@@ -57,7 +57,7 @@ export function RatingSelector({
             onClick={() => onChange(num)}
             disabled={disabled}
             className={cn(
-              "flex-1 h-10 rounded-lg text-xs font-semibold transition-all flex items-center justify-center",
+              "flex-1 h-11 rounded-lg text-xs font-semibold transition-all flex items-center justify-center",
               getZoneColor(num, value >= num),
               value === num && "scale-110 ring-2 ring-offset-1 ring-offset-background",
               value === num && num <= 4 && "ring-error-500/30",

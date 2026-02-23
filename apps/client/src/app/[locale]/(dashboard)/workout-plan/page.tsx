@@ -6,7 +6,7 @@ import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/hooks/use-auth";
 import { Dumbbell, Calendar, Clock, RefreshCw, Zap, Target, Loader2, AlertTriangle, Sparkles, ChevronDown } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { cn } from "@fitfast/ui/cn";
 import { usePlanStream } from "@/hooks/use-plan-stream";
 import { EmptyState } from "@fitfast/ui/empty-state";
@@ -24,6 +24,28 @@ export default function WorkoutPlanPage() {
   const [selectedDay, setSelectedDay] = useState(0);
   const [generatingPlan, setGeneratingPlan] = useState(false);
   const [expandedExercise, setExpandedExercise] = useState<number | null>(0);
+  const daySelectorRef = useRef<HTMLDivElement>(null);
+  const isRTL = locale === "ar";
+
+  // Scroll day selector to show day 1 on the correct edge for RTL
+  useEffect(() => {
+    const el = daySelectorRef.current;
+    if (!el) return;
+    if (isRTL) {
+      // In RTL, scroll to the end so day 1 appears on the right edge
+      el.scrollLeft = el.scrollWidth - el.clientWidth;
+    }
+  }, [isRTL]);
+
+  // Scroll selected day into view
+  useEffect(() => {
+    const el = daySelectorRef.current;
+    if (!el) return;
+    const activeBtn = el.querySelector("[data-active='true']");
+    if (activeBtn) {
+      activeBtn.scrollIntoView({ inline: "nearest", block: "nearest", behavior: "smooth" });
+    }
+  }, [selectedDay]);
 
   const generateWorkoutPlan = useAction(api.ai.generateWorkoutPlan);
 

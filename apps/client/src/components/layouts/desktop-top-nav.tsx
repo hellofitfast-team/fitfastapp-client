@@ -66,7 +66,7 @@ function NavLink({
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+        "flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors min-h-11",
         isActive
           ? "bg-primary/10 text-primary"
           : "text-muted-foreground hover:bg-neutral-100 hover:text-foreground"
@@ -156,7 +156,7 @@ export function DesktopTopNav({ userName }: DesktopTopNavProps) {
       <div className="flex items-center gap-1.5">
         {/* Language Switcher */}
         <button
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-xs font-semibold text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
+          className="flex h-11 w-11 items-center justify-center rounded-lg text-xs font-semibold text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
           onClick={switchLocale}
           aria-label="Switch language"
         >
@@ -165,7 +165,7 @@ export function DesktopTopNav({ userName }: DesktopTopNavProps) {
 
         {/* Notifications */}
         <button
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
+          className="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
           aria-label="Notifications"
         >
           <Bell className="h-4 w-4" />
@@ -175,7 +175,7 @@ export function DesktopTopNav({ userName }: DesktopTopNavProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center gap-2 rounded-lg px-3 h-9 text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
+              className="flex items-center gap-2 rounded-lg px-3 h-11 text-muted-foreground hover:bg-neutral-100 hover:text-foreground transition-colors"
               aria-label="User menu"
             >
               <User className="h-4 w-4" />
