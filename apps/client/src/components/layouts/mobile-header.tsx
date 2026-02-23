@@ -62,8 +62,8 @@ export function MobileHeader({ userName }: MobileHeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-[var(--z-header)] h-[var(--height-header)] border-b border-border bg-card/95 backdrop-blur-md lg:hidden">
-      <div className="flex h-full items-center justify-between px-4">
+    <header className="sticky top-0 z-[var(--z-header)] border-b border-border bg-card/95 backdrop-blur-md pt-[env(safe-area-inset-top)] lg:hidden">
+      <div className="flex h-[var(--height-header)] items-center justify-between px-4">
         {/* Left side — Greeting or Title */}
         {isDashboard && userName ? (
           <div className="flex items-center gap-3">

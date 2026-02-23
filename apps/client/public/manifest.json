@@ -4,7 +4,7 @@
   "description": "Personalized meal plans and workout routines powered by AI",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
+  "background_color": "#FFFEF5",
   "theme_color": "#4169E1",
   "orientation": "portrait-primary",
   "scope": "/",
