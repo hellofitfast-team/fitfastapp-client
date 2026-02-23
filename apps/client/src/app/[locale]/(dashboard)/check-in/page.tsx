@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useSwipeable } from "react-swipeable";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -141,6 +142,33 @@ export default function CheckInPage() {
     }
   };
 
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: async () => {
+      if (currentStep === 4) return;
+      const isRtl = document.dir === "rtl";
+      if (isRtl) {
+        handleBack();
+      } else {
+        const isValid = await validateStep(currentStep);
+        if (isValid && currentStep < STEPS.length) setCurrentStep(currentStep + 1);
+      }
+    },
+    onSwipedRight: async () => {
+      if (currentStep === 4) return;
+      const isRtl = document.dir === "rtl";
+      if (isRtl) {
+        const isValid = await validateStep(currentStep);
+        if (isValid && currentStep < STEPS.length) setCurrentStep(currentStep + 1);
+      } else {
+        handleBack();
+      }
+    },
+    delta: 50,
+    preventScrollOnSwipe: false,
+    trackTouch: true,
+    trackMouse: false,
+  });
+
   const onSubmit = async (data: CheckInFormData) => {
     if (!profile) {
       toast({ title: t("authRequired"), description: t("authRequiredDescription"), variant: "destructive" });
@@ -238,26 +266,31 @@ export default function CheckInPage() {
           {/* Form with FormProvider */}
           <FormProvider {...methods}>
             <form onSubmit={methods.handleSubmit(onSubmit)} onKeyDown={handleKeyDown} className="space-y-5">
-              {/* Step 1: Weight & Measurements */}
-              {currentStep === 1 && <WeightStep />}
+              {/* Swipeable step content */}
+              <div {...swipeHandlers} className="touch-pan-y">
+                <div key={currentStep} className="animate-fade-in">
+                  {/* Step 1: Weight & Measurements */}
+                  {currentStep === 1 && <WeightStep />}
 
-              {/* Step 2: Fitness Metrics */}
-              {currentStep === 2 && <FitnessStep />}
+                  {/* Step 2: Fitness Metrics */}
+                  {currentStep === 2 && <FitnessStep />}
 
-              {/* Step 3: Dietary Adherence */}
-              {currentStep === 3 && <DietaryStep />}
+                  {/* Step 3: Dietary Adherence */}
+                  {currentStep === 3 && <DietaryStep />}
 
-              {/* Step 4: Progress Photos */}
-              {currentStep === 4 && (
-                <PhotosStep
-                  uploadedPhotos={uploadedPhotos}
-                  onPhotoChange={handlePhotoChange}
-                  onRemovePhoto={removePhoto}
-                />
-              )}
+                  {/* Step 4: Progress Photos */}
+                  {currentStep === 4 && (
+                    <PhotosStep
+                      uploadedPhotos={uploadedPhotos}
+                      onPhotoChange={handlePhotoChange}
+                      onRemovePhoto={removePhoto}
+                    />
+                  )}
 
-              {/* Step 5: Review & Submit */}
-              {currentStep === 5 && <ReviewStep uploadedPhotosCount={uploadedPhotos.length} />}
+                  {/* Step 5: Review & Submit */}
+                  {currentStep === 5 && <ReviewStep uploadedPhotosCount={uploadedPhotos.length} />}
+                </div>
+              </div>
 
               {/* Navigation Buttons */}
               <StepNavigation

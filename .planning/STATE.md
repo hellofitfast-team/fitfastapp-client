@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-17)
 
 **Core value:** Every user flow works reliably, looks polished, and feels consistent in both languages
-**Current focus:** v1.1 Mobile UI Renovation — Phase 11 complete, Phase 12 done, ready for Phase 13
+**Current focus:** v1.1 Mobile UI Renovation — roadmap complete, ready for phase planning
 
 ## Current Position
 
 Milestone: v1.1 Mobile UI Renovation
-Status: In progress — Phase 11 complete
-Phase: Phase 11 — Foundation: Shell and Navigation
-Plan: 02 complete (v1 cleanup + requirements audit)
-Progress: [############........] 12/20 plans (60%)
+Status: In progress — Phase 14 executing
+Phase: Phase 14 — Check-in Wizard and Onboarding
+Plan: 01 complete (swipe wizard + progress bar)
+Progress: [#############.......] 13/20 plans (65%)
 Started: 2026-02-17
 
 ## Previous Milestone
@@ -25,12 +25,11 @@ v1.0 Polish & Rebrand — SHIPPED 2026-02-16
 
 | Phase | Name | Plans | Status |
 |-------|------|-------|--------|
-| 11 | Foundation — Shell and Navigation | 2/2 | Complete |
-| 11.1 | Auth, Authorization, and Marketing Landing Page | 7/7 | Complete |
-| 12 | Design Tokens and Core Primitives | 3/3 | Complete |
-| 13 | Page-Level Renovation | 0/7 | Not started |
-| 14 | Check-in Wizard and Onboarding | 0/3 | Not started |
-| 15 | RTL Audit and Polish | 0/3 | Not started |
+| 11 | Foundation — Shell and Navigation | 4 | Not started |
+| 12 | Design Tokens and Core Primitives | 3 | Not started |
+| 13 | Page-Level Renovation | 7 | Not started |
+| 14 | Check-in Wizard and Onboarding | 1/3 | In progress |
+| 15 | RTL Audit and Polish | 3 | Not started |
 
 Total: 5 phases, 20 plans, 65 requirements
 
@@ -80,26 +79,15 @@ Total: 5 phases, 20 plans, 65 requirements
 - [11.1-06] Reject action uses inline textarea expansion in signups-table (no modal) — faster UX
 - [11.1-06] PlansManager uses local state + single Save button — avoids partial saves on every keystroke
 - [11.1-06] Max 4 plans enforced in UI only (business rule, not backend constraint)
-- [12-01] Background token changed from cream #FFFEF5 to near-white #FAFAFA — already in neutral scale, reads as white but slightly warmer
-- [12-01] Typography scale documented as CSS comment (not custom properties) — Tailwind built-in utilities handle sizing; comment serves as Phase 13 guide
-- [12-01] Only difference between three globals.css files is client's Clerk @layer declaration — all token values are identical
-- [12-02] Entrance @keyframes placed inside @theme block — Tailwind v4 requires this for auto-generated animate-* utilities
-- [12-02] animation-fill-mode: both included in --animate-* token shorthand value — prevents stagger flash when animationDelay is set via inline style
-- [12-02] Wildcard reduced-motion (*, ::before, ::after with 0.01ms) replaces per-class listing — future animations automatically covered
-- [12-02] animate-slide-in renamed to animate-slide-in-bottom — aligns with --animate-slide-in-bottom token; no component files used the old name
-- [12-03] hover:shadow-lifted is unconditional on WidgetCard — all cards get hover shadow lift (not just clickable ones) for consistent affordance
-- [12-03] active:scale standardized at 0.97 codebase-wide — bottom-nav FAB (was scale-95) and tickets link (was 0.99) corrected
-- [12-03] EmptyState icon container changed from rounded-full h-14 w-14 to rounded-2xl h-16 w-16 — matches WidgetCard icon shape language
-- [12-03] Skeleton variants use bg-card not bg-white — token-based for dark mode readiness
-- [11-01] Badge data via single Convex query for efficiency — one reactive query per page load
-- [11-01] Unread tickets = status "coach_responded" for current user
-- [11-02] Renamed dashboard-shell-v2.tsx to dashboard-shell.tsx — no v1 to distinguish from
+- [14-01] Segmented bar uses single bg-primary for completed+current steps (no bg-success-500 distinction)
+- [14-01] RTL swipe detection via document.dir at swipe time (runtime check)
+- [14-01] Photos step disables swipe entirely to avoid drag/drop conflicts
 
 ### Roadmap Evolution
 
 - Phase 11.1 inserted after Phase 11: Auth, Authorization, and Marketing Landing Page (URGENT)
   - Expanded scope: includes 3rd monorepo app (`apps/marketing/`) with checkout flow, pricing plans, royal blue theme
-  - Full circle: marketing site -> checkout -> payment screenshot -> coach approval -> client credentials -> initial assessment
+  - Full circle: marketing site → checkout → payment screenshot → coach approval → client credentials → initial assessment
   - Skills to use during planning/execution: /brainstorming, /frontend-design, marketing-skills
 
 ### Blockers/Concerns
@@ -108,10 +96,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-22
-Stopped at: Completed Phase 11 (11-01 + 11-02) — badge indicators, pill nav, v1 cleanup
-Resume file: .planning/phases/11-foundation-shell-navigation/11-02-SUMMARY.md
+Last session: 2026-02-23
+Stopped at: Completed 14-01-PLAN.md (swipe wizard + progress bar)
+Resume file: .planning/phases/14-checkin-wizard-onboarding/14-01-SUMMARY.md
 
 ---
 *State initialized: 2026-02-12*
-*Last updated: 2026-02-22 — Phase 11 complete: 2 plans, 4 commits, badge indicators + pill nav + v1 cleanup*
+*Last updated: 2026-02-23 — Phase 14 plan 01 complete: swipe wizard + segmented progress bar*
