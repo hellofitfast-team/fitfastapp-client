@@ -120,7 +120,7 @@ Plans:
 
 Plans:
 - [ ] 14-01-PLAN.md — Segmented progress bar and swipe navigation for check-in wizard
-- [ ] 14-02-PLAN.md — Enhanced review summary and smart weight defaults
+- [x] 14-02-PLAN.md — Enhanced review summary and smart weight defaults
 - [ ] 14-03-PLAN.md — Onboarding assessment guided wizard conversion
 
 ### Phase 15: RTL Audit and Polish
@@ -150,7 +150,7 @@ Plans:
 | 11.1. Auth, Authorization, and Marketing Landing Page | 7/7 | Complete    | 2026-02-21 | - |
 | 12. Design Tokens and Core Primitives | v1.1 | 0/3 | Not started | - |
 | 13. Page-Level Renovation | v1.1 | 0/7 | Not started | - |
-| 14. Check-in Wizard and Onboarding | v1.1 | 0/3 | Not started | - |
+| 14. Check-in Wizard and Onboarding | v1.1 | 1/3 | In progress | - |
 | 15. RTL Audit and Polish | v1.1 | 0/3 | Not started | - |
 
 ---

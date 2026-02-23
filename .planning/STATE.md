@@ -10,10 +10,10 @@ See: .planning/PROJECT.md (updated 2026-02-17)
 ## Current Position
 
 Milestone: v1.1 Mobile UI Renovation
-Status: In progress — Phase 11 complete
-Phase: Phase 11 — Foundation: Shell and Navigation
-Plan: 02 complete (v1 cleanup + requirements audit)
-Progress: [############........] 12/20 plans (60%)
+Status: In progress — Phase 14 Plan 02 complete
+Phase: Phase 14 — Check-in Wizard and Onboarding
+Plan: 02 complete (review screen + smart weight default)
+Progress: [#############.......] 13/20 plans (65%)
 Started: 2026-02-17
 
 ## Previous Milestone
@@ -29,7 +29,7 @@ v1.0 Polish & Rebrand — SHIPPED 2026-02-16
 | 11.1 | Auth, Authorization, and Marketing Landing Page | 7/7 | Complete |
 | 12 | Design Tokens and Core Primitives | 3/3 | Complete |
 | 13 | Page-Level Renovation | 0/7 | Not started |
-| 14 | Check-in Wizard and Onboarding | 0/3 | Not started |
+| 14 | Check-in Wizard and Onboarding | 1/3 | In progress |
 | 15 | RTL Audit and Polish | 0/3 | Not started |
 
 Total: 5 phases, 20 plans, 65 requirements
@@ -94,6 +94,8 @@ Total: 5 phases, 20 plans, 65 requirements
 - [11-01] Badge data via single Convex query for efficiency — one reactive query per page load
 - [11-01] Unread tickets = status "coach_responded" for current user
 - [11-02] Renamed dashboard-shell-v2.tsx to dashboard-shell.tsx — no v1 to distinguish from
+- [14-02] useEffect for weight pre-fill instead of defaultValues — handles async Convex query loading correctly
+- [14-02] Section cards with divide-y rows for review layout — consistent with existing SectionCard pattern
 
 ### Roadmap Evolution
 
@@ -108,10 +110,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-22
-Stopped at: Completed Phase 11 (11-01 + 11-02) — badge indicators, pill nav, v1 cleanup
-Resume file: .planning/phases/11-foundation-shell-navigation/11-02-SUMMARY.md
+Last session: 2026-02-23
+Stopped at: Completed 14-02-PLAN.md — review screen + smart weight default
+Resume file: .planning/phases/14-checkin-wizard-onboarding/14-02-SUMMARY.md
 
 ---
 *State initialized: 2026-02-12*
-*Last updated: 2026-02-22 — Phase 11 complete: 2 plans, 4 commits, badge indicators + pill nav + v1 cleanup*
+*Last updated: 2026-02-23 — Phase 14 Plan 02 complete: 2 tasks, 2 commits, review screen + weight pre-fill*
