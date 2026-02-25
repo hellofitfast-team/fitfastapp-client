@@ -149,7 +149,7 @@ export const activateClient = internalMutation({
 
     await ctx.db.patch(profile._id, {
       status: "active",
-      planTier: "monthly",
+      planTier: "quarterly",
       planStartDate: new Date().toISOString().split("T")[0],
       planEndDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
       updatedAt: Date.now(),
@@ -269,7 +269,7 @@ export const insertAuthUser = internalMutation({
       language: "en",
       status: "active",
       isCoach,
-      planTier: isCoach ? undefined : ("monthly" as const),
+      planTier: isCoach ? undefined : ("quarterly" as const),
       planStartDate: isCoach
         ? undefined
         : new Date().toISOString().split("T")[0],
@@ -365,10 +365,6 @@ export const deleteUserByEmail = internalMutation({
   },
 });
 
-/**
- * One-off migration: coerce string config values to numbers.
- * Run from dashboard: `npx convex run seed:fixConfigTypes`
- */
 /** Check if a knowledge entry with the given title already exists. Used by seedKnowledgeBase. */
 export const checkKnowledgeExists = internalQuery({
   args: { title: v.string() },

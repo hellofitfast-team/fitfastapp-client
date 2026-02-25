@@ -270,7 +270,7 @@ export default function SettingsPage() {
               <div className="flex justify-between items-center py-2 border-b border-border">
                 <span className="text-xs text-muted-foreground">{t("planTier")}</span>
                 <span className="text-sm font-semibold">
-                  {t(`planTiers.${profile.planTier === "monthly" ? "monthly" : "quarterly"}`)}
+                  {t(`planTiers.${profile.planTier}`)}
                 </span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border">

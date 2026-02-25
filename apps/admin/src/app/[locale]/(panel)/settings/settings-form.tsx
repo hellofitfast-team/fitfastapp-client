@@ -80,11 +80,13 @@ export function AdminSettingsForm() {
         </div>
 
         {/* Save general settings */}
-        <SaveButton
-          onSave={handleSave}
-          label={t("save")}
-          savingLabel={t("saving")}
-        />
+        <div className="flex justify-end">
+          <SaveButton
+            onSave={handleSave}
+            label={t("save")}
+            savingLabel={t("saving")}
+          />
+        </div>
       </div>
 
       {/* ===== Pricing Plans ===== */}
@@ -131,10 +133,10 @@ export function AdminSettingsForm() {
           </div>
           <div>
             <h2 className="font-semibold text-sm text-stone-900">
-              Social Links
+              {tSettings("socialLinks")}
             </h2>
             <p className="text-xs text-stone-400 mt-0.5">
-              Add your social media links. Only filled ones appear on the marketing site.
+              {tSettings("socialLinksDesc")}
             </p>
           </div>
         </div>

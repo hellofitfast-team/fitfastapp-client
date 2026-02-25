@@ -21,10 +21,10 @@ function normalizeMeal(raw: any) {
   return {
     name: raw.name || "",
     type: raw.type || "",
-    calories: raw.calories || macros.calories || 0,
-    protein: raw.protein || macros.protein || 0,
-    carbs: raw.carbs || macros.carbs || 0,
-    fat: raw.fat || macros.fat || 0,
+    calories: raw.calories ?? macros.calories ?? 0,
+    protein: raw.protein ?? macros.protein ?? 0,
+    carbs: raw.carbs ?? macros.carbs ?? 0,
+    fat: raw.fat ?? macros.fat ?? 0,
     ingredients: Array.isArray(raw.ingredients) ? raw.ingredients : [],
     instructions: Array.isArray(raw.instructions)
       ? raw.instructions

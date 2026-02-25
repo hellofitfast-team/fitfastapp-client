@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useConvexAuth, useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import * as Sentry from "@sentry/nextjs";
+import { useTranslations } from "next-intl";
 import { SaveButton } from "./save-button";
 
 const SOCIAL_PLATFORMS = [
@@ -18,6 +19,7 @@ const SOCIAL_PLATFORMS = [
 type SocialLinks = Record<string, string>;
 
 export function SocialLinksManager() {
+  const t = useTranslations("settings");
   const { isAuthenticated } = useConvexAuth();
   const serverLinks = useQuery(api.systemConfig.getSocialLinks, isAuthenticated ? {} : "skip");
   const updateSocialLinks = useMutation(api.systemConfig.updateSocialLinks);
@@ -70,12 +72,12 @@ export function SocialLinksManager() {
           </div>
         ))}
         <p className="text-[11px] text-stone-400">
-          Only platforms with a URL will appear in the marketing site footer.
+          {t("socialLinksHint")}
         </p>
       </div>
 
       <div className="flex justify-end pt-2">
-        <SaveButton onSave={handleSave} label="Save Social Links" />
+        <SaveButton onSave={handleSave} label={t("saveSocialLinks")} />
       </div>
     </div>
   );

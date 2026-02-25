@@ -178,7 +178,11 @@
     "accountTypeOrange": "Orange Cash",
     "accountTypeEtisalat": "Etisalat Cash",
     "accountTypeCIB": "CIB",
-    "accountTypeOther": "Other"
+    "accountTypeOther": "Other",
+    "socialLinks": "Social Links",
+    "socialLinksDesc": "Add your social media links. Only filled ones appear on the marketing site.",
+    "saveSocialLinks": "Save Social Links",
+    "socialLinksHint": "Only platforms with a URL will appear in the marketing site footer."
   },
   "adminNav": {
     "dashboard": "Dashboard",

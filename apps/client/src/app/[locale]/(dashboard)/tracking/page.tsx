@@ -44,9 +44,9 @@ export default function TrackingPage() {
   // Map a calendar date to the plan's "day1", "day2", etc. key
   const getDayKey = (date: string, planStartDate?: string): string => {
     if (!planStartDate) return "day1";
-    const start = new Date(planStartDate);
-    const current = new Date(date);
-    const diffDays = Math.floor((current.getTime() - start.getTime()) / 86400000);
+    const start = new Date(planStartDate + "T00:00:00Z");
+    const current = new Date(date + "T00:00:00Z");
+    const diffDays = Math.round((current.getTime() - start.getTime()) / 86400000);
     return `day${Math.max(1, diffDays + 1)}`;
   };
 

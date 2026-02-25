@@ -195,7 +195,7 @@ export const setConfig = mutation({
 
     // Coerce string-typed numbers for keys that must be numeric
     const storedValue = NUMERIC_CONFIG_KEYS.has(key) && typeof value === "string"
-      ? Number(value) || 14
+      ? (Number.isNaN(Number(value)) ? 14 : Number(value))
       : value;
 
     const existing = await ctx.db

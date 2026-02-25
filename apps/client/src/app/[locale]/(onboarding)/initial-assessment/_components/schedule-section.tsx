@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useTranslations } from "next-intl";
 import { Calendar, Clock, Sun, Info } from "lucide-react";
 import { SectionCard } from "@fitfast/ui/section-card";
@@ -31,6 +32,12 @@ export function ScheduleSection({
 }: ScheduleSectionProps) {
   const t = useTranslations("onboarding.assessment");
   const limits = getDayLimits(primaryGoal, experienceLevel);
+
+  React.useEffect(() => {
+    if (selectedDays.length > limits.max) {
+      setSelectedDays(selectedDays.slice(0, limits.max));
+    }
+  }, [limits.max]);
 
   const handleToggleDay = (dayId: string) => {
     if (selectedDays.includes(dayId)) {

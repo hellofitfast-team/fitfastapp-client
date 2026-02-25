@@ -29,7 +29,7 @@ export default async function DashboardLayout({
 
   // Block coach accounts from accessing the client app
   if (profile.isCoach) {
-    redirect(`/${locale}/login?message=${encodeURIComponent("Coach accounts cannot access the client app. Please use the admin panel.")}`);
+    redirect(`/${locale}/login?error=coach_not_allowed`);
   }
 
   const hasAssessment = !!assessment;

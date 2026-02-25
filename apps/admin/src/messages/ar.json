@@ -178,7 +178,11 @@
     "accountTypeOrange": "أورانج كاش",
     "accountTypeEtisalat": "اتصالات كاش",
     "accountTypeCIB": "CIB",
-    "accountTypeOther": "أخرى"
+    "accountTypeOther": "أخرى",
+    "socialLinks": "روابط التواصل الاجتماعي",
+    "socialLinksDesc": "أضف روابط التواصل الاجتماعي. تظهر فقط الروابط المملوءة في الموقع.",
+    "saveSocialLinks": "حفظ الروابط",
+    "socialLinksHint": "ستظهر فقط المنصات التي تحتوي على رابط في تذييل الموقع."
   },
   "adminNav": {
     "dashboard": "لوحة التحكم",

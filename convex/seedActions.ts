@@ -2,7 +2,13 @@
 
 import { internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
-import { Scrypt } from "lucia";
+import { randomBytes, scryptSync } from "crypto";
+
+function hashPassword(password: string): string {
+  const salt = randomBytes(16).toString("hex");
+  const hash = scryptSync(password, salt, 64).toString("hex");
+  return `${salt}:${hash}`;
+}
 
 /**
  * Seed test users into Convex Auth.
@@ -10,19 +16,22 @@ import { Scrypt } from "lucia";
  *
  * Run: npx convex run seedActions:seedTestUsers
  *
- * Coach:  testadmin@admin.com / @SAMAR22ziad
- * Client: ziad.adel@scaleflow.digital / @SAMAR22ziad
+ * Coach:  testadmin@admin.com / (set SEED_USER_PASSWORD env var)
+ * Client: ziad.adel@scaleflow.digital / (set SEED_USER_PASSWORD env var)
  */
 /**
  * Delete all non-coach client users and create a fresh one.
  * Run: npx convex run seedActions:resetClientUser
  *
- * New client: client@fitfast.app / @SAMAR22ziad
+ * New client: client@fitfast.app / (set SEED_USER_PASSWORD env var)
  */
 export const resetClientUser = internalAction({
   args: {},
   handler: async (ctx) => {
-    const scrypt = new Scrypt();
+    const seedPassword = process.env.SEED_USER_PASSWORD;
+    if (!seedPassword)
+      throw new Error("SEED_USER_PASSWORD env var is required");
+
     const results: string[] = [];
 
     // Delete existing client users
@@ -32,19 +41,31 @@ export const resetClientUser = internalAction({
       "test_client@client.com",
     ];
     for (const email of clientEmails) {
-      const r = await ctx.runMutation(internal.seed.deleteUserByEmail, { email });
-      results.push(r);
+      try {
+        const r = await ctx.runMutation(internal.seed.deleteUserByEmail, {
+          email,
+        });
+        results.push(r);
+      } catch (error) {
+        console.error(`Failed to delete user ${email}:`, error);
+        results.push(`ERROR deleting ${email}: ${error}`);
+      }
     }
 
     // Create fresh client
-    const hashedPassword = await scrypt.hash("@SAMAR22ziad");
-    const r = await ctx.runMutation(internal.seed.insertAuthUser, {
-      email: "client@fitfast.app",
-      hashedPassword,
-      fullName: "Ziad Adel",
-      isCoach: false,
-    });
-    results.push(r);
+    const hashedPassword = hashPassword(seedPassword);
+    try {
+      const r = await ctx.runMutation(internal.seed.insertAuthUser, {
+        email: "client@fitfast.app",
+        hashedPassword,
+        fullName: "Ziad Adel",
+        isCoach: false,
+      });
+      results.push(r);
+    } catch (error) {
+      console.error("Failed to create client user:", error);
+      results.push(`ERROR creating client@fitfast.app: ${error}`);
+    }
 
     return results.join("\n");
   },
@@ -482,18 +503,18 @@ MONITORING RECOVERY (coach should track):
 export const seedTestUsers = internalAction({
   args: {},
   handler: async (ctx) => {
-    const scrypt = new Scrypt();
+    const seedPassword = process.env.SEED_USER_PASSWORD;
+    if (!seedPassword)
+      throw new Error("SEED_USER_PASSWORD env var is required");
 
     const testUsers = [
       {
         email: "testadmin@admin.com",
-        password: "@SAMAR22ziad",
         fullName: "Coach Admin",
         isCoach: true,
       },
       {
         email: "ziad.adel@scaleflow.digital",
-        password: "@SAMAR22ziad",
         fullName: "Ziad Adel",
         isCoach: false,
       },
@@ -502,18 +523,20 @@ export const seedTestUsers = internalAction({
     const results: string[] = [];
 
     for (const user of testUsers) {
-      const hashedPassword = await scrypt.hash(user.password);
+      try {
+        const hashedPassword = hashPassword(seedPassword);
 
-      const result = await ctx.runMutation(
-        internal.seed.insertAuthUser,
-        {
+        const result = await ctx.runMutation(internal.seed.insertAuthUser, {
           email: user.email,
           hashedPassword,
           fullName: user.fullName,
           isCoach: user.isCoach,
-        },
-      );
-      results.push(result);
+        });
+        results.push(result);
+      } catch (error) {
+        console.error(`Failed to seed user ${user.email}:`, error);
+        results.push(`ERROR seeding ${user.email}: ${error}`);
+      }
     }
 
     return results.join("\n");

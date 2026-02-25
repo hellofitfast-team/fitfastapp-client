@@ -32,6 +32,9 @@ const statusStyles: Record<string, string> = {
 const tierLabels: Record<string, string> = {
   monthly: "Monthly",
   quarterly: "Quarterly",
+  "3_months": "Quarterly",
+  "6_months": "Semi-Annual",
+  "12_months": "Annual",
 };
 
 function RejectModal({
@@ -93,7 +96,12 @@ function RejectModal({
       />
 
       {/* Modal panel */}
-      <div className="relative z-10 w-full max-w-md rounded-xl border border-stone-200 bg-white p-6 shadow-xl">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="client-modal-title"
+        className="relative z-10 w-full max-w-md rounded-xl border border-stone-200 bg-white p-6 shadow-xl"
+      >
         {/* Close button */}
         <button
           onClick={() => { if (!isSubmitting) onClose(); }}
@@ -103,7 +111,7 @@ function RejectModal({
         </button>
 
         {/* Header */}
-        <h2 className="text-lg font-semibold text-stone-900 pe-8">
+        <h2 id="client-modal-title" className="text-lg font-semibold text-stone-900 pe-8">
           Reject {client.fullName ?? "Client"}
         </h2>
         <p className="text-sm text-stone-500 mt-1">
@@ -227,7 +235,7 @@ export function ClientsList({ clients }: { clients: Client[] }) {
                   <td className="px-4 py-4">
                     <span className="text-xs font-semibold text-primary">
                       {client.planTier
-                        ? tierLabels[client.planTier] || client.planTier
+                        ? tierLabels[client.planTier] ?? client.planTier
                         : "---"}
                     </span>
                   </td>

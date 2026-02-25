@@ -63,7 +63,7 @@ function generateDayLabels(splitType: string, totalDays: number): { en: string[]
         break;
       }
       case "upper_lower": {
-        // 4-day pattern: Upper → Lower → Rest → Upper → Lower → Rest ...
+        // 3-day cycle: Upper → Lower → Rest → Upper → Lower → Rest ...
         const pos = i % 3;
         if (pos === 0) { labels.en.push("Upper"); labels.ar.push("علوي"); }
         else if (pos === 1) { labels.en.push("Lower"); labels.ar.push("سفلي"); }

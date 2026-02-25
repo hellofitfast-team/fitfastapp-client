@@ -137,7 +137,7 @@ export default function DashboardPage() {
       id: idx,
       name: meal.name,
       time: meal.type || "",
-      calories: meal.calories || macros.calories || 0,
+      calories: meal.calories ?? macros.calories ?? 0,
       done: todayMealCompletions.some((c) => c.mealIndex === idx && c.completed),
     };
   });

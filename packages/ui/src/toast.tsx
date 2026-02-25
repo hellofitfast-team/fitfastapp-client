@@ -52,6 +52,7 @@ const Toast = React.forwardRef<
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-bottom-full",
         variant === "default" && "border-border bg-card text-card-foreground",
         variant !== "default" && "border-transparent",
+        variant !== "default" && variant,
         className
       )}
       style={{ ...variantStyles[variant], ...style }}
@@ -126,6 +127,7 @@ type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>;
 type ToastActionElement = React.ReactElement<typeof ToastAction>;
 
 export {
+  type ToastVariant,
   type ToastProps,
   type ToastActionElement,
   ToastProvider,

@@ -29,8 +29,11 @@ export function InstallPrompt() {
     setDismissed(false);
 
     // iOS detection (Safari on iOS doesn't fire beforeinstallprompt)
+    // iPadOS 13+ reports as "Macintosh" so also check maxTouchPoints
+    const userAgent = navigator.userAgent;
     const isIos =
-      /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+      (/iPad|iPhone|iPod/.test(userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) &&
       !(window as unknown as { MSStream?: unknown }).MSStream;
 
     if (isIos) {
