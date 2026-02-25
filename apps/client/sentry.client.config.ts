@@ -32,6 +32,17 @@ Sentry.init({
     }),
   ],
 
+  // Scrub PII from structured logs before sending to Sentry
+  beforeSendLog(log) {
+    const sensitiveKeys = ["email", "password", "token", "userId", "user_id"];
+    if (log.attributes) {
+      for (const key of sensitiveKeys) {
+        delete log.attributes[key];
+      }
+    }
+    return log;
+  },
+
   // Only send errors in production
   enabled: process.env.NODE_ENV === "production",
 });

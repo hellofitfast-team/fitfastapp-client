@@ -8,7 +8,8 @@ import * as Sentry from "@sentry/nextjs";
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
 
-  // Enable structured logging
+  // Enable structured logging (Sentry.logger.* only — consoleLoggingIntegration
+  // is omitted because the edge runtime has a limited API surface)
   enableLogs: true,
 
   // Adjust this value in production, or use tracesSampler for greater control

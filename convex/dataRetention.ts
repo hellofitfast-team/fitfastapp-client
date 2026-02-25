@@ -102,7 +102,7 @@ export const runRetentionCleanup = internalAction({
         });
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
-        failures.push(`user:${userId.slice(0, 8)}…: ${msg}`);
+        failures.push(`profile:${profileId}: ${msg}`);
       }
     }
     if (failures.length > 0) {
