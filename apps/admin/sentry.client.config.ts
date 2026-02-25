@@ -34,7 +34,10 @@ Sentry.init({
 
   // Scrub PII from structured logs before sending to Sentry
   beforeSendLog(log) {
-    const sensitiveKeys = ["email", "password", "token", "userId", "user_id"];
+    const sensitiveKeys = [
+      "email", "password", "token", "userId", "user_id",
+      "user.id", "user.email", "user.name",
+    ];
     if (log.attributes) {
       for (const key of sensitiveKeys) {
         delete log.attributes[key];

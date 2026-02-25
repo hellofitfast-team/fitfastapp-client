@@ -101,7 +101,8 @@ export const runRetentionCleanup = internalAction({
           profileId,
         });
       } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
+        const rawMsg = err instanceof Error ? err.message : String(err);
+        const msg = rawMsg.replace(userId, "[REDACTED]");
         failures.push(`profile:${profileId}: ${msg}`);
       }
     }
