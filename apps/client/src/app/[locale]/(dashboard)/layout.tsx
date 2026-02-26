@@ -39,13 +39,13 @@ export default async function DashboardLayout({
     case "pending_approval":
       redirect(`/${locale}/pending`);
       break;
-    case "inactive":
     case "expired":
+      redirect(`/${locale}/expired`);
+      break;
+    case "inactive":
       redirect(
         `/${locale}/login?message=${encodeURIComponent(
-          profile.status === "expired"
-            ? "Your subscription has expired. Please contact support."
-            : "Your account is inactive. Please contact support."
+          "Your account is inactive. Please contact support."
         )}`
       );
       break;
@@ -58,8 +58,23 @@ export default async function DashboardLayout({
       redirect(`/${locale}/login`);
   }
 
+  // Compute days until plan expiry for the near-expiry banner
+  let daysUntilExpiry: number | null = null;
+  if (profile.planEndDate) {
+    const endDate = new Date(profile.planEndDate + "T23:59:59");
+    const now = new Date();
+    const diffMs = endDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays >= 0 && diffDays <= 3) {
+      daysUntilExpiry = diffDays;
+    }
+  }
+
   return (
-    <DashboardShell userName={profile.fullName || "User"}>
+    <DashboardShell
+      userName={profile.fullName || "User"}
+      daysUntilExpiry={daysUntilExpiry}
+    >
       {children}
     </DashboardShell>
   );

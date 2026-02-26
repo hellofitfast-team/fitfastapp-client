@@ -3,6 +3,7 @@ import { query, mutation, internalMutation } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { getAuthUserId } from "./auth";
 import { pendingSignupsCount } from "./adminStats";
+import { rateLimiter } from "./rateLimiter";
 
 export const getPendingSignups = query({
   args: {},
@@ -110,6 +111,15 @@ export const createSignup = mutation({
     paymentScreenshotId: v.optional(v.id("_storage")),
   },
   handler: async (ctx, args) => {
+    await rateLimiter.limit(ctx, "createSignup", { key: args.email });
+    // Duplicate email guard
+    const existingPending = await ctx.db
+      .query("pendingSignups")
+      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .filter((q) => q.eq(q.field("status"), "pending"))
+      .first();
+    if (existingPending) throw new Error("A signup with this email is already pending");
+
     const id = await ctx.db.insert("pendingSignups", { ...args, status: "pending" });
     // Increment the denormalized pending count for the admin dashboard
     await pendingSignupsCount.insert(ctx, { key: id, id });
@@ -201,14 +211,93 @@ export const rejectSignup = mutation({
 });
 
 // ---------------------------------------------------------------------------
+// Renewal — existing (expired) clients submit a renewal request
+// ---------------------------------------------------------------------------
+
+export const createRenewalSignup = mutation({
+  args: {
+    planId: v.optional(v.string()),
+    planTier: v.optional(
+      v.union(v.literal("monthly"), v.literal("quarterly")),
+    ),
+    paymentScreenshotId: v.optional(v.id("_storage")),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!profile) throw new Error("Profile not found");
+    if (profile.status !== "expired" && profile.status !== "inactive")
+      throw new Error("Only expired or inactive accounts can renew");
+
+    const email = profile.email ?? "";
+    await rateLimiter.limit(ctx, "createSignup", { key: email });
+
+    // Don't allow duplicate pending renewal
+    const existingPending = await ctx.db
+      .query("pendingSignups")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .filter((q) => q.eq(q.field("status"), "pending"))
+      .first();
+    if (existingPending) throw new Error("A renewal request is already pending");
+
+    const id = await ctx.db.insert("pendingSignups", {
+      email,
+      fullName: profile.fullName ?? "Client",
+      planId: args.planId,
+      planTier: args.planTier,
+      paymentScreenshotId: args.paymentScreenshotId,
+      status: "pending",
+    });
+
+    await pendingSignupsCount.insert(ctx, { key: id, id });
+
+    if (args.paymentScreenshotId) {
+      await ctx.scheduler.runAfter(0, internal.ocrExtraction.extractPaymentData, {
+        signupId: id,
+        storageId: args.paymentScreenshotId,
+      });
+    }
+
+    return id;
+  },
+});
+
+export const getMyPendingRenewal = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!profile?.email) return null;
+
+    return ctx.db
+      .query("pendingSignups")
+      .withIndex("by_email", (q) => q.eq("email", profile.email!))
+      .filter((q) => q.eq(q.field("status"), "pending"))
+      .first();
+  },
+});
+
+// ---------------------------------------------------------------------------
 // Invite token validation — used by client app accept-invite page
 // ---------------------------------------------------------------------------
 
 export const validateInviteToken = query({
   args: { token: v.string() },
   handler: async (ctx, { token }) => {
-    const signups = await ctx.db.query("pendingSignups").collect();
-    const signup = signups.find((s) => s.inviteToken === token);
+    const signup = await ctx.db
+      .query("pendingSignups")
+      .withIndex("by_inviteToken", (q) => q.eq("inviteToken", token))
+      .unique();
 
     if (!signup) return null;
     if (signup.inviteExpiresAt && signup.inviteExpiresAt < Date.now()) return null;

@@ -2,17 +2,14 @@
 
 import { internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
-import { randomBytes, scryptSync } from "crypto";
+import { Scrypt } from "lucia";
 
 /**
- * Hash password using Node.js scrypt — format: "hex_salt:hex_hash"
- * Must match the verification logic in the Convex Auth password provider.
- * scrypt params: N=2^15 (default), r=8, p=1, keylen=64
+ * Hash password using Lucia's Scrypt — same algorithm used by Convex Auth.
+ * Format: "hex_salt:hex_hash" with params N=16384, r=16, p=1, dkLen=64.
  */
-function hashPassword(password: string): string {
-  const salt = randomBytes(16).toString("hex");
-  const hash = scryptSync(password, salt, 64).toString("hex");
-  return `${salt}:${hash}`;
+async function hashPassword(password: string): Promise<string> {
+  return await new Scrypt().hash(password);
 }
 
 /**
@@ -58,7 +55,7 @@ export const resetClientUser = internalAction({
     }
 
     // Create fresh client
-    const hashedPassword = hashPassword(seedPassword);
+    const hashedPassword = await hashPassword(seedPassword);
     try {
       const r = await ctx.runMutation(internal.seed.insertAuthUser, {
         email: "client@fitfast.app",
@@ -505,6 +502,91 @@ MONITORING RECOVERY (coach should track):
   },
 });
 
+/**
+ * Seed two demo users for testing subscription expiry flows.
+ * - nearexpiry@fitfast.app — Active, plan expires in 3 days, fully populated
+ * - expired@fitfast.app — Expired 5 days ago, minimal data
+ *
+ * Run: npx convex run seedActions:seedDemoUsers
+ */
+export const seedDemoUsers = internalAction({
+  args: {},
+  handler: async (ctx) => {
+    const seedPassword = process.env.SEED_USER_PASSWORD;
+    if (!seedPassword)
+      throw new Error("SEED_USER_PASSWORD env var is required");
+
+    const demoUsers = [
+      { email: "nearexpiry@fitfast.app", fullName: "Near Expiry Demo" },
+      { email: "expired@fitfast.app", fullName: "Expired Demo" },
+    ];
+
+    const results: string[] = [];
+
+    // Delete existing demo users first (idempotent)
+    for (const user of demoUsers) {
+      try {
+        const r = await ctx.runMutation(internal.seed.deleteUserByEmail, {
+          email: user.email,
+        });
+        results.push(r);
+      } catch (error) {
+        results.push(`Delete ${user.email}: ${error}`);
+      }
+    }
+
+    // Create both users
+    for (const user of demoUsers) {
+      try {
+        const hashedPassword = await hashPassword(seedPassword);
+        const r = await ctx.runMutation(internal.seed.insertAuthUser, {
+          email: user.email,
+          hashedPassword,
+          fullName: user.fullName,
+          isCoach: false,
+        });
+        results.push(r);
+      } catch (error) {
+        results.push(`Create ${user.email}: ERROR ${error}`);
+      }
+    }
+
+    // Now populate demo data for each user
+    // We need to find the userId for each user from profiles
+    for (const user of demoUsers) {
+      try {
+        const authAccount = await ctx.runQuery(
+          internal.seedDemo_helpers.findAuthAccountByEmail,
+          { email: user.email },
+        );
+        if (!authAccount) {
+          results.push(`SKIP populate ${user.email}: auth account not found`);
+          continue;
+        }
+        const userId = authAccount.userId;
+
+        if (user.email === "nearexpiry@fitfast.app") {
+          const r = await ctx.runMutation(
+            internal.seedDemo.populateNearExpiryUser,
+            { userId },
+          );
+          results.push(r);
+        } else {
+          const r = await ctx.runMutation(
+            internal.seedDemo.populateExpiredUser,
+            { userId },
+          );
+          results.push(r);
+        }
+      } catch (error) {
+        results.push(`Populate ${user.email}: ERROR ${error}`);
+      }
+    }
+
+    return results.join("\n");
+  },
+});
+
 export const seedTestUsers = internalAction({
   args: {},
   handler: async (ctx) => {
@@ -529,7 +611,7 @@ export const seedTestUsers = internalAction({
 
     for (const user of testUsers) {
       try {
-        const hashedPassword = hashPassword(seedPassword);
+        const hashedPassword = await hashPassword(seedPassword);
 
         const result = await ctx.runMutation(internal.seed.insertAuthUser, {
           email: user.email,

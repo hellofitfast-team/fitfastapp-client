@@ -24,19 +24,31 @@
   },
   "emptyStates": {
     "noPlan": {
-      "title": "Your plan is on the way!",
-      "description": "Your coach is preparing your personalized plan. Check back soon!",
+      "title": "No Plan Yet",
+      "description": "Complete your initial assessment to receive your personalized AI-generated plans.",
       "action": "Let's get started!"
+    },
+    "plansGenerating": {
+      "title": "Generating Your Plans...",
+      "description": "Our AI is creating your personalized meal and workout plans. This usually takes 2-3 minutes. This page will update automatically."
     },
     "noMealPlan": {
       "title": "No Meal Plan Yet",
-      "description": "Your AI-powered meal plan will appear here after your first check-in. Complete a check-in to get started!",
+      "description": "Your AI-powered meal plan will appear here after your initial assessment or next check-in.",
       "action": "Time to check in!"
+    },
+    "mealPlanGenerating": {
+      "title": "Generating Your Meal Plan...",
+      "description": "Our AI is creating your personalized meal plan. This usually takes 2-3 minutes. This page will update automatically."
     },
     "noWorkoutPlan": {
       "title": "No Workout Plan Yet",
-      "description": "Your personalized workout plan will appear here after your first check-in. Complete a check-in to get started!",
+      "description": "Your personalized workout plan will appear here after your initial assessment or next check-in.",
       "action": "Let's get started!"
+    },
+    "workoutPlanGenerating": {
+      "title": "Generating Your Workout Plan...",
+      "description": "Our AI is creating your personalized workout plan. This usually takes 2-3 minutes. This page will update automatically."
     },
     "noTickets": {
       "title": "No Support Tickets",
@@ -86,7 +98,6 @@
     "invalidEmail": "Please enter a valid email",
     "invalidPassword": "Password must be at least 8 characters",
     "createPasswordDescription": "Create a secure password for your account",
-    "passwordRequirements": "Must be at least 8 characters",
     "updatingPassword": "Updating...",
     "passwordSet": "Password set successfully!",
     "redirectingToDashboard": "Redirecting to dashboard...",
@@ -100,8 +111,23 @@
     "createAccount": "Create Account",
     "invalidInviteLink": "Invalid invitation link. Please contact your coach.",
     "inviteExpired": "This invitation link is invalid or has expired. Please contact your coach.",
+    "accountCreationFailed": "Account creation failed. Please try again or contact your coach.",
     "passwordsMustMatch": "Passwords don't match",
-    "brandTagline": "Your AI-Powered Fitness Coach"
+    "brandTagline": "Your AI-Powered Fitness Coach",
+    "validEmail": "Please enter a valid email",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "invalidCredentials": "Invalid email or password",
+    "verificationRequired": "Verification code is required",
+    "passwordRequirements": "Password must be at least 8 characters",
+    "passwordComplexity": "Password must contain at least one uppercase letter, one lowercase letter, and one number",
+    "passwordStrength": { "weak": "Weak", "medium": "Medium", "strong": "Strong", "label": "Strength" },
+    "emailNotFound": "Email not found. Please start the password reset process again.",
+    "unexpectedError": "An unexpected error occurred. Please try again.",
+    "loginMessages": {
+      "session_expired": "Your session has expired. Please log in again.",
+      "account_pending": "Your account is pending approval.",
+      "password_changed": "Password changed successfully. Please log in."
+    }
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -179,7 +205,8 @@
     "dailyTotals": "Daily Totals",
     "coachNotes": "Coach Notes",
     "kcal": "KCAL",
-    "aiGenerating": "AI is crafting your meal plan..."
+    "aiGenerating": "AI is crafting your meal plan...",
+    "calorieExplanation": "Your daily target is {calories} kcal ({protein}g protein) based on your profile and {trainingDays} training days/week."
   },
   "workouts": {
     "title": "Workout Plan",
@@ -256,7 +283,7 @@
     "checkInLocked": "Check-in Locked",
     "nextCheckInAvailable": "Next Check-in Available",
     "days": "Days",
-    "lockReason": "Check-ins are scheduled every 14 days to ensure optimal progress tracking and AI plan generation. Use this time to follow your current meal and workout plans.",
+    "lockReason": "Check-ins are scheduled every {days} days to ensure optimal progress tracking and AI plan generation. Use this time to follow your current meal and workout plans.",
     "steps": {
       "weight": "Weight & Measurements",
       "fitness": "Fitness Metrics",
@@ -478,7 +505,20 @@
     "welcome": {
       "title": "Welcome to FitFast",
       "subtitle": "Your personalized fitness journey starts here",
-      "getStarted": "Get Started"
+      "getStarted": "Get Started",
+      "features": {
+        "mealPlans": "Personalized Meal Plans",
+        "mealPlansDesc": "AI-generated meal plans tailored to your goals and preferences",
+        "workoutPlans": "Custom Workout Plans",
+        "workoutPlansDesc": "Exercise routines designed for your fitness level and schedule",
+        "progressTracking": "Progress Tracking",
+        "progressTrackingDesc": "Monitor your weight, measurements, and achievements over time",
+        "coachSupport": "Coach Support",
+        "coachSupportDesc": "Direct communication with your coach through the ticket system"
+      },
+      "completeAssessment": "Complete your assessment to receive your personalized plans",
+      "remember": "Remember",
+      "journeyMessage": "Your journey to a better you starts now"
     },
     "assessment": {
       "title": "Initial Assessment",
@@ -600,7 +640,19 @@
       },
       "completeAssessment": "Complete Assessment",
       "submitting": "Creating your plan...",
-      "generatingDescription": "We're generating your personalized meal and workout plans. This may take a moment."
+      "generatingDescription": "We're generating your personalized meal and workout plans. This may take a moment.",
+      "activityLevelTitle": "Daily Activity Level",
+      "activityLevelDesc": "How active is your daily life outside of exercise?",
+      "activityLevels": {
+        "sedentary": "Sedentary",
+        "sedentary_desc": "Desk job, little daily movement",
+        "lightly_active": "Lightly Active",
+        "lightly_active_desc": "Some walking, light daily activity",
+        "moderately_active": "Moderately Active",
+        "moderately_active_desc": "Active job or regular movement throughout day",
+        "very_active": "Very Active",
+        "very_active_desc": "Physical labor or very active lifestyle"
+      }
     },
     "pending": {
       "title": "Account Pending Approval",
@@ -674,7 +726,43 @@
     "equipmentRequired": "Please select your available equipment",
     "equipmentSpecify": "Please specify your equipment",
     "signInRequired": "Please sign in to continue",
-    "unexpectedError": "An unexpected error occurred"
+    "unexpectedError": "An unexpected error occurred",
+    "somethingWentWrong": "Something went wrong. Our team has been notified and we're working to fix it.",
+    "errorId": "Error ID",
+    "tryAgain": "Try again",
+    "replyFailed": "Failed to send reply. Please try again.",
+    "saveFailed": "Failed to save. Please try again."
+  },
+  "subscription": {
+    "banner": {
+      "expiresIn": "Your subscription expires in {days} days.",
+      "expiresInOne": "Your subscription expires tomorrow!",
+      "renewNow": "Renew now"
+    },
+    "expired": {
+      "title": "Subscription Expired",
+      "subtitle": "Your subscription has ended",
+      "dataWarning": "Your data will be retained for 90 days. After that, it will be permanently deleted.",
+      "renewButton": "Renew Subscription",
+      "logoutButton": "Log Out",
+      "contactCoach": "Contact your coach for help"
+    },
+    "renewal": {
+      "title": "Renew Your Subscription",
+      "selectPlan": "Select a Plan",
+      "paymentMethod": "Payment Method",
+      "uploadScreenshot": "Upload Payment Screenshot",
+      "uploadHint": "Upload a screenshot of your payment transfer",
+      "submitRenewal": "Submit Renewal Request",
+      "submitting": "Submitting...",
+      "pendingTitle": "Renewal Submitted!",
+      "pendingMessage": "Your renewal request has been submitted. Your coach will review it shortly. You'll be redirected to the dashboard once approved.",
+      "alreadyPending": "You already have a pending renewal request. Your coach will review it shortly.",
+      "selectPlanFirst": "Please select a plan",
+      "perMonth": "/month",
+      "perQuarter": "/quarter",
+      "popular": "Popular"
+    }
   },
   "routeErrors": {
     "checkIn": {
