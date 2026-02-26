@@ -4,6 +4,10 @@ import { v } from "convex/values";
 import { internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 // ---------------------------------------------------------------------------
 // Email sending helper
 // ---------------------------------------------------------------------------
@@ -25,11 +29,12 @@ async function sendEmail(to: string, subject: string, html: string): Promise<voi
 
 function getWelcomeEmail(fullName: string, language: "en" | "ar") {
   const isAr = language === "ar";
+  const safeName = escapeHtml(fullName);
   return {
     subject: isAr ? "مرحبًا بك في فيت فاست! 🎉" : "Welcome to FitFast! 🎉",
     html: `
       <div dir="${isAr ? "rtl" : "ltr"}" style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
-        <h1 style="color:#10B981">${isAr ? `أهلاً ${fullName}!` : `Hey ${fullName}!`}</h1>
+        <h1 style="color:#10B981">${isAr ? `أهلاً ${safeName}!` : `Hey ${safeName}!`}</h1>
         <p>${isAr
           ? "تمت الموافقة على حسابك. يمكنك الآن تسجيل الدخول وبدء رحلتك في اللياقة البدنية."
           : "Your account has been approved. You can now sign in and start your fitness journey."
@@ -45,11 +50,12 @@ function getWelcomeEmail(fullName: string, language: "en" | "ar") {
 
 function getPlanReadyEmail(fullName: string, language: "en" | "ar") {
   const isAr = language === "ar";
+  const safeName = escapeHtml(fullName);
   return {
     subject: isAr ? "خططك الجديدة جاهزة! 💪" : "Your new plans are ready! 💪",
     html: `
       <div dir="${isAr ? "rtl" : "ltr"}" style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
-        <h1 style="color:#10B981">${isAr ? `${fullName}، خططك جاهزة!` : `${fullName}, your plans are ready!`}</h1>
+        <h1 style="color:#10B981">${isAr ? `${safeName}، خططك جاهزة!` : `${safeName}, your plans are ready!`}</h1>
         <p>${isAr
           ? "تم إنشاء خطة الوجبات وخطة التمارين الجديدة بنجاح بناءً على آخر تسجيل متابعة."
           : "Your new meal plan and workout plan have been generated based on your latest check-in."
@@ -65,14 +71,17 @@ function getPlanReadyEmail(fullName: string, language: "en" | "ar") {
 
 function getTicketReplyEmail(fullName: string, ticketSubject: string, coachMessage: string, language: "en" | "ar") {
   const isAr = language === "ar";
+  const safeName = escapeHtml(fullName);
+  const safeSubject = escapeHtml(ticketSubject);
+  const safeMessage = escapeHtml(coachMessage);
   return {
     subject: isAr ? `رد المدرب: ${ticketSubject}` : `Coach replied: ${ticketSubject}`,
     html: `
       <div dir="${isAr ? "rtl" : "ltr"}" style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
-        <h1 style="color:#10B981">${isAr ? `${fullName}، رد مدربك` : `${fullName}, your coach replied`}</h1>
-        <p style="font-weight:600">${isAr ? "الموضوع:" : "Subject:"} ${ticketSubject}</p>
+        <h1 style="color:#10B981">${isAr ? `${safeName}، رد مدربك` : `${safeName}, your coach replied`}</h1>
+        <p style="font-weight:600">${isAr ? "الموضوع:" : "Subject:"} ${safeSubject}</p>
         <div style="background:#f5f5f5;border-radius:8px;padding:16px;margin:16px 0">
-          <p style="margin:0">${coachMessage}</p>
+          <p style="margin:0">${safeMessage}</p>
         </div>
         <p>${isAr
           ? "افتح التطبيق للرد أو عرض المحادثة الكاملة."
@@ -85,11 +94,12 @@ function getTicketReplyEmail(fullName: string, ticketSubject: string, coachMessa
 
 function getReminderEmail(fullName: string, language: "en" | "ar") {
   const isAr = language === "ar";
+  const safeName = escapeHtml(fullName);
   return {
     subject: isAr ? "حان وقت المتابعة! 📊" : "Time for your check-in! 📊",
     html: `
       <div dir="${isAr ? "rtl" : "ltr"}" style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
-        <h1 style="color:#10B981">${isAr ? `${fullName}، حان وقت المتابعة` : `${fullName}, it's check-in time`}</h1>
+        <h1 style="color:#10B981">${isAr ? `${safeName}، حان وقت المتابعة` : `${safeName}, it's check-in time`}</h1>
         <p>${isAr
           ? "سجّل تقدمك اليوم حتى يتمكن مدربك من تحديث خططك."
           : "Track your progress today so your coach can update your plans."
@@ -101,21 +111,23 @@ function getReminderEmail(fullName: string, language: "en" | "ar") {
 
 function getRejectionEmail(fullName: string, rejectionReason: string, language: "en" | "ar") {
   const isAr = language === "ar";
+  const safeName = escapeHtml(fullName);
+  const safeReason = escapeHtml(rejectionReason);
   return {
     subject: isAr
       ? "تحديث على طلبك في فيت فاست"
       : "Your FitFast Application Update",
     html: `
       <div dir="${isAr ? "rtl" : "ltr"}" style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
-        <h1 style="color:#374151">${isAr ? `${fullName}، شكرًا لاهتمامك` : `Hi ${fullName},`}</h1>
+        <h1 style="color:#374151">${isAr ? `${safeName}، شكرًا لاهتمامك` : `Hi ${safeName},`}</h1>
         <p>${isAr
           ? "شكرًا لتقديمك للانضمام إلى فيت فاست. بعد مراجعة طلبك، لم نتمكن من الموافقة عليه في هذا الوقت."
           : "Thank you for applying to join FitFast. After reviewing your application, we're unable to approve it at this time."
         }</p>
-        ${rejectionReason ? `
+        ${safeReason ? `
         <div style="background:#f9fafb;border-left:4px solid #d1d5db;border-radius:4px;padding:16px;margin:16px 0">
           <p style="margin:0;font-weight:600;color:#374151">${isAr ? "السبب:" : "Reason:"}</p>
-          <p style="margin:8px 0 0;color:#6b7280">${rejectionReason}</p>
+          <p style="margin:8px 0 0;color:#6b7280">${safeReason}</p>
         </div>
         ` : ""}
         <p>${isAr
@@ -129,6 +141,7 @@ function getRejectionEmail(fullName: string, rejectionReason: string, language: 
 
 function getInvitationEmail(fullName: string, inviteToken: string, language: "en" | "ar") {
   const isAr = language === "ar";
+  const safeName = escapeHtml(fullName);
   const clientUrl = process.env.CLIENT_APP_URL ?? "https://app.fitfast.app";
   const locale = isAr ? "ar" : "en";
   const acceptLink = `${clientUrl}/${locale}/accept-invite?token=${inviteToken}`;
@@ -139,7 +152,7 @@ function getInvitationEmail(fullName: string, inviteToken: string, language: "en
       : "Welcome to FitFast! Create your account 🎉",
     html: `
       <div dir="${isAr ? "rtl" : "ltr"}" style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
-        <h1 style="color:#FF4500">${isAr ? `أهلاً ${fullName}!` : `Hey ${fullName}!`}</h1>
+        <h1 style="color:#FF4500">${isAr ? `أهلاً ${safeName}!` : `Hey ${safeName}!`}</h1>
         <p>${isAr
           ? "تمت الموافقة على طلبك للانضمام إلى فيت فاست. اضغط على الزر أدناه لإنشاء حسابك وبدء رحلتك."
           : "Your application to join FitFast has been approved. Click the button below to create your account and start your fitness journey."
