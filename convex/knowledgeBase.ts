@@ -66,6 +66,33 @@ export const addTextEntry = mutation({
   },
 });
 
+export const updateKnowledgeEntry = mutation({
+  args: {
+    entryId: v.id("coachKnowledge"),
+    title: v.string(),
+    content: v.string(),
+    tags: v.optional(v.array(v.string())),
+  },
+  handler: async (ctx, { entryId, title, content, tags }) => {
+    await requireCoach(ctx);
+
+    const entry = await ctx.db.get(entryId);
+    if (!entry) throw new Error("Entry not found");
+
+    await ctx.db.patch(entryId, {
+      title,
+      content,
+      tags,
+      updatedAt: Date.now(),
+    });
+
+    // Re-embed with updated content
+    await ctx.scheduler.runAfter(0, internal.knowledgeBaseActions.embedEntry, {
+      entryId,
+    });
+  },
+});
+
 export const deleteKnowledgeEntry = mutation({
   args: { entryId: v.id("coachKnowledge") },
   handler: async (ctx, { entryId }) => {

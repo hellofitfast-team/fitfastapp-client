@@ -12,10 +12,62 @@ import {
   Trash2,
   Loader2,
   X,
+  Pencil,
+  UtensilsCrossed,
+  Search,
 } from "lucide-react";
 import { cn } from "@fitfast/ui/cn";
 
+const CATEGORY_OPTIONS = [
+  "protein", "carb", "fat", "vegetable", "fruit", "dairy", "dessert", "recipe",
+] as const;
+
 export function KnowledgeManager() {
+  const t = useTranslations("knowledge");
+  const { isAuthenticated } = useConvexAuth();
+  const [activeTab, setActiveTab] = useState<"knowledge" | "food">("knowledge");
+
+  return (
+    <div className="space-y-4">
+      {/* Tabs */}
+      <div className="flex gap-1 rounded-lg border border-stone-200 bg-stone-50 p-1">
+        <button
+          onClick={() => setActiveTab("knowledge")}
+          className={cn(
+            "flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors",
+            activeTab === "knowledge"
+              ? "bg-white text-stone-900 shadow-sm"
+              : "text-stone-500 hover:text-stone-700",
+          )}
+        >
+          <BookOpen className="inline h-4 w-4 mr-1.5 -mt-0.5" />
+          {t("knowledgeTab")}
+        </button>
+        <button
+          onClick={() => setActiveTab("food")}
+          className={cn(
+            "flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors",
+            activeTab === "food"
+              ? "bg-white text-stone-900 shadow-sm"
+              : "text-stone-500 hover:text-stone-700",
+          )}
+        >
+          <UtensilsCrossed className="inline h-4 w-4 mr-1.5 -mt-0.5" />
+          {t("foodTab")}
+        </button>
+      </div>
+
+      {activeTab === "knowledge" ? (
+        <KnowledgeTab />
+      ) : (
+        <FoodTab />
+      )}
+    </div>
+  );
+}
+
+/* ─── Knowledge Tab (original) ─── */
+function KnowledgeTab() {
   const t = useTranslations("knowledge");
   const { isAuthenticated } = useConvexAuth();
   const entries = useQuery(api.knowledgeBase.listKnowledgeEntries, isAuthenticated ? {} : "skip");
@@ -32,6 +84,13 @@ export function KnowledgeManager() {
   const [isUploading, setIsUploading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [pdfTags, setPdfTags] = useState<string[]>([]);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editContent, setEditContent] = useState("");
+  const [editTags, setEditTags] = useState<string[]>([]);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const updateEntry = useMutation(api.knowledgeBase.updateKnowledgeEntry);
 
   const TAG_OPTIONS = [
     { id: "nutrition", color: "bg-green-50 text-green-700 border-green-200" },
@@ -97,6 +156,37 @@ export function KnowledgeManager() {
       await deleteEntry({ entryId });
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const startEditing = (entry: any) => {
+    setEditingId(entry._id);
+    setEditTitle(entry.title);
+    setEditContent(entry.content || "");
+    setEditTags(entry.tags || []);
+    setExpandedId(entry._id);
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditTitle("");
+    setEditContent("");
+    setEditTags([]);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingId || !editTitle.trim()) return;
+    setIsSavingEdit(true);
+    try {
+      await updateEntry({
+        entryId: editingId as any,
+        title: editTitle.trim(),
+        content: editContent.trim(),
+        tags: editTags.length > 0 ? editTags : undefined,
+      });
+      cancelEditing();
+    } finally {
+      setIsSavingEdit(false);
     }
   };
 
@@ -231,66 +321,533 @@ export function KnowledgeManager() {
         </div>
       ) : (
         <div className="space-y-3">
-          {entries.map((entry) => (
+          {entries.map((entry) => {
+            const isExpanded = expandedId === entry._id;
+            return (
+              <div
+                key={entry._id}
+                className={cn(
+                  "rounded-xl border bg-white p-4 transition-colors cursor-pointer",
+                  isExpanded
+                    ? "border-primary/30 ring-1 ring-primary/10"
+                    : "border-stone-200 hover:border-stone-300",
+                )}
+                onClick={() => setExpandedId(isExpanded ? null : entry._id)}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div
+                      className={cn(
+                        "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+                        entry.type === "pdf"
+                          ? "bg-red-50 text-red-500"
+                          : "bg-blue-50 text-blue-500",
+                      )}
+                    >
+                      {entry.type === "pdf" ? (
+                        <Upload className="h-4 w-4" />
+                      ) : (
+                        <FileText className="h-4 w-4" />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-sm truncate">
+                        {entry.title}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                        <span className="text-xs text-stone-500 uppercase font-medium">
+                          {entry.type}
+                        </span>
+                        {entry.content && (
+                          <span className="text-xs text-stone-400">
+                            {entry.content.split(/\s+/).length} {t("words")}
+                          </span>
+                        )}
+                        {entry.tags?.map((tag: string) => (
+                          <span
+                            key={tag}
+                            className={cn(
+                              "rounded-full border px-2 py-0.5 text-[10px] font-medium",
+                              getTagColor(tag),
+                            )}
+                          >
+                            {t(`tag${tag.charAt(0).toUpperCase()}${tag.slice(1)}`)}
+                          </span>
+                        ))}
+                      </div>
+                      {entry.content && !isExpanded && (
+                        <p className="text-xs text-stone-500 mt-2 line-clamp-2">
+                          {entry.content.slice(0, 200)}
+                          {entry.content.length > 200 ? "..." : ""}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 gap-1">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        startEditing(entry);
+                      }}
+                      className="rounded-lg p-2 text-stone-400 hover:text-primary hover:bg-primary/10 transition-colors"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(entry._id);
+                      }}
+                      disabled={deletingId === entry._id}
+                      className="rounded-lg p-2 text-stone-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                    >
+                      {deletingId === entry._id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+                {isExpanded && editingId === entry._id ? (
+                  <div className="mt-3 pt-3 border-t border-stone-100 space-y-3">
+                    <input
+                      type="text"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    />
+                    <textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      rows={12}
+                      className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-y"
+                    />
+                    <div>
+                      <label className="text-xs font-medium text-stone-500 mb-1.5 block">
+                        {t("selectTags")}
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {TAG_OPTIONS.map((tag) => (
+                          <button
+                            key={tag.id}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleTag(tag.id, editTags, setEditTags);
+                            }}
+                            className={cn(
+                              "rounded-full border px-3 py-1 text-xs font-medium transition-all",
+                              editTags.includes(tag.id)
+                                ? `${tag.color} ring-1 ring-current`
+                                : "border-stone-200 text-stone-400 hover:border-stone-300",
+                            )}
+                          >
+                            {t(`tag${tag.id.charAt(0).toUpperCase()}${tag.id.slice(1)}`)}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSaveEdit();
+                        }}
+                        disabled={isSavingEdit || !editTitle.trim()}
+                        className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                      >
+                        {isSavingEdit && <Loader2 className="h-4 w-4 animate-spin" />}
+                        {t("save")}
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          cancelEditing();
+                        }}
+                        className="rounded-lg border border-stone-200 px-4 py-2 text-sm font-medium text-stone-600 hover:bg-stone-50 transition-colors"
+                      >
+                        {t("cancel")}
+                      </button>
+                    </div>
+                  </div>
+                ) : isExpanded && entry.content ? (
+                  <div className="mt-3 pt-3 border-t border-stone-100">
+                    <p className="text-sm text-stone-700 whitespace-pre-wrap leading-relaxed">
+                      {entry.content}
+                    </p>
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Food & Recipes Tab ─── */
+function FoodTab() {
+  const t = useTranslations("knowledge");
+  const { isAuthenticated } = useConvexAuth();
+
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [isRecipeMode, setIsRecipeMode] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Filters
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
+  const [filterType, setFilterType] = useState<"all" | "ingredient" | "recipe">("all");
+
+  // Form fields
+  const [foodName, setFoodName] = useState("");
+  const [foodNameAr, setFoodNameAr] = useState("");
+  const [foodCategory, setFoodCategory] = useState("protein");
+  const [foodTags, setFoodTags] = useState<string[]>([]);
+  const [cal100, setCal100] = useState("");
+  const [pro100, setPro100] = useState("");
+  const [carb100, setCarb100] = useState("");
+  const [fat100, setFat100] = useState("");
+  // Recipe-specific
+  const [servingSize, setServingSize] = useState("");
+  const [calServing, setCalServing] = useState("");
+  const [proServing, setProServing] = useState("");
+  const [carbServing, setCarbServing] = useState("");
+  const [fatServing, setFatServing] = useState("");
+  const [ingredients, setIngredients] = useState("");
+  const [instructions, setInstructions] = useState("");
+
+  const foods = useQuery(
+    api.foodDatabase.listFoods,
+    isAuthenticated
+      ? {
+          category: filterCategory || undefined,
+          isRecipe: filterType === "all" ? undefined : filterType === "recipe",
+          search: searchQuery || undefined,
+        }
+      : "skip",
+  );
+  const addFood = useMutation(api.foodDatabase.addFood);
+  const deleteFood = useMutation(api.foodDatabase.deleteFood);
+
+  const FOOD_TAG_OPTIONS = [
+    "high_protein", "low_fat", "low_carb", "high_fiber",
+    "healthy_dessert", "junk_made_healthy", "comfort_food", "post_workout",
+    "egyptian", "middle_eastern", "international",
+    "quick_prep", "meal_prep_friendly",
+    "dairy_free", "gluten_free", "vegan", "vegetarian",
+  ];
+
+  const resetForm = () => {
+    setFoodName(""); setFoodNameAr(""); setFoodCategory("protein"); setFoodTags([]);
+    setCal100(""); setPro100(""); setCarb100(""); setFat100("");
+    setServingSize(""); setCalServing(""); setProServing(""); setCarbServing(""); setFatServing("");
+    setIngredients(""); setInstructions("");
+    setShowAddForm(false); setIsRecipeMode(false);
+  };
+
+  const handleAdd = async () => {
+    if (!foodName.trim() || !cal100 || !pro100 || !carb100 || !fat100) return;
+    setIsSubmitting(true);
+    try {
+      await addFood({
+        name: foodName.trim(),
+        nameAr: foodNameAr.trim() || undefined,
+        category: foodCategory,
+        tags: foodTags,
+        per100g: {
+          calories: parseFloat(cal100),
+          protein: parseFloat(pro100),
+          carbs: parseFloat(carb100),
+          fat: parseFloat(fat100),
+        },
+        isRecipe: isRecipeMode,
+        servingSize: isRecipeMode && servingSize ? servingSize : undefined,
+        perServing: isRecipeMode && calServing ? {
+          calories: parseFloat(calServing),
+          protein: parseFloat(proServing || "0"),
+          carbs: parseFloat(carbServing || "0"),
+          fat: parseFloat(fatServing || "0"),
+        } : undefined,
+        ingredients: isRecipeMode && ingredients.trim()
+          ? ingredients.trim().split("\n").filter(Boolean)
+          : undefined,
+        instructions: isRecipeMode && instructions.trim()
+          ? instructions.trim().split("\n").filter(Boolean)
+          : undefined,
+      });
+      resetForm();
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: any) => {
+    setDeletingId(id);
+    try {
+      await deleteFood({ foodId: id });
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Actions */}
+      <div className="flex gap-3">
+        <button
+          onClick={() => { setShowAddForm(true); setIsRecipeMode(false); }}
+          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary/90 transition-colors"
+        >
+          <Plus className="h-4 w-4" />
+          {t("addFood")}
+        </button>
+        <button
+          onClick={() => { setShowAddForm(true); setIsRecipeMode(true); }}
+          className="inline-flex items-center gap-2 rounded-lg border border-stone-200 bg-white px-4 py-2.5 text-sm font-medium hover:bg-stone-50 transition-colors"
+        >
+          <Plus className="h-4 w-4" />
+          {t("addRecipe")}
+        </button>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
+          <input
+            type="text"
+            placeholder={t("foodName") + "..."}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full rounded-lg border border-stone-200 pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+          />
+        </div>
+        <select
+          value={filterCategory}
+          onChange={(e) => setFilterCategory(e.target.value)}
+          className="rounded-lg border border-stone-200 px-3 py-2 text-sm bg-white"
+        >
+          <option value="">{t("allCategories")}</option>
+          {CATEGORY_OPTIONS.map((cat) => (
+            <option key={cat} value={cat}>{t(`categories.${cat}`)}</option>
+          ))}
+        </select>
+        <div className="flex rounded-lg border border-stone-200 overflow-hidden">
+          {(["all", "ingredient", "recipe"] as const).map((type) => (
+            <button
+              key={type}
+              onClick={() => setFilterType(type)}
+              className={cn(
+                "px-3 py-2 text-xs font-medium transition-colors",
+                filterType === type
+                  ? "bg-primary text-white"
+                  : "bg-white text-stone-600 hover:bg-stone-50",
+              )}
+            >
+              {type === "all" ? t("allItems") : type === "ingredient" ? t("ingredientsOnly") : t("recipesOnly")}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Add Form */}
+      {showAddForm && (
+        <div className="rounded-xl border border-stone-200 bg-white p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold">{isRecipeMode ? t("addRecipe") : t("addFood")}</h3>
+            <button onClick={resetForm} className="text-stone-400 hover:text-stone-600">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <input
+              type="text"
+              placeholder={t("foodName")}
+              value={foodName}
+              onChange={(e) => setFoodName(e.target.value)}
+              className="rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            />
+            <input
+              type="text"
+              placeholder={t("foodNameAr")}
+              value={foodNameAr}
+              onChange={(e) => setFoodNameAr(e.target.value)}
+              className="rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              dir="rtl"
+            />
+          </div>
+
+          <select
+            value={foodCategory}
+            onChange={(e) => setFoodCategory(e.target.value)}
+            className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm bg-white"
+          >
+            {CATEGORY_OPTIONS.map((cat) => (
+              <option key={cat} value={cat}>{t(`categories.${cat}`)}</option>
+            ))}
+          </select>
+
+          {/* Macros per 100g */}
+          <div>
+            <label className="text-xs font-medium text-stone-500 mb-1.5 block">{t("per100g")}</label>
+            <div className="grid gap-2 grid-cols-4">
+              <input type="number" placeholder={t("caloriesPer100g")} value={cal100} onChange={(e) => setCal100(e.target.value)} className="rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              <input type="number" placeholder={t("proteinPer100g")} value={pro100} onChange={(e) => setPro100(e.target.value)} className="rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              <input type="number" placeholder={t("carbsPer100g")} value={carb100} onChange={(e) => setCarb100(e.target.value)} className="rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              <input type="number" placeholder={t("fatPer100g")} value={fat100} onChange={(e) => setFat100(e.target.value)} className="rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            </div>
+          </div>
+
+          {/* Recipe-specific fields */}
+          {isRecipeMode && (
+            <>
+              <input
+                type="text"
+                placeholder={t("servingSize")}
+                value={servingSize}
+                onChange={(e) => setServingSize(e.target.value)}
+                className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+              <div>
+                <label className="text-xs font-medium text-stone-500 mb-1.5 block">{t("perServing")}</label>
+                <div className="grid gap-2 grid-cols-4">
+                  <input type="number" placeholder={t("caloriesPerServing")} value={calServing} onChange={(e) => setCalServing(e.target.value)} className="rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                  <input type="number" placeholder={t("proteinPerServing")} value={proServing} onChange={(e) => setProServing(e.target.value)} className="rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                  <input type="number" placeholder={t("carbsPerServing")} value={carbServing} onChange={(e) => setCarbServing(e.target.value)} className="rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                  <input type="number" placeholder={t("fatPerServing")} value={fatServing} onChange={(e) => setFatServing(e.target.value)} className="rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                </div>
+              </div>
+              <textarea
+                placeholder={t("ingredientsList")}
+                value={ingredients}
+                onChange={(e) => setIngredients(e.target.value)}
+                rows={4}
+                className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-y"
+              />
+              <textarea
+                placeholder={t("instructionsList")}
+                value={instructions}
+                onChange={(e) => setInstructions(e.target.value)}
+                rows={4}
+                className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-y"
+              />
+            </>
+          )}
+
+          {/* Tags */}
+          <div>
+            <label className="text-xs font-medium text-stone-500 mb-1.5 block">{t("foodTags")}</label>
+            <div className="flex flex-wrap gap-1.5">
+              {FOOD_TAG_OPTIONS.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() =>
+                    setFoodTags((prev) =>
+                      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
+                    )
+                  }
+                  className={cn(
+                    "rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-all",
+                    foodTags.includes(tag)
+                      ? "border-primary/30 bg-primary/10 text-primary"
+                      : "border-stone-200 text-stone-400 hover:border-stone-300",
+                  )}
+                >
+                  {tag.replace(/_/g, " ")}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={handleAdd}
+            disabled={isSubmitting || !foodName.trim() || !cal100}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50 transition-colors"
+          >
+            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+            {t("save")}
+          </button>
+        </div>
+      )}
+
+      {/* Food List */}
+      {foods === undefined ? (
+        <div className="flex justify-center py-12">
+          <Loader2 className="h-6 w-6 animate-spin text-stone-400" />
+        </div>
+      ) : foods.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-stone-300 bg-stone-50 p-12 text-center">
+          <UtensilsCrossed className="h-10 w-10 mx-auto text-stone-400 mb-3" />
+          <h3 className="font-semibold text-stone-600">{t("emptyFoodTitle")}</h3>
+          <p className="text-sm text-stone-500 mt-1 max-w-sm mx-auto">
+            {t("emptyFoodDescription")}
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <p className="text-xs text-stone-500">{foods.length} {t("foodItems")}</p>
+          {foods.map((food) => (
             <div
-              key={entry._id}
+              key={food._id}
               className="rounded-xl border border-stone-200 bg-white p-4"
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3 min-w-0">
-                  <div
-                    className={cn(
-                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-                      entry.type === "pdf"
-                        ? "bg-red-50 text-red-500"
-                        : "bg-blue-50 text-blue-500",
-                    )}
-                  >
-                    {entry.type === "pdf" ? (
-                      <Upload className="h-4 w-4" />
-                    ) : (
-                      <FileText className="h-4 w-4" />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-sm truncate">{food.name}</h3>
+                    {food.nameAr && (
+                      <span className="text-xs text-stone-400" dir="rtl">{food.nameAr}</span>
                     )}
                   </div>
-                  <div className="min-w-0">
-                    <h3 className="font-semibold text-sm truncate">
-                      {entry.title}
-                    </h3>
-                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                      <span className="text-xs text-stone-500 uppercase font-medium">
-                        {entry.type}
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    <span className="rounded-full border border-stone-200 bg-stone-50 px-2 py-0.5 text-[10px] font-medium text-stone-600">
+                      {t(`categories.${food.category}`)}
+                    </span>
+                    {food.isRecipe && (
+                      <span className="rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700">
+                        {t("recipesOnly")}
                       </span>
-                      {entry.content && (
-                        <span className="text-xs text-stone-400">
-                          {entry.content.split(/\s+/).length} {t("words")}
-                        </span>
-                      )}
-                      {entry.tags?.map((tag: string) => (
-                        <span
-                          key={tag}
-                          className={cn(
-                            "rounded-full border px-2 py-0.5 text-[10px] font-medium",
-                            getTagColor(tag),
-                          )}
-                        >
-                          {t(`tag${tag.charAt(0).toUpperCase()}${tag.slice(1)}`)}
-                        </span>
-                      ))}
-                    </div>
-                    {entry.content && (
-                      <p className="text-xs text-stone-500 mt-2 line-clamp-2">
-                        {entry.content.slice(0, 200)}
-                        {entry.content.length > 200 ? "..." : ""}
-                      </p>
                     )}
+                    <span className={cn(
+                      "rounded-full border px-2 py-0.5 text-[10px] font-medium",
+                      food.source === "coach"
+                        ? "border-orange-200 bg-orange-50 text-orange-700"
+                        : "border-green-200 bg-green-50 text-green-700",
+                    )}>
+                      {food.source === "coach" ? t("coach") : t("verified")}
+                    </span>
                   </div>
+                  <div className="flex gap-4 mt-2 text-xs text-stone-500">
+                    <span>{food.per100g.calories} kcal</span>
+                    <span>P: {food.per100g.protein}g</span>
+                    <span>C: {food.per100g.carbs}g</span>
+                    <span>F: {food.per100g.fat}g</span>
+                    <span className="text-stone-400">({t("per100g")})</span>
+                  </div>
+                  {food.isRecipe && food.perServing && (
+                    <div className="flex gap-4 mt-0.5 text-xs text-stone-400">
+                      <span>{food.perServing.calories} kcal</span>
+                      <span>P: {food.perServing.protein}g</span>
+                      <span>C: {food.perServing.carbs}g</span>
+                      <span>F: {food.perServing.fat}g</span>
+                      <span>({t("perServing")})</span>
+                    </div>
+                  )}
                 </div>
                 <button
-                  onClick={() => handleDelete(entry._id)}
-                  disabled={deletingId === entry._id}
+                  onClick={() => handleDelete(food._id)}
+                  disabled={deletingId === food._id}
                   className="shrink-0 rounded-lg p-2 text-stone-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
                 >
-                  {deletingId === entry._id ? (
+                  {deletingId === food._id ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     <Trash2 className="h-4 w-4" />
