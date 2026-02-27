@@ -3,6 +3,18 @@
 import { useEffect, useRef } from "react";
 import OneSignal from "react-onesignal";
 
+/** Resolves when OneSignal.init() completes (or rejects if init fails / is skipped). */
+let initPromise: Promise<void> | null = null;
+
+/**
+ * Wait for OneSignal SDK initialization before calling any SDK methods.
+ * Returns a rejected promise if OneSignal isn't configured.
+ */
+export function waitForOneSignal(): Promise<void> {
+  if (!initPromise) return Promise.reject(new Error("OneSignal not configured"));
+  return initPromise;
+}
+
 export function OneSignalProvider() {
   const initialized = useRef(false);
 
@@ -11,7 +23,7 @@ export function OneSignalProvider() {
     if (!appId || initialized.current) return;
     initialized.current = true;
 
-    OneSignal.init({
+    initPromise = OneSignal.init({
       appId,
       serviceWorkerParam: { scope: "/" },
       serviceWorkerPath: "/OneSignalSDKWorker.js",

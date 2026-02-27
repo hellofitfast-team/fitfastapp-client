@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useConvexAuth, useMutation } from "convex/react";
+import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/hooks/use-auth";
 import { createLogger } from "@fitfast/config/logger";
+import { waitForOneSignal } from "./OneSignalProvider";
 
 const log = createLogger("onesignal-identity");
 
@@ -29,11 +30,11 @@ export function OneSignalIdentity() {
   useEffect(() => {
     if (!profile?._id || linkedRef.current) return;
 
-    // Skip entirely if OneSignal isn't configured (e.g. local dev without app ID)
-    if (!process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID) return;
-
     async function linkIdentity() {
       try {
+        // Wait for OneSignal.init() to complete before calling any SDK methods
+        await waitForOneSignal();
+
         const OneSignal = (await import("react-onesignal")).default;
 
         // Link Convex user ID as OneSignal external_id
@@ -61,6 +62,8 @@ export function OneSignalIdentity() {
         // Listen for future subscription changes
         OneSignal.User.PushSubscription.addEventListener("change", handlerRef.current);
       } catch (err) {
+        // Silently skip if OneSignal isn't configured (e.g. local dev without app ID)
+        if (err instanceof Error && err.message === "OneSignal not configured") return;
         log.error({ err, userId: profile?._id }, "OneSignal identity link failed");
       }
     }
