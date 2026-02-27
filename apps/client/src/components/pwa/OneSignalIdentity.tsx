@@ -29,6 +29,9 @@ export function OneSignalIdentity() {
   useEffect(() => {
     if (!profile?._id || linkedRef.current) return;
 
+    // Skip entirely if OneSignal isn't configured (e.g. local dev without app ID)
+    if (!process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID) return;
+
     async function linkIdentity() {
       try {
         const OneSignal = (await import("react-onesignal")).default;

@@ -369,7 +369,7 @@ GUIDELINES:
 1. Consider food preferences, allergies, and dietary restrictions
 2. Each meal must have accurate macros that sum to the daily totals above
 3. Use locally available, affordable ingredients
-4. Include specific measurements (grams, cups, tablespoons) and clear cooking instructions
+4. Include specific measurements (grams, cups, tablespoons) and detailed cooking instructions with cooking times, temperatures, and practical tips (e.g. "Cook on medium heat for 3-4 minutes per side until golden", "Bake at 180°C/350°F for 20 minutes", "Soak overnight in the fridge")
 5. Each meal must have 1-2 fully detailed alternatives with name, type, calories, protein, carbs, fat, ingredients, and instructions. Alternatives should match the main meal's calories within ±10%.
 6. If adherence data is provided, adjust meal complexity accordingly
 7. If weight trend shows stall (>2 weeks same weight on fat loss), slightly increase protein and reduce carbs
@@ -399,8 +399,8 @@ Return a JSON object with this EXACT structure (include ALL fields for every mea
           "protein": 30,
           "carbs": 35,
           "fat": 20,
-          "ingredients": ["3 eggs", "2 toast", "1 tbsp olive oil"],
-          "instructions": ["Step 1...", "Step 2..."],
+          "ingredients": ["3 eggs", "2 slices whole wheat toast", "1 tbsp olive oil", "salt and pepper to taste"],
+          "instructions": ["Heat olive oil in a non-stick pan over medium-low heat for 30 seconds", "Crack eggs into a bowl, season with salt and pepper, and whisk for 15 seconds", "Pour eggs into pan and stir gently with a spatula for 2-3 minutes until just set but still soft", "Toast bread until golden (~2 minutes) and serve alongside eggs"],
           "alternatives": [
             {
               "name": "Oatmeal with Protein Powder",
@@ -410,7 +410,7 @@ Return a JSON object with this EXACT structure (include ALL fields for every mea
               "carbs": 55,
               "fat": 8,
               "ingredients": ["50g rolled oats", "1 scoop whey protein", "200ml milk", "1 tbsp honey"],
-              "instructions": ["Cook oats with milk", "Let cool slightly", "Stir in protein powder", "Drizzle honey"]
+              "instructions": ["Combine oats and milk in a pot, bring to a simmer over medium heat, stirring occasionally for 4-5 minutes until thick and creamy", "Remove from heat and let cool for 1-2 minutes (hot liquid denatures whey protein)", "Stir in protein powder until fully dissolved", "Drizzle honey on top and serve warm"]
             }
           ]
         }

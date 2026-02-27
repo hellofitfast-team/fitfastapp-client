@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: [
       "lucide-react",
+      "recharts",
       "@sentry/nextjs",
       "react-hook-form",
       "zod",
@@ -97,13 +98,19 @@ const nextConfig: NextConfig = {
 const configWithIntl = withNextIntl(nextConfig);
 const configWithAnalyzer = withBundleAnalyzer(configWithIntl);
 
-export default withSentryConfig(configWithAnalyzer, {
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  silent: !process.env.CI,
-  widenClientFileUpload: true,
-  tunnelRoute: "/monitoring",
-  sourcemaps: {
-    deleteSourcemapsAfterUpload: true,
-  },
-});
+// Skip Sentry bundler wrapping in dev — it adds source map overhead that slows Turbopack
+const finalConfig =
+  process.env.NODE_ENV === "development"
+    ? configWithAnalyzer
+    : withSentryConfig(configWithAnalyzer, {
+        org: process.env.SENTRY_ORG,
+        project: process.env.SENTRY_PROJECT,
+        silent: !process.env.CI,
+        widenClientFileUpload: !!process.env.CI,
+        tunnelRoute: "/monitoring",
+        sourcemaps: {
+          deleteSourcemapsAfterUpload: true,
+        },
+      });
+
+export default finalConfig;
