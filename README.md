@@ -25,7 +25,7 @@
 | ---------- | ---------------------------------------------------- |
 | Framework  | Next.js 16+ (App Router, Turbopack), TypeScript      |
 | Backend    | Convex (real-time, serverless)                       |
-| Auth       | Clerk                                                |
+| Auth       | Convex Auth (@convex-dev/auth)                       |
 | AI         | OpenRouter (DeepSeek V3, Qwen3-VL) via Vercel AI SDK |
 | Styling    | Tailwind CSS v4 + shadcn/ui                          |
 | i18n       | next-intl (English + Arabic with RTL)                |
@@ -69,7 +69,7 @@ fitfast/
 - Node.js >= 20
 - pnpm >= 10 (`corepack enable && corepack prepare pnpm@10.12.1 --activate`)
 - Convex account (https://www.convex.dev)
-- Clerk account (https://clerk.com)
+- Convex Auth (built into Convex — no separate account needed)
 
 ### 1. Clone and Install
 

@@ -162,12 +162,11 @@ Access Vercel at https://vercel.com:
 
 ### Login Issues
 
-| Symptom                        | Likely Cause                | Fix                                                                                     |
-| ------------------------------ | --------------------------- | --------------------------------------------------------------------------------------- |
-| "Not authenticated" error      | Clerk keys misconfigured    | Verify `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` match Clerk dashboard |
-| Login page loops back          | Middleware misconfiguration | Check `apps/client/middleware.ts` and `apps/admin/middleware.ts`                        |
-| Coach can't access admin panel | Profile not marked as coach | In Convex, check the profile has `isCoach: true`                                        |
-| Clerk webhook not firing       | Webhook URL incorrect       | Verify the endpoint URL in Clerk Dashboard > Webhooks                                   |
+| Symptom                        | Likely Cause                | Fix                                                              |
+| ------------------------------ | --------------------------- | ---------------------------------------------------------------- |
+| "Not authenticated" error      | Convex Auth session expired | Check Convex Auth configuration and session handling             |
+| Login page loops back          | Middleware misconfiguration | Check `apps/client/middleware.ts` and `apps/admin/middleware.ts` |
+| Coach can't access admin panel | Profile not marked as coach | In Convex, check the profile has `isCoach: true`                 |
 
 ### AI Plan Generation Failures
 
@@ -232,7 +231,7 @@ Convex provides data export functionality through the dashboard:
 ### What to Back Up Externally
 
 - Environment variables (keep a secure copy of all API keys)
-- Clerk user data (exportable from Clerk dashboard)
+- User data (stored in Convex, included in Convex backups)
 - Custom knowledge base content (consider periodic exports)
 
 ### Recovery Scenarios

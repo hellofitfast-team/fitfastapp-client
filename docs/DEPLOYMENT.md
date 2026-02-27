@@ -9,15 +9,14 @@ Complete technical guide for deploying the FitFast platform from scratch.
 1. [Prerequisites](#prerequisites)
 2. [Repository Setup](#repository-setup)
 3. [Convex Setup](#convex-setup)
-4. [Clerk Setup](#clerk-setup)
-5. [Vercel Deployment](#vercel-deployment)
-6. [OneSignal Setup](#onesignal-setup)
-7. [Resend Setup](#resend-setup)
-8. [Sentry Setup](#sentry-setup)
-9. [OpenRouter Setup](#openrouter-setup)
-10. [DNS Configuration](#dns-configuration)
-11. [Post-Deployment Checklist](#post-deployment-checklist)
-12. [Environment Variables Reference](#environment-variables-reference)
+4. [Vercel Deployment](#vercel-deployment)
+5. [OneSignal Setup](#onesignal-setup)
+6. [Resend Setup](#resend-setup)
+7. [Sentry Setup](#sentry-setup)
+8. [OpenRouter Setup](#openrouter-setup)
+9. [DNS Configuration](#dns-configuration)
+10. [Post-Deployment Checklist](#post-deployment-checklist)
+11. [Environment Variables Reference](#environment-variables-reference)
 
 ---
 
@@ -28,8 +27,7 @@ Complete technical guide for deploying the FitFast platform from scratch.
 | Service    | Purpose                          | Signup URL             |
 | ---------- | -------------------------------- | ---------------------- |
 | Vercel     | Hosting (client + admin apps)    | https://vercel.com     |
-| Convex     | Backend / database               | https://www.convex.dev |
-| Clerk      | Authentication                   | https://clerk.com      |
+| Convex     | Backend / database / auth        | https://www.convex.dev |
 | OpenRouter | AI model access (DeepSeek, Qwen) | https://openrouter.ai  |
 | Resend     | Transactional emails             | https://resend.com     |
 | OneSignal  | Push notifications               | https://onesignal.com  |
@@ -141,33 +139,7 @@ Deployment URL: https://your-deployment-123.convex.cloud
 
 Use this as `NEXT_PUBLIC_CONVEX_URL` in both apps.
 
----
-
-## Clerk Setup
-
-### 1. Create a Clerk Application
-
-1. Go to https://dashboard.clerk.com and create a new application.
-2. Name it "FitFast" (or your preferred name).
-3. Enable **Email + Password** sign-in.
-
-### 2. Get API Keys
-
-From the Clerk dashboard:
-
-- **Publishable Key** (`pk_live_...`) -- used as `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
-- **Secret Key** (`sk_live_...`) -- used as `CLERK_SECRET_KEY`
-
-Both apps (client and admin) share the same Clerk application.
-
-### 3. Configure Webhook (Optional)
-
-If you need Clerk webhooks for sync:
-
-1. In Clerk Dashboard, go to **Webhooks**.
-2. Add an endpoint pointing to your Convex HTTP action (e.g., `https://your-deployment.convex.cloud/clerk-webhook`).
-3. Select relevant events (user.created, user.updated).
-4. Copy the signing secret for the `CLERK_WEBHOOK_SECRET` env var.
+> **Note:** Authentication is handled by Convex Auth (`@convex-dev/auth`) — no separate auth service is needed. User accounts are stored directly in Convex.
 
 ---
 
@@ -187,19 +159,17 @@ You need to deploy **two separate Vercel projects** from the same repository.
 
 3. Add environment variables:
 
-   | Variable                            | Value                         |
-   | ----------------------------------- | ----------------------------- |
-   | `NEXT_PUBLIC_CONVEX_URL`            | Your Convex deployment URL    |
-   | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk publishable key         |
-   | `CLERK_SECRET_KEY`                  | Clerk secret key              |
-   | `NEXT_PUBLIC_SENTRY_DSN`            | Sentry DSN for client project |
-   | `SENTRY_AUTH_TOKEN`                 | Sentry auth token             |
-   | `SENTRY_ORG`                        | Sentry organization slug      |
-   | `SENTRY_PROJECT`                    | Sentry project slug (client)  |
-   | `NEXT_PUBLIC_ONESIGNAL_APP_ID`      | OneSignal app ID              |
-   | `ONESIGNAL_REST_API_KEY`            | OneSignal REST API key        |
-   | `OPENROUTER_API_KEY`                | OpenRouter API key            |
-   | `NEXT_PUBLIC_APP_URL`               | `https://app.yourdomain.com`  |
+   | Variable                       | Value                         |
+   | ------------------------------ | ----------------------------- |
+   | `NEXT_PUBLIC_CONVEX_URL`       | Your Convex deployment URL    |
+   | `NEXT_PUBLIC_SENTRY_DSN`       | Sentry DSN for client project |
+   | `SENTRY_AUTH_TOKEN`            | Sentry auth token             |
+   | `SENTRY_ORG`                   | Sentry organization slug      |
+   | `SENTRY_PROJECT`               | Sentry project slug (client)  |
+   | `NEXT_PUBLIC_ONESIGNAL_APP_ID` | OneSignal app ID              |
+   | `ONESIGNAL_REST_API_KEY`       | OneSignal REST API key        |
+   | `OPENROUTER_API_KEY`           | OpenRouter API key            |
+   | `NEXT_PUBLIC_APP_URL`          | `https://app.yourdomain.com`  |
 
 4. Deploy.
 
@@ -215,15 +185,13 @@ You need to deploy **two separate Vercel projects** from the same repository.
 
 3. Add environment variables:
 
-   | Variable                            | Value                        |
-   | ----------------------------------- | ---------------------------- |
-   | `NEXT_PUBLIC_CONVEX_URL`            | Same Convex deployment URL   |
-   | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Same Clerk publishable key   |
-   | `CLERK_SECRET_KEY`                  | Same Clerk secret key        |
-   | `NEXT_PUBLIC_SENTRY_DSN`            | Sentry DSN for admin project |
-   | `SENTRY_AUTH_TOKEN`                 | Sentry auth token            |
-   | `SENTRY_ORG`                        | Sentry organization slug     |
-   | `SENTRY_PROJECT`                    | Sentry project slug (admin)  |
+   | Variable                 | Value                        |
+   | ------------------------ | ---------------------------- |
+   | `NEXT_PUBLIC_CONVEX_URL` | Same Convex deployment URL   |
+   | `NEXT_PUBLIC_SENTRY_DSN` | Sentry DSN for admin project |
+   | `SENTRY_AUTH_TOKEN`      | Sentry auth token            |
+   | `SENTRY_ORG`             | Sentry organization slug     |
+   | `SENTRY_PROJECT`         | Sentry project slug (admin)  |
 
 4. Deploy.
 
@@ -397,31 +365,27 @@ Run through this checklist after deploying everything:
 
 ### Client App (`apps/client/.env.local`)
 
-| Variable                            | Required | Description                    |
-| ----------------------------------- | -------- | ------------------------------ |
-| `NEXT_PUBLIC_CONVEX_URL`            | Yes      | Convex deployment URL          |
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Yes      | Clerk publishable key          |
-| `CLERK_SECRET_KEY`                  | Yes      | Clerk secret key (server-side) |
-| `NEXT_PUBLIC_SENTRY_DSN`            | Yes      | Sentry DSN for client project  |
-| `SENTRY_AUTH_TOKEN`                 | Yes      | Sentry auth token (build-time) |
-| `SENTRY_ORG`                        | Yes      | Sentry organization slug       |
-| `SENTRY_PROJECT`                    | Yes      | Sentry project slug            |
-| `NEXT_PUBLIC_ONESIGNAL_APP_ID`      | Yes      | OneSignal app ID               |
-| `ONESIGNAL_REST_API_KEY`            | Yes      | OneSignal REST API key         |
-| `OPENROUTER_API_KEY`                | Yes      | OpenRouter API key for AI      |
-| `NEXT_PUBLIC_APP_URL`               | Yes      | Public URL of the client app   |
+| Variable                       | Required | Description                    |
+| ------------------------------ | -------- | ------------------------------ |
+| `NEXT_PUBLIC_CONVEX_URL`       | Yes      | Convex deployment URL          |
+| `NEXT_PUBLIC_SENTRY_DSN`       | Yes      | Sentry DSN for client project  |
+| `SENTRY_AUTH_TOKEN`            | Yes      | Sentry auth token (build-time) |
+| `SENTRY_ORG`                   | Yes      | Sentry organization slug       |
+| `SENTRY_PROJECT`               | Yes      | Sentry project slug            |
+| `NEXT_PUBLIC_ONESIGNAL_APP_ID` | Yes      | OneSignal app ID               |
+| `ONESIGNAL_REST_API_KEY`       | Yes      | OneSignal REST API key         |
+| `OPENROUTER_API_KEY`           | Yes      | OpenRouter API key for AI      |
+| `NEXT_PUBLIC_APP_URL`          | Yes      | Public URL of the client app   |
 
 ### Admin App (`apps/admin/.env.local`)
 
-| Variable                            | Required | Description                    |
-| ----------------------------------- | -------- | ------------------------------ |
-| `NEXT_PUBLIC_CONVEX_URL`            | Yes      | Same Convex deployment URL     |
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Yes      | Same Clerk publishable key     |
-| `CLERK_SECRET_KEY`                  | Yes      | Same Clerk secret key          |
-| `NEXT_PUBLIC_SENTRY_DSN`            | Yes      | Sentry DSN for admin project   |
-| `SENTRY_AUTH_TOKEN`                 | Yes      | Sentry auth token (build-time) |
-| `SENTRY_ORG`                        | Yes      | Sentry organization slug       |
-| `SENTRY_PROJECT`                    | Yes      | Sentry project slug            |
+| Variable                 | Required | Description                    |
+| ------------------------ | -------- | ------------------------------ |
+| `NEXT_PUBLIC_CONVEX_URL` | Yes      | Same Convex deployment URL     |
+| `NEXT_PUBLIC_SENTRY_DSN` | Yes      | Sentry DSN for admin project   |
+| `SENTRY_AUTH_TOKEN`      | Yes      | Sentry auth token (build-time) |
+| `SENTRY_ORG`             | Yes      | Sentry organization slug       |
+| `SENTRY_PROJECT`         | Yes      | Sentry project slug            |
 
 ### Convex Backend (`convex/.env`)
 

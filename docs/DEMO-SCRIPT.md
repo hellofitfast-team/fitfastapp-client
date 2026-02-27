@@ -257,7 +257,7 @@ Use these throughout the demo:
 | Vercel          | Hobby free           | $0 - $20/month                     |
 | Convex          | Free tier generous   | $0 - $25/month                     |
 | OpenRouter (AI) | Pay per use          | ~$100/month                        |
-| Clerk           | Free up to 10K MAU   | $0                                 |
+| Convex Auth     | Included with Convex | $0                                 |
 | Resend          | 3000 emails/day free | $0                                 |
 | OneSignal       | Free tier            | $0                                 |
 | Sentry          | Free tier            | $0                                 |
