@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useTranslations, useLocale } from "next-intl";
@@ -87,8 +87,8 @@ function ClientGrowthChart({
   const t = useTranslations("admin");
   const locale = useLocale();
 
+  const [now] = useState(() => Date.now());
   const chartData = useMemo(() => {
-    const now = Date.now();
     const months: { name: string; clients: number }[] = [];
 
     for (let i = 5; i >= 0; i--) {
@@ -107,7 +107,7 @@ function ClientGrowthChart({
       });
     }
     return months;
-  }, [clients, locale]);
+  }, [clients, locale, now]);
 
   return (
     <div className="chart-section rounded-xl border border-stone-200 bg-white p-6">
@@ -175,8 +175,8 @@ function ActivityChart({
 }) {
   const t = useTranslations("admin");
 
+  const [now] = useState(() => Date.now());
   const chartData = useMemo(() => {
-    const now = Date.now();
     const weeks: { name: string; signups: number; tickets: number }[] = [];
 
     for (let i = 3; i >= 0; i--) {
@@ -192,7 +192,7 @@ function ActivityChart({
       });
     }
     return weeks;
-  }, [signups, tickets]);
+  }, [signups, tickets, now]);
 
   return (
     <div className="chart-section rounded-xl border border-stone-200 bg-white p-6">

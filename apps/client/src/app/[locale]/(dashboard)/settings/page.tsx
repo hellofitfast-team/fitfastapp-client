@@ -62,7 +62,14 @@ export default function SettingsPage() {
   });
 
   const [reminderTime, setReminderTime] = useState("08:00");
+  const [reminderInitialized, setReminderInitialized] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Initialize reminder time from profile once (setState during render, guarded by flag)
+  if (profile?.notificationReminderTime && !reminderInitialized) {
+    setReminderTime(profile.notificationReminderTime);
+    setReminderInitialized(true);
+  }
 
   useEffect(() => {
     if (profile) {
@@ -71,9 +78,6 @@ export default function SettingsPage() {
         phone: profile.phone || "",
         language: (profile.language || "en") as "en" | "ar",
       });
-      if (profile.notificationReminderTime) {
-        setReminderTime(profile.notificationReminderTime);
-      }
     }
   }, [profile, reset]);
 

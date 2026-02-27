@@ -65,6 +65,8 @@ export default function DashboardPage() {
   const locale = useLocale();
   const { dashboardData, isLoading, error } = useDashboardData();
 
+  const [now] = useState(() => Date.now());
+
   // Rotating motivational greeting (HOME-01)
   const [messageIndex, setMessageIndex] = useState(0);
   const [bannerDismissed, setBannerDismissed] = useState(false);
@@ -135,9 +137,7 @@ export default function DashboardPage() {
   const checkInLock = dashboardData.checkInLock;
   const nextCheckInDays =
     checkInLock.isLocked && checkInLock.nextCheckInDate
-      ? Math.ceil(
-          (new Date(checkInLock.nextCheckInDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
-        )
+      ? Math.ceil((new Date(checkInLock.nextCheckInDate).getTime() - now) / (1000 * 60 * 60 * 24))
       : null;
   const nextCheckInDisplay = nextCheckInDays !== null ? `${nextCheckInDays}d` : "-";
 
@@ -150,7 +150,7 @@ export default function DashboardPage() {
     startDate?: string,
   ): T | null {
     if (!weeklyPlan || !startDate) return null;
-    const diff = Math.floor((Date.now() - new Date(startDate).getTime()) / 86400000);
+    const diff = Math.floor((now - new Date(startDate).getTime()) / 86400000);
     const dayIndex = Math.max(0, diff);
 
     // Try new format: "day1", "day2", ...
@@ -246,10 +246,7 @@ export default function DashboardPage() {
   const planCurrentDay = mealPlanStartDate
     ? Math.min(
         planTotalDays,
-        Math.max(
-          1,
-          Math.floor((Date.now() - new Date(mealPlanStartDate).getTime()) / 86400000) + 1,
-        ),
+        Math.max(1, Math.floor((now - new Date(mealPlanStartDate).getTime()) / 86400000) + 1),
       )
     : null;
 

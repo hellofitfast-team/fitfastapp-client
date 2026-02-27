@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useConvexAuth, useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -33,10 +33,10 @@ export function TicketsList() {
   const [response, setResponse] = useState("");
   const [respondingId, setRespondingId] = useState<string | null>(null);
 
-  // Reset response text when switching between tickets
-  useEffect(() => {
+  const toggleTicket = (id: string) => {
+    setExpandedId((prev) => (prev === id ? null : id));
     setResponse("");
-  }, [expandedId]);
+  };
 
   if (tickets === undefined) {
     return (
@@ -92,7 +92,7 @@ export function TicketsList() {
           >
             {/* Header row */}
             <button
-              onClick={() => setExpandedId(isExpanded ? null : ticket._id)}
+              onClick={() => toggleTicket(ticket._id)}
               className="flex w-full items-center gap-4 p-4 text-start"
             >
               <div

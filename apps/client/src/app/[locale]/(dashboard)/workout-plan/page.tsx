@@ -198,6 +198,7 @@ export default function WorkoutPlanPage() {
   const locale = useLocale();
   const { workoutPlan, isLoading, error } = useCurrentWorkoutPlan();
   const assessment = useQuery(api.assessments.getMyAssessment);
+  const [now] = useState(() => Date.now());
   const [selectedDay, setSelectedDay] = useState(0);
   const [expandedExercise, setExpandedExercise] = useState<number | null>(0);
   const daySelectorRef = useRef<HTMLDivElement>(null);
@@ -240,19 +241,22 @@ export default function WorkoutPlanPage() {
             86400000,
         ) - 1
       : 13;
-  const todayDayIndex = useMemo(() => {
-    if (!workoutPlan?.startDate) return 0;
-    const start = new Date(workoutPlan.startDate);
-    const diff = Math.floor((Date.now() - start.getTime()) / 86400000);
-    return Math.max(0, Math.min(maxDayIndex, diff));
-  }, [workoutPlan?.startDate, maxDayIndex]);
+  const todayDayIndex = workoutPlan?.startDate
+    ? Math.max(
+        0,
+        Math.min(
+          maxDayIndex,
+          Math.floor((now - new Date(workoutPlan.startDate).getTime()) / 86400000),
+        ),
+      )
+    : 0;
 
-  // Auto-select today on mount
-  useEffect(() => {
-    if (workoutPlan?.startDate) {
-      setSelectedDay(todayDayIndex);
-    }
-  }, [todayDayIndex, workoutPlan?.startDate]);
+  // Auto-select today (setState during render, guarded by selectedDay === 0)
+  const [dayInitialized, setDayInitialized] = useState(false);
+  if (workoutPlan?.startDate && !dayInitialized) {
+    setSelectedDay(todayDayIndex);
+    setDayInitialized(true);
+  }
 
   // Dynamic total days
   const totalDays =
@@ -264,6 +268,7 @@ export default function WorkoutPlanPage() {
       : 14;
 
   // Detect rest days for DaySelector
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization -- compiler infers subset; all 3 deps are needed
   const restDays = useMemo(() => {
     if (!workoutPlan?.planData) return [];
     const planData = workoutPlan.planData as unknown as GeneratedWorkoutPlan;

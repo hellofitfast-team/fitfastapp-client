@@ -25,6 +25,7 @@ export function InstallPrompt() {
     // Session-only dismiss check
     if (sessionStorage.getItem(SESSION_DISMISS_KEY)) return;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync with browser install state
     setDismissed(false);
 
     // iOS detection (Safari on iOS doesn't fire beforeinstallprompt)

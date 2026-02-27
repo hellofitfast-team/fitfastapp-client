@@ -100,9 +100,9 @@ export default function TicketDetailPage() {
 
   const toCamelCase = (str: string) => str.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase());
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic key constructed from server data (e.g. status codes), not statically known
   const safeT = (key: string, fallback: string) => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic key from server data
       return t(key as any);
     } catch {
       return fallback;

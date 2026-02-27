@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useConvexAuth, useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -42,12 +42,10 @@ export function PaymentMethodsManager() {
   const [methods, setMethods] = useState<PaymentMethod[] | null>(null);
   const [confirmRemoveIdx, setConfirmRemoveIdx] = useState<number | null>(null);
 
-  // Initialize local state once server data arrives
-  useEffect(() => {
-    if (serverMethods !== undefined && methods === null) {
-      setMethods(serverMethods.length > 0 ? serverMethods : []);
-    }
-  }, [serverMethods, methods]);
+  // Initialize local state once server data arrives (setState during render is safe if conditional)
+  if (serverMethods !== undefined && methods === null) {
+    setMethods(serverMethods.length > 0 ? serverMethods : []);
+  }
 
   if (methods === null) {
     return (

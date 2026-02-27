@@ -1,9 +1,8 @@
 import createMiddleware from "next-intl/middleware";
-import { type NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { routing } from "@fitfast/i18n/routing";
 import {
   convexAuthNextjsMiddleware,
-  createRouteMatcher,
   nextjsMiddlewareRedirect,
 } from "@convex-dev/auth/nextjs/server";
 
@@ -18,8 +17,6 @@ function getLocaleFromPath(pathname: string): string {
   const match = pathname.match(/^\/(en|ar)/);
   return match ? match[1] : "en";
 }
-
-const isPublicRoute = createRouteMatcher(["/login", "/en/login", "/ar/login"]);
 
 export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
   const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();

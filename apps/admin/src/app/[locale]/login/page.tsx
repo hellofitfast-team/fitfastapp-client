@@ -37,8 +37,11 @@ export default function AdminLoginPage() {
   const profile = useQuery(api.profiles.getMyProfile, isConvexAuth ? {} : "skip");
   const isSigningOut = useRef(false);
 
+  // Derive error from URL param instead of setting state in an effect
+  const errorParam = searchParams.get("error");
+  const notCoachError = errorParam === "not_coach" ? t("notAuthorized") : null;
+
   useEffect(() => {
-    const errorParam = searchParams.get("error");
     if (errorParam === "not_coach") {
       // Auto-clear stale client session if still authenticated
       if (isConvexAuth && !isSigningOut.current) {
@@ -47,9 +50,8 @@ export default function AdminLoginPage() {
           isSigningOut.current = false;
         });
       }
-      setError(t("notAuthorized"));
     }
-  }, [searchParams, t, isConvexAuth, signOut]);
+  }, [errorParam, isConvexAuth, signOut]);
 
   // Redirect if authenticated as coach (covers both fresh login and revisiting login page)
   useEffect(() => {
@@ -148,9 +150,9 @@ export default function AdminLoginPage() {
 
           <div className="px-8 pt-6 pb-8">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {error && (
+              {(error || notCoachError) && (
                 <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-                  <p className="text-sm font-medium text-red-600">{error}</p>
+                  <p className="text-sm font-medium text-red-600">{error ?? notCoachError}</p>
                 </div>
               )}
 

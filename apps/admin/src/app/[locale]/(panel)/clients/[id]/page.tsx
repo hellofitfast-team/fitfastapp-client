@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useRouter } from "@fitfast/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
@@ -207,14 +207,11 @@ export default function ClientDetailPage() {
   const [rejectionReason, setRejectionReason] = useState("");
 
   // Pre-select the plan tier from the latest signup if available (coach can override)
-  const [tierInitialized, setTierInitialized] = useState(false);
-  useEffect(() => {
-    if (latestSignup?.planTier && !tierInitialized) {
-      setSelectedTier(latestSignup.planTier as "monthly" | "quarterly");
-      setTierInitialized(true);
-    }
-  }, [latestSignup?.planTier, tierInitialized]);
+  const initialTier = latestSignup?.planTier as "monthly" | "quarterly" | undefined;
+  const [tierOverridden, setTierOverridden] = useState(false);
+  const effectiveTier = tierOverridden ? selectedTier : (initialTier ?? selectedTier);
 
+  const [now] = useState(() => Date.now());
   const isLoading = profile === undefined || assessment === undefined;
 
   if (isLoading) {
@@ -242,7 +239,7 @@ export default function ClientDetailPage() {
   const handleActivate = async () => {
     setIsActing(true);
     try {
-      const tier = tierOptions.find((opt) => opt.value === selectedTier)!;
+      const tier = tierOptions.find((opt) => opt.value === effectiveTier)!;
       const startDate = new Date().toISOString().split("T")[0];
       const endDate = new Date();
       endDate.setMonth(endDate.getMonth() + tier.months);
@@ -250,18 +247,18 @@ export default function ClientDetailPage() {
       await updateStatus({
         profileId: profile._id as Id<"profiles">,
         status: "active",
-        planTier: selectedTier,
+        planTier: effectiveTier,
         planStartDate: startDate,
         planEndDate: endDate.toISOString().split("T")[0],
       });
 
       toast({
         title: t("clientDetail.activated"),
-        description: `${profile.fullName} — ${t(`tierLabels.${selectedTier}`)}`,
+        description: `${profile.fullName} — ${t(`tierLabels.${effectiveTier}`)}`,
         variant: "success",
       });
     } catch (err) {
-      log.error({ err, profileId: profile._id, tier: selectedTier }, "Client activation failed");
+      log.error({ err, profileId: profile._id, tier: effectiveTier }, "Client activation failed");
       toast({
         title: t("clientDetail.activateFailed"),
         description: err instanceof Error ? err.message : t("clientDetail.activateFailed"),
@@ -406,8 +403,7 @@ export default function ClientDetailPage() {
                   {Math.max(
                     0,
                     Math.ceil(
-                      (new Date(profile.planEndDate).getTime() - Date.now()) /
-                        (1000 * 60 * 60 * 24),
+                      (new Date(profile.planEndDate).getTime() - now) / (1000 * 60 * 60 * 24),
                     ),
                   )}{" "}
                   {t("clientDetail.days")}
@@ -518,9 +514,12 @@ export default function ClientDetailPage() {
                   <button
                     key={tier.value}
                     type="button"
-                    onClick={() => setSelectedTier(tier.value)}
+                    onClick={() => {
+                      setSelectedTier(tier.value);
+                      setTierOverridden(true);
+                    }}
                     className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
-                      selectedTier === tier.value
+                      effectiveTier === tier.value
                         ? "border-primary bg-primary text-white"
                         : "hover:border-primary/40 border-stone-200 bg-white text-stone-700"
                     }`}

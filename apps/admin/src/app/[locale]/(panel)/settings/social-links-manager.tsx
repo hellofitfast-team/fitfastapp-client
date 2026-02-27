@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useConvexAuth, useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import * as Sentry from "@sentry/nextjs";
@@ -26,11 +26,10 @@ export function SocialLinksManager() {
 
   const [links, setLinks] = useState<SocialLinks | null>(null);
 
-  useEffect(() => {
-    if (serverLinks !== undefined && links === null) {
-      setLinks(serverLinks);
-    }
-  }, [serverLinks, links]);
+  // Initialize local state once server data arrives (setState during render is safe if conditional)
+  if (serverLinks !== undefined && links === null) {
+    setLinks(serverLinks);
+  }
 
   if (links === null) {
     return <div className="h-32 animate-pulse rounded-xl border border-stone-200 bg-stone-50" />;

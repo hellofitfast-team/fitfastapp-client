@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useConvexAuth, useQuery, useMutation, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -127,16 +127,16 @@ export function PlansManager() {
     [translateAction],
   );
 
-  // Initialize local state once server data arrives
-  useEffect(() => {
-    if (serverPlans !== undefined && plans === null) {
-      setPlans(serverPlans.length > 0 ? serverPlans : []);
-      // Mark loaded plans as manually edited so we don't overwrite existing AR names
-      for (const p of serverPlans) {
-        if (p.nameAr) manualArEdits.current.add(p.id);
-      }
+  // Initialize local state once server data arrives (setState during render is safe if conditional)
+  if (serverPlans !== undefined && plans === null) {
+    setPlans(serverPlans.length > 0 ? serverPlans : []);
+    // Mark loaded plans with existing AR names so auto-translate doesn't overwrite them
+    /* eslint-disable react-hooks/refs -- one-time init alongside setState during render */
+    for (const p of serverPlans) {
+      if (p.nameAr) manualArEdits.current.add(p.id);
     }
-  }, [serverPlans, plans]);
+    /* eslint-enable react-hooks/refs */
+  }
 
   if (plans === null) {
     return (
