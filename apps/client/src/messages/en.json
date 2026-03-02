@@ -630,6 +630,9 @@
         "other": "Other"
       },
       "medicalConditions": "Medical Conditions",
+      "medicalNotesTitle": "Medical Notes",
+      "medicalNotesDescription": "Optional: injuries, conditions, or limitations",
+      "medicalNotesPlaceholder": "E.g., knee injury, back pain, diabetes, high blood pressure...",
       "injuries": "Current Injuries",
       "exerciseHistory": "Exercise History",
       "basicInfo": "Basic Information",
@@ -696,7 +699,14 @@
       "stepUnderReview": "Under Review",
       "stepUnderReviewDesc": "Your coach is reviewing your application",
       "stepApprovalNotification": "Approval Notification",
-      "stepApprovalNotificationDesc": "You'll receive an email when your account is approved"
+      "stepApprovalNotificationDesc": "You'll receive an email when your account is approved",
+      "infoLabel": "Info",
+      "statuses": {
+        "pending_approval": "Pending Approval",
+        "active": "Active",
+        "inactive": "Inactive",
+        "expired": "Expired"
+      }
     }
   },
   "units": {

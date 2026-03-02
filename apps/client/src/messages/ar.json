@@ -625,6 +625,9 @@
         "other": "أخرى"
       },
       "medicalConditions": "الحالات الطبية",
+      "medicalNotesTitle": "ملاحظات طبية",
+      "medicalNotesDescription": "اختياري: إصابات أو حالات صحية أو قيود",
+      "medicalNotesPlaceholder": "مثال: إصابة في الركبة، آلام الظهر، سكري، ضغط دم مرتفع...",
       "injuries": "الإصابات الحالية",
       "exerciseHistory": "تاريخ التمارين",
       "basicInfo": "المعلومات الأساسية",
@@ -691,7 +694,14 @@
       "stepUnderReview": "قيد المراجعة",
       "stepUnderReviewDesc": "مدربك يراجع طلبك",
       "stepApprovalNotification": "إشعار الموافقة",
-      "stepApprovalNotificationDesc": "ستتلقى بريدًا إلكترونيًا عند الموافقة على حسابك"
+      "stepApprovalNotificationDesc": "ستتلقى بريدًا إلكترونيًا عند الموافقة على حسابك",
+      "infoLabel": "معلومات",
+      "statuses": {
+        "pending_approval": "قيد الموافقة",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "expired": "منتهي"
+      }
     }
   },
   "units": {

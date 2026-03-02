@@ -104,6 +104,11 @@
     "view": "عرض",
     "coachResponse": "رد المدرب",
     "typeResponse": "اكتب ردك...",
+    "ticketStatuses": {
+      "open": "مفتوحة",
+      "coach_responded": "تم الرد",
+      "closed": "مغلقة"
+    },
     "close": "إغلاق",
     "cancel": "إلغاء",
     "addFaq": "إضافة سؤال",

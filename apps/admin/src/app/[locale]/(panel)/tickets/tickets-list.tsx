@@ -120,7 +120,7 @@ export function TicketsList() {
                   statusStyles[ticket.status] ?? ""
                 }`}
               >
-                {ticket.status.replace("_", " ")}
+                {t(`ticketStatuses.${ticket.status}`)}
               </span>
             </button>
 

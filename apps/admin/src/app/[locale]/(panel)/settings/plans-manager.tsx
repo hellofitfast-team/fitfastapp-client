@@ -332,7 +332,7 @@ export function PlansManager() {
                     className="focus:ring-primary/20 focus:border-primary h-10 w-full rounded-lg border border-stone-200 bg-stone-50 px-3 text-sm text-stone-900 transition-all placeholder:text-stone-400 focus:ring-2 focus:outline-none"
                   />
                   {translatingIds.has(plan.id) && (
-                    <div className="absolute top-1/2 left-3 -translate-y-1/2">
+                    <div className="absolute start-3 top-1/2 -translate-y-1/2">
                       <Loader2 className="h-3.5 w-3.5 animate-spin text-stone-400" />
                     </div>
                   )}

@@ -100,7 +100,7 @@ export default function PendingPage() {
       {/* Info Box */}
       <Card className="bg-primary/5 border-primary/20">
         <CardContent className="p-5">
-          <p className="text-muted-foreground mb-1 text-xs">Info</p>
+          <p className="text-muted-foreground mb-1 text-xs">{t("infoLabel")}</p>
           <p className="text-sm font-medium">{t("message")}</p>
         </CardContent>
       </Card>
@@ -112,7 +112,7 @@ export default function PendingPage() {
             <div>
               <p className="text-muted-foreground mb-1.5 text-xs">{t("currentStatus")}</p>
               <span className="bg-primary/10 text-primary inline-flex items-center rounded-full px-3 py-1 text-sm font-medium">
-                {profile.status.replace("_", " ")}
+                {t(`statuses.${profile.status}`)}
               </span>
             </div>
           </CardContent>

@@ -104,6 +104,11 @@
     "view": "View",
     "coachResponse": "Coach Response",
     "typeResponse": "Type your response...",
+    "ticketStatuses": {
+      "open": "Open",
+      "coach_responded": "Responded",
+      "closed": "Closed"
+    },
     "close": "Close",
     "cancel": "Cancel",
     "addFaq": "Add FAQ",

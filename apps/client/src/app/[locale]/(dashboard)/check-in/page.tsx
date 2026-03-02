@@ -63,6 +63,7 @@ const STEP_ICONS = [Weight, Dumbbell, UtensilsCrossed, Camera, ClipboardCheck];
 
 export default function CheckInPage() {
   const t = useTranslations("checkIn");
+  const tCommon = useTranslations("common");
   const locale = useLocale();
   const isRTL = locale === "ar";
   const router = useRouter();
@@ -313,7 +314,7 @@ export default function CheckInPage() {
       {isLoadingLockStatus ? (
         <div className="border-border bg-card rounded-xl border p-12 text-center">
           <Loader2 className="text-muted-foreground mx-auto mb-4 h-10 w-10 animate-spin" />
-          <p className="text-muted-foreground text-sm font-semibold">Loading...</p>
+          <p className="text-muted-foreground text-sm font-semibold">{tCommon("loading")}</p>
         </div>
       ) : isCheckInLocked && nextCheckInDate ? (
         <CheckInLocked

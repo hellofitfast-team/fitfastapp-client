@@ -338,7 +338,9 @@ async function generateMealPlanHandler(
 
   const { createOpenRouter } = await import("@openrouter/ai-sdk-provider");
   const { generateText } = await import("ai");
-  const openrouter = createOpenRouter({ apiKey: process.env.OPENROUTER_API_KEY });
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) throw new Error("OPENROUTER_API_KEY environment variable is not set");
+  const openrouter = createOpenRouter({ apiKey });
   const isArabic = language === "ar";
 
   const contextBlock = formatContextForPrompt(clientCtx);
@@ -564,7 +566,9 @@ async function generateWorkoutPlanHandler(
 
   const { createOpenRouter } = await import("@openrouter/ai-sdk-provider");
   const { generateText } = await import("ai");
-  const openrouter = createOpenRouter({ apiKey: process.env.OPENROUTER_API_KEY });
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) throw new Error("OPENROUTER_API_KEY environment variable is not set");
+  const openrouter = createOpenRouter({ apiKey });
   const isArabic = language === "ar";
 
   const contextBlock = formatContextForPrompt(clientCtx);
@@ -928,28 +932,34 @@ export const translateToArabic = action({
     const { createOpenRouter } = await import("@openrouter/ai-sdk-provider");
     const { generateText } = await import("ai");
 
-    const openrouter = createOpenRouter({
-      apiKey: process.env.OPENROUTER_API_KEY,
-    });
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey) throw new Error("OPENROUTER_API_KEY environment variable is not set");
 
-    const { text: translated } = await generateText({
-      model: openrouter("google/gemini-2.5-flash-lite"),
-      maxOutputTokens: 100,
-      temperature: 0.3,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a professional Arabic translator for a fitness coaching app. " +
-            "Translate the given English text into natural, modern Arabic as it would be used in fitness/gym marketing in Egypt. " +
-            "Do NOT do literal word-for-word translation. Use the Arabic word or phrase that conveys the same meaning and feeling. " +
-            "For example: 'Starter' → 'مبتدئ', 'Premium' → 'مميز', 'Pro' → 'احترافي', 'Ultimate' → 'شامل'. " +
-            "Return ONLY the Arabic translation, nothing else.",
-        },
-        { role: "user", content: text },
-      ],
-    });
+    const openrouter = createOpenRouter({ apiKey });
 
-    return translated.trim();
+    try {
+      const { text: translated } = await generateText({
+        model: openrouter("google/gemini-2.5-flash-lite"),
+        maxOutputTokens: 100,
+        temperature: 0.3,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a professional Arabic translator for a fitness coaching app. " +
+              "Translate the given English text into natural, modern Arabic as it would be used in fitness/gym marketing in Egypt. " +
+              "Do NOT do literal word-for-word translation. Use the Arabic word or phrase that conveys the same meaning and feeling. " +
+              "For example: 'Starter' → 'مبتدئ', 'Premium' → 'مميز', 'Pro' → 'احترافي', 'Ultimate' → 'شامل'. " +
+              "Return ONLY the Arabic translation, nothing else.",
+          },
+          { role: "user", content: text },
+        ],
+      });
+
+      return translated.trim();
+    } catch (err) {
+      console.error("[AI] Translation failed:", err);
+      throw new Error("Translation failed. Please try again.");
+    }
   },
 });
