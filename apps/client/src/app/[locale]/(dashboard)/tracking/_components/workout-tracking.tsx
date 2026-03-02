@@ -49,8 +49,8 @@ export function WorkoutTracking({
         className="border-border flex w-full items-center justify-between border-b p-4 transition-colors hover:bg-neutral-50"
       >
         <div className="flex items-center gap-3">
-          <div className="bg-fitness-500/12 flex h-9 w-9 items-center justify-center rounded-lg">
-            <Dumbbell className="text-fitness-500 h-4 w-4" />
+          <div className="bg-fitness/12 flex h-9 w-9 items-center justify-center rounded-lg">
+            <Dumbbell className="text-fitness h-4 w-4" />
           </div>
           <div className="text-start">
             <h2 className="text-sm font-semibold">{t("workoutTracking")}</h2>

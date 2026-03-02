@@ -86,7 +86,8 @@
     "invalidFileType": "يرجى رفع صورة (PNG، JPG، WEBP).",
     "paymentInstructions": "أرسل الدفعة إلى",
     "noPaymentMethods": "تواصل معنا للحصول على تفاصيل الدفع.",
-    "invalidPhone": "يرجى إدخال رقم هاتف صالح"
+    "invalidPhone": "يرجى إدخال رقم هاتف صالح",
+    "screenshotRequired": "لقطة شاشة الدفع مطلوبة"
   },
   "confirmation": {
     "title": "تم إرسال طلبك بنجاح!",

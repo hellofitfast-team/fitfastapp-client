@@ -1,8 +1,8 @@
 import { v } from "convex/values";
-import { query, mutation, internalQuery } from "./_generated/server";
+import { query, mutation, internalQuery, internalMutation } from "./_generated/server";
 import { getAuthUserId } from "./auth";
 
-// Internal: used by notifications action to look up a user's push endpoint
+/** Internal: used by notifications action to look up a user's push subscription */
 export const getSubscriptionByUserId = internalQuery({
   args: { userId: v.string() },
   handler: async (ctx, { userId }) => {
@@ -26,26 +26,57 @@ export const getMySubscription = query({
   },
 });
 
+/** Returns the VAPID public key so the client can subscribe to push */
+export const getVapidPublicKey = query({
+  args: {},
+  handler: async (): Promise<string | null> => {
+    return process.env.VAPID_PUBLIC_KEY ?? null;
+  },
+});
+
+/** Internal: returns all active push subscriptions for non-coach clients */
+export const getAllActiveSubscriptions = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    // Fetch subscriptions and profiles in parallel (2 queries instead of N+1)
+    const [subscriptions, profiles] = await Promise.all([
+      ctx.db
+        .query("pushSubscriptions")
+        .filter((q) => q.eq(q.field("isActive"), true))
+        .collect(),
+      ctx.db
+        .query("profiles")
+        .filter((q) => q.and(q.eq(q.field("isCoach"), false), q.eq(q.field("status"), "active")))
+        .collect(),
+    ]);
+
+    const activeClientUserIds = new Set(profiles.map((p) => p.userId));
+    return subscriptions.filter((sub) => activeClientUserIds.has(sub.userId));
+  },
+});
+
 export const saveSubscription = mutation({
   args: {
-    onesignalSubscriptionId: v.string(),
+    endpoint: v.string(),
+    p256dh: v.string(),
+    auth: v.string(),
     deviceType: v.optional(v.string()),
   },
-  handler: async (ctx, { onesignalSubscriptionId, deviceType }) => {
+  handler: async (ctx, { endpoint, p256dh, auth, deviceType }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    // Check if subscription already exists
+    // Check if subscription already exists for this endpoint
     const existing = await ctx.db
       .query("pushSubscriptions")
-      .withIndex("by_subscriptionId", (q) =>
-        q.eq("onesignalSubscriptionId", onesignalSubscriptionId),
-      )
+      .withIndex("by_endpoint", (q) => q.eq("endpoint", endpoint))
       .unique();
 
     if (existing) {
       await ctx.db.patch(existing._id, {
         userId,
+        p256dh,
+        auth,
         isActive: true,
         updatedAt: Date.now(),
       });
@@ -54,7 +85,9 @@ export const saveSubscription = mutation({
 
     return ctx.db.insert("pushSubscriptions", {
       userId,
-      onesignalSubscriptionId,
+      endpoint,
+      p256dh,
+      auth,
       deviceType,
       isActive: true,
       updatedAt: Date.now(),
@@ -62,17 +95,33 @@ export const saveSubscription = mutation({
   },
 });
 
+/** Internal: auto-deactivate an expired subscription (410 Gone from push service) */
+export const deactivateByEndpoint = internalMutation({
+  args: { endpoint: v.string() },
+  handler: async (ctx, { endpoint }) => {
+    const existing = await ctx.db
+      .query("pushSubscriptions")
+      .withIndex("by_endpoint", (q) => q.eq("endpoint", endpoint))
+      .unique();
+
+    if (existing && existing.isActive) {
+      await ctx.db.patch(existing._id, {
+        isActive: false,
+        updatedAt: Date.now(),
+      });
+    }
+  },
+});
+
 export const deactivateSubscription = mutation({
-  args: { onesignalSubscriptionId: v.string() },
-  handler: async (ctx, { onesignalSubscriptionId }) => {
+  args: { endpoint: v.string() },
+  handler: async (ctx, { endpoint }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
     const existing = await ctx.db
       .query("pushSubscriptions")
-      .withIndex("by_subscriptionId", (q) =>
-        q.eq("onesignalSubscriptionId", onesignalSubscriptionId),
-      )
+      .withIndex("by_endpoint", (q) => q.eq("endpoint", endpoint))
       .unique();
 
     if (existing) {

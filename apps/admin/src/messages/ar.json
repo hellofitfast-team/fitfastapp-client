@@ -104,6 +104,11 @@
     "view": "عرض",
     "coachResponse": "رد المدرب",
     "typeResponse": "اكتب ردك...",
+    "ticketStatuses": {
+      "open": "مفتوحة",
+      "coach_responded": "تم الرد",
+      "closed": "مغلقة"
+    },
     "close": "إغلاق",
     "cancel": "إلغاء",
     "addFaq": "إضافة سؤال",
@@ -150,7 +155,26 @@
       "deactivateFailed": "فشل التعطيل",
       "rejected": "تم رفض العميل",
       "rejectFailed": "فشل رفض العميل",
-      "activateFailed": "فشل تفعيل العميل"
+      "activateFailed": "فشل تفعيل العميل",
+      "sendNotification": "إرسال إشعار",
+      "referenceNumber": "الرقم المرجعي",
+      "amount": "المبلغ",
+      "sender": "المرسل",
+      "bank": "البنك",
+      "noPaymentDetails": "لم يتم تقديم تفاصيل الدفع.",
+      "noScreenshot": "لا توجد صورة",
+      "paymentStatus": {
+        "pending": "قيد الانتظار",
+        "approved": "موافق عليه",
+        "rejected": "مرفوض"
+      }
+    },
+    "ocrLabels": {
+      "amount": "المبلغ",
+      "sender_name": "المرسل",
+      "reference_number": "الرقم المرجعي",
+      "date": "التاريخ",
+      "bank": "البنك"
     },
     "tierLabels": {
       "monthly": "شهري",
@@ -256,7 +280,9 @@
     "accountTypeOther": "أخرى",
     "socialLinks": "روابط التواصل الاجتماعي",
     "socialLinksDesc": "أضف روابط التواصل الاجتماعي الخاصة بك. ستظهر فقط المنصات التي تحتوي على رابط في الموقع.",
-    "saveSocialLinks": "حفظ الروابط"
+    "saveSocialLinks": "حفظ الروابط",
+    "pushNotifications": "الإشعارات الفورية",
+    "pushNotificationsDesc": "تفعيل أو تعطيل الإشعارات الفورية المرسلة لجميع العملاء (جاهزية الخطة، التذكيرات، الإرسال اليدوي)."
   },
   "adminNav": {
     "dashboard": "لوحة التحكم",
@@ -265,7 +291,48 @@
     "tickets": "التذاكر",
     "faqs": "الأسئلة الشائعة",
     "knowledge": "قاعدة المعرفة",
-    "settings": "الإعدادات"
+    "settings": "الإعدادات",
+    "notifications": "الإشعارات"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "broadcast": "إرسال جماعي",
+    "broadcastDesc": "إرسال إشعار فوري لجميع العملاء النشطين.",
+    "notificationTitle": "العنوان",
+    "titlePlaceholder": "عنوان الإشعار...",
+    "notificationBody": "الرسالة",
+    "bodyPlaceholder": "نص الإشعار...",
+    "sendToAll": "إرسال للجميع",
+    "sending": "جاري الإرسال...",
+    "sendToClient": "إرسال إشعار",
+    "confirmBroadcast": "إرسال جماعي؟",
+    "confirmBroadcastDesc": "سيتم إرسال إشعار فوري لجميع العملاء النشطين الذين فعّلوا الإشعارات.",
+    "confirmSend": "إرسال",
+    "cancelSend": "إلغاء",
+    "sent": "تم الإرسال",
+    "sentDesc": "تم تسليم الإشعار الفوري.",
+    "broadcastSent": "تم الإرسال الجماعي",
+    "broadcastSentDesc": "تم تسليم {sent}، فشل {failed}",
+    "sendFailed": "فشل الإرسال",
+    "sendFailedDesc": "فشل إرسال الإشعار. قد لا يكون العميل قد فعّل الإشعارات.",
+    "notificationsDisabled": "الإشعارات معطلة حالياً. فعّلها من الإعدادات أولاً.",
+    "history": "السجل",
+    "historyEmpty": "لم يتم إرسال إشعارات بعد.",
+    "date": "التاريخ",
+    "type": "النوع",
+    "typeLabels": {
+      "plan_ready": "خطة جاهزة",
+      "reminder": "تذكير",
+      "broadcast": "إرسال جماعي",
+      "individual": "فردي"
+    },
+    "recipients": "المستلمون",
+    "statusLabel": "الحالة",
+    "statusLabels": {
+      "sent": "مُرسل",
+      "failed": "فشل",
+      "partial": "جزئي"
+    }
   },
   "brand": {
     "name": "فيت فاست",
@@ -328,6 +395,10 @@
     "english": "English",
     "arabic": "العربية",
     "coachAccountError": "هذا حساب مدرب. يرجى استخدام لوحة الإدارة لتسجيل الدخول."
+  },
+  "validation": {
+    "invalidEmail": "يرجى إدخال بريد إلكتروني صالح",
+    "passwordMinLength": "يجب أن تكون كلمة المرور ٦ أحرف على الأقل"
   },
   "routeErrors": {
     "checkIn": {

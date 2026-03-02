@@ -1,8 +1,9 @@
 "use client";
 
+import { useId } from "react";
 import { useTranslations } from "next-intl";
+import { Link, useRouter, usePathname as useI18nPathname } from "@fitfast/i18n/navigation";
 import { usePathname } from "next/navigation";
-import { Link, useRouter } from "@fitfast/i18n/navigation";
 import { useParams } from "next/navigation";
 import {
   Home,
@@ -95,17 +96,19 @@ interface DesktopTopNavProps {
 export function DesktopTopNav({ userName }: DesktopTopNavProps) {
   const t = useTranslations();
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = usePathname(); // next/navigation — includes locale prefix (for active-state matching)
+  const i18nPathname = useI18nPathname(); // next-intl — locale-free (for locale switching)
   const params = useParams();
   const currentLocale = params.locale as string;
   const { signOut } = useAuthActions();
   const { checkInDue, unreadTicketCount } = useNavBadges();
+  const menuId = useId();
 
   const pathWithoutLocale = pathname.replace(/^\/(en|ar)/, "") || "/";
 
   const switchLocale = () => {
     const newLocale = currentLocale === "en" ? "ar" : "en";
-    router.replace(pathname, { locale: newLocale });
+    router.replace(i18nPathname, { locale: newLocale });
   };
 
   const handleLogout = async () => {
@@ -169,6 +172,7 @@ export function DesktopTopNav({ userName }: DesktopTopNavProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
+              id={`desktop-user-menu-${menuId}`}
               className="text-muted-foreground hover:text-foreground flex h-11 items-center gap-2 rounded-lg px-3 transition-colors hover:bg-neutral-100"
               aria-label="User menu"
             >

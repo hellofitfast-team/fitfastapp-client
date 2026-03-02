@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@fitfast/ui/cn";
+import { toLocalDigits } from "@/lib/utils";
 
 interface DaySelectorProps {
   totalDays: number;
@@ -27,6 +28,7 @@ export function DaySelector({
   featureColor = "nutrition",
 }: DaySelectorProps) {
   const locale = useLocale();
+  const t = useTranslations("meals");
   const activeRef = useRef<HTMLButtonElement>(null);
 
   // Auto-scroll selected day into view on mount
@@ -39,7 +41,7 @@ export function DaySelector({
     try {
       const date = new Date(planStartDate);
       date.setDate(date.getDate() + dayIndex);
-      return date.toLocaleDateString(locale === "ar" ? "ar-u-nu-latn" : "en-US", {
+      return date.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
         weekday: "short",
       });
     } catch {
@@ -68,7 +70,7 @@ export function DaySelector({
                   : "text-muted-foreground bg-neutral-100 hover:bg-neutral-200",
             )}
           >
-            <div>Day {i + 1}</div>
+            <div>{t("dayLabel", { n: toLocalDigits(i + 1, locale) })}</div>
             {weekday && <div className="mt-0.5 text-[10px] opacity-80">{weekday}</div>}
           </button>
         );

@@ -371,6 +371,37 @@ export const insertAuthUser = internalMutation({
   },
 });
 
+/** Shared helper: delete all docs in a table matching userId via index. */
+async function deleteByUserIdIndex(
+  ctx: { db: any },
+  userId: string,
+  table: string,
+  indexName: string,
+): Promise<number> {
+  const docs = await ctx.db
+    .query(table)
+    .withIndex(indexName, (q: any) => q.eq("userId", userId))
+    .collect();
+  for (const doc of docs) {
+    await ctx.db.delete(doc._id);
+  }
+  return docs.length;
+}
+
+/** Common table list for cascade-deleting all user data by indexed tables. */
+const USER_DATA_TABLES = [
+  ["dailyReflections", "by_userId_date"],
+  ["mealCompletions", "by_userId_date"],
+  ["workoutCompletions", "by_userId_date"],
+  ["mealPlans", "by_userId"],
+  ["workoutPlans", "by_userId"],
+  ["checkIns", "by_userId"],
+  ["initialAssessments", "by_userId"],
+  ["assessmentHistory", "by_userId"],
+  ["tickets", "by_userId"],
+  ["pushSubscriptions", "by_userId"],
+] as const;
+
 /** Full cascade-delete a user by email: auth tables + profile + all data. */
 export const deleteUserByEmail = internalMutation({
   args: { email: v.string() },
@@ -393,26 +424,9 @@ export const deleteUserByEmail = internalMutation({
       .first();
 
     // Delete all user data (same tables as dataRetention)
-    async function deleteByIndex(table: string, indexName: string) {
-      const docs = await (ctx.db as any)
-        .query(table)
-        .withIndex(indexName, (q: any) => q.eq("userId", userId))
-        .collect();
-      for (const doc of docs) {
-        await ctx.db.delete(doc._id);
-      }
+    for (const [table, index] of USER_DATA_TABLES) {
+      await deleteByUserIdIndex(ctx, userId, table, index);
     }
-
-    await deleteByIndex("dailyReflections", "by_userId_date");
-    await deleteByIndex("mealCompletions", "by_userId_date");
-    await deleteByIndex("workoutCompletions", "by_userId_date");
-    await deleteByIndex("mealPlans", "by_userId");
-    await deleteByIndex("workoutPlans", "by_userId");
-    await deleteByIndex("checkIns", "by_userId");
-    await deleteByIndex("initialAssessments", "by_userId");
-    await deleteByIndex("assessmentHistory", "by_userId");
-    await deleteByIndex("tickets", "by_userId");
-    await deleteByIndex("pushSubscriptions", "by_userId");
 
     // Delete file metadata + storage
     const fileMeta = await ctx.db
@@ -450,6 +464,80 @@ export const deleteUserByEmail = internalMutation({
   },
 });
 
+/** Light delete: remove user + authAccount + profile without scanning sessions (avoids 32K limit). */
+export const deleteUserLight = internalMutation({
+  args: { email: v.string() },
+  handler: async (ctx, { email }) => {
+    const authAccount = await ctx.db
+      .query("authAccounts")
+      .filter((q) =>
+        q.and(q.eq(q.field("provider"), "password"), q.eq(q.field("providerAccountId"), email)),
+      )
+      .first();
+    if (!authAccount) return `No user found with email ${email}`;
+
+    const userId = authAccount.userId;
+
+    // Delete profile
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q: any) => q.eq("userId", userId))
+      .first();
+    if (profile) await ctx.db.delete(profile._id);
+
+    // Delete indexed user data only (skip session table scans)
+    for (const [table, index] of USER_DATA_TABLES) {
+      await deleteByUserIdIndex(ctx, userId, table, index);
+    }
+
+    // Delete auth account + user record
+    await ctx.db.delete(authAccount._id);
+    await ctx.db.delete(userId);
+
+    return `Deleted user ${email} (light mode — sessions will expire)`;
+  },
+});
+
+/** List all user emails in the system. Used by seedFreshUsers to wipe everything. */
+export const listAllUserEmails = internalQuery({
+  args: {},
+  handler: async (ctx): Promise<string[]> => {
+    const accounts = await ctx.db
+      .query("authAccounts")
+      .filter((q) => q.eq(q.field("provider"), "password"))
+      .collect();
+    return accounts.map((a) => a.providerAccountId);
+  },
+});
+
+/** Update a profile's status and optionally clear plan dates (for onboarding flow). */
+export const setProfileStatus = internalMutation({
+  args: {
+    userId: v.string(),
+    status: v.string(),
+    clearPlanDates: v.optional(v.boolean()),
+  },
+  handler: async (ctx, { userId, status, clearPlanDates }) => {
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!profile) throw new Error(`No profile found for userId: ${userId}`);
+
+    const patch: Record<string, unknown> = {
+      status,
+      updatedAt: Date.now(),
+    };
+    if (clearPlanDates) {
+      patch.planStartDate = undefined;
+      patch.planEndDate = undefined;
+      patch.planTier = undefined;
+    }
+    await ctx.db.patch(profile._id, patch);
+    return `Profile ${userId} updated to status=${status}`;
+  },
+});
+
 /** Check if a knowledge entry with the given title already exists. Used by seedKnowledgeBase. */
 export const checkKnowledgeExists = internalQuery({
   args: { title: v.string() },
@@ -478,6 +566,61 @@ export const fixConfigTypes = internalMutation({
 });
 
 /**
+ * Unlock check-in for E2E tests by deleting only check-ins and plans.
+ * Also ensures an initial assessment exists so the user stays on dashboard.
+ *
+ * Run: npx convex run seed:unlockCheckIn '{"email":"client@fitfast.app"}'
+ */
+export const unlockCheckIn = internalMutation({
+  args: { email: v.string() },
+  handler: async (ctx, { email }) => {
+    const authAccount = await ctx.db
+      .query("authAccounts")
+      .filter((q) =>
+        q.and(q.eq(q.field("provider"), "password"), q.eq(q.field("providerAccountId"), email)),
+      )
+      .first();
+    if (!authAccount) return `No user found with email ${email}`;
+
+    const userId = authAccount.userId;
+
+    const deleted: string[] = [];
+    const checkIns = await deleteByUserIdIndex(ctx, userId, "checkIns", "by_userId");
+    if (checkIns) deleted.push(`checkIns: ${checkIns}`);
+    const mealPlans = await deleteByUserIdIndex(ctx, userId, "mealPlans", "by_userId");
+    if (mealPlans) deleted.push(`mealPlans: ${mealPlans}`);
+    const workoutPlans = await deleteByUserIdIndex(ctx, userId, "workoutPlans", "by_userId");
+    if (workoutPlans) deleted.push(`workoutPlans: ${workoutPlans}`);
+
+    // Ensure an initial assessment exists so client stays on dashboard
+    const existingAssessment = await ctx.db
+      .query("initialAssessments")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .first();
+    if (!existingAssessment) {
+      await ctx.db.insert("initialAssessments", {
+        userId,
+        goals: "weight_loss",
+        currentWeight: 80,
+        height: 175,
+        age: 28,
+        gender: "male",
+        activityLevel: "moderately_active",
+        experienceLevel: "intermediate",
+        scheduleAvailability: {
+          days: ["mon", "wed", "fri"],
+          sessionDuration: 60,
+          preferredTime: "morning",
+        },
+      });
+      deleted.push("created assessment");
+    }
+
+    return `Unlocked check-in for ${email} — ${deleted.join(", ") || "nothing to change"}`;
+  },
+});
+
+/**
  * Reset a client's data (plans, assessment, check-ins, completions, tickets)
  * but keep the auth account + profile intact so they can log in and get
  * redirected back to onboarding (initial-assessment).
@@ -498,28 +641,10 @@ export const resetClientData = internalMutation({
 
     const userId = authAccount.userId;
 
-    // Helper: delete all docs in a table matching userId via index
-    async function deleteByIndex(table: string, indexName: string) {
-      const docs = await (ctx.db as any)
-        .query(table)
-        .withIndex(indexName, (q: any) => q.eq("userId", userId))
-        .collect();
-      for (const doc of docs) {
-        await ctx.db.delete(doc._id);
-      }
-      return docs.length;
-    }
-
     const counts: Record<string, number> = {};
-    counts.mealPlans = await deleteByIndex("mealPlans", "by_userId");
-    counts.workoutPlans = await deleteByIndex("workoutPlans", "by_userId");
-    counts.checkIns = await deleteByIndex("checkIns", "by_userId");
-    counts.initialAssessments = await deleteByIndex("initialAssessments", "by_userId");
-    counts.assessmentHistory = await deleteByIndex("assessmentHistory", "by_userId");
-    counts.mealCompletions = await deleteByIndex("mealCompletions", "by_userId_date");
-    counts.workoutCompletions = await deleteByIndex("workoutCompletions", "by_userId_date");
-    counts.dailyReflections = await deleteByIndex("dailyReflections", "by_userId_date");
-    counts.tickets = await deleteByIndex("tickets", "by_userId");
+    for (const [table, index] of USER_DATA_TABLES) {
+      counts[table] = await deleteByUserIdIndex(ctx, userId, table, index);
+    }
 
     // Delete file metadata + storage (progress photos, ticket screenshots)
     const fileMeta = await ctx.db

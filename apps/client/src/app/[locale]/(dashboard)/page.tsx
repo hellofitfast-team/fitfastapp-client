@@ -367,7 +367,7 @@ export default function DashboardPage() {
             {t("dashboard.estDuration", { duration: todaysWorkout.duration })}
           </p>
           {todaysWorkout.done && (
-            <span className="bg-fitness-500/10 text-fitness-500 inline-block rounded-full px-2 py-0.5 text-[10px] font-medium">
+            <span className="bg-fitness/10 text-fitness inline-block rounded-full px-2 py-0.5 text-[10px] font-medium">
               {t("dashboard.completedToday")}
             </span>
           )}
@@ -395,7 +395,7 @@ export default function DashboardPage() {
             dir={locale === "ar" ? "rtl" : "ltr"}
           >
             <div
-              className="bg-routine-500 h-full rounded-full transition-all"
+              className="bg-routine h-full rounded-full transition-all"
               style={{ width: `${(planCurrentDay / planTotalDays) * 100}%` }}
             />
           </div>
@@ -432,6 +432,7 @@ export default function DashboardPage() {
           <button
             onClick={() => setBannerDismissed(true)}
             className="text-muted-foreground hover:text-foreground shrink-0 p-1"
+            aria-label="Dismiss"
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -507,6 +508,7 @@ export default function DashboardPage() {
                 scrollToIndex(i);
                 setActiveCardIndex(i);
               }}
+              aria-label={`Go to card ${i + 1}`}
               className={cn(
                 "h-1.5 rounded-full transition-all duration-300",
                 activeCardIndex === i ? "bg-primary w-4" : "w-1.5 bg-neutral-300",

@@ -10,6 +10,7 @@ import { PlansManager } from "./plans-manager";
 import { PaymentMethodsManager } from "./payment-methods-manager";
 import { SocialLinksManager } from "./social-links-manager";
 import { SaveButton } from "./save-button";
+import { NotificationToggle } from "./notification-toggle";
 
 export function AdminSettingsForm() {
   const t = useTranslations("admin");
@@ -79,6 +80,9 @@ export function AdminSettingsForm() {
             <span className="text-sm text-stone-500">{t("daysBetweenCheckIns")}</span>
           </div>
         </div>
+
+        {/* Notification toggle */}
+        <NotificationToggle />
 
         {/* Save general settings */}
         <div className="flex justify-end">

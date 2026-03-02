@@ -155,13 +155,13 @@
     "startWorkout": "بدء التمرين",
     "logMeal": "تسجيل الوجبة",
     "motivational": {
-      "0": "واصل الجهد، {name}!",
-      "1": "أنت في المسار الصحيح، {name}!",
-      "2": "الاستمرارية هي المفتاح، {name}!",
-      "3": "كل تمرين مهم، {name}!",
-      "4": "أنت قادر على ذلك، {name}!",
-      "5": "مجهود رائع، {name}!",
-      "6": "يوم بيوم، {name}!"
+      "0": "يالله يا {name}، كمّل!",
+      "1": "ماشي صح يا {name}!",
+      "2": "الاستمرارية هي المفتاح يا {name}!",
+      "3": "كل تمرين بيفرق يا {name}!",
+      "4": "قدها وقدود يا {name}!",
+      "5": "مجهود رائع يا {name}!",
+      "6": "يوم بيوم يا {name}!"
     },
     "coachMessageBanner": "ردّ المدرب على تذكرتك",
     "viewTicket": "عرض",
@@ -206,7 +206,8 @@
     "coachNotes": "ملاحظات المدرب",
     "kcal": "سعرة",
     "aiGenerating": "الذكاء الاصطناعي يُعد خطة وجباتك...",
-    "calorieExplanation": "هدفك اليومي {calories} سعرة ({protein} جرام بروتين) بناءً على بياناتك و{trainingDays} أيام تمرين/أسبوع."
+    "calorieExplanation": "الذكاء الاصطناعي بيستهدف حوالي {calories} سعرة/يوم ({protein} جرام بروتين) بناءً على بياناتك و{trainingDays} أيام تمرين/أسبوع. الوجبات الفعلية ممكن تختلف بسيط.",
+    "dayLabel": "يوم {n}"
   },
   "workouts": {
     "title": "خطة التمارين",
@@ -624,14 +625,41 @@
         "other": "أخرى"
       },
       "medicalConditions": "الحالات الطبية",
+      "medicalNotesTitle": "ملاحظات طبية",
+      "medicalNotesDescription": "اختياري: إصابات أو حالات صحية أو قيود",
+      "medicalNotesPlaceholder": "مثال: إصابة في الركبة، آلام الظهر، سكري، ضغط دم مرتفع...",
       "injuries": "الإصابات الحالية",
       "exerciseHistory": "تاريخ التمارين",
+      "basicInfo": "المعلومات الأساسية",
+      "currentWeightLabel": "الوزن الحالي",
+      "heightLabel": "الطول",
+      "ageLabel": "العمر",
+      "genderLabel": "الجنس",
+      "genders": {
+        "male": "ذكر",
+        "female": "أنثى"
+      },
       "experienceLevel": "مستوى الخبرة",
       "levels": {
         "beginner": "مبتدئ",
+        "beginner_desc": "جديد على التمارين",
         "intermediate": "متوسط",
-        "advanced": "متقدم"
+        "intermediate_desc": "سنة - سنتين",
+        "advanced": "متقدم",
+        "advanced_desc": "+٣ سنوات"
       },
+      "equipmentTitle": "المعدات المتاحة",
+      "equipmentOptions": {
+        "full_gym": "جيم كامل",
+        "home_basic": "منزلي (أساسي: دامبلز، مات)",
+        "home_advanced": "منزلي (متقدم: بنش، بار)",
+        "bodyweight": "وزن الجسم فقط",
+        "resistance_bands": "أحبال مقاومة",
+        "other": "أخرى"
+      },
+      "equipmentOtherPlaceholder": "اوصف المعدات المتاحة...",
+      "otherOption": "أخرى",
+      "specifyPlaceholder": "حدد من فضلك...",
       "steps": {
         "goals": "الأهداف",
         "bodyInfo": "معلومات الجسم",
@@ -666,7 +694,14 @@
       "stepUnderReview": "قيد المراجعة",
       "stepUnderReviewDesc": "مدربك يراجع طلبك",
       "stepApprovalNotification": "إشعار الموافقة",
-      "stepApprovalNotificationDesc": "ستتلقى بريدًا إلكترونيًا عند الموافقة على حسابك"
+      "stepApprovalNotificationDesc": "ستتلقى بريدًا إلكترونيًا عند الموافقة على حسابك",
+      "infoLabel": "معلومات",
+      "statuses": {
+        "pending_approval": "قيد الموافقة",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "expired": "منتهي"
+      }
     }
   },
   "units": {
@@ -767,6 +802,13 @@
       "perQuarter": "/ربع سنة",
       "popular": "الأكثر شيوعاً"
     }
+  },
+  "validation": {
+    "nameMinLength": "يجب أن يكون الاسم حرفين على الأقل",
+    "nameMaxLength": "يجب أن يكون الاسم أقل من ١٠٠ حرف",
+    "invalidPhone": "صيغة رقم الهاتف غير صحيحة",
+    "invalidEmail": "يرجى إدخال بريد إلكتروني صالح",
+    "passwordMinLength": "يجب أن تكون كلمة المرور ٦ أحرف على الأقل"
   },
   "routeErrors": {
     "checkIn": {

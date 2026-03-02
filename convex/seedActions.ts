@@ -11,6 +11,7 @@
  * ============================================================================
  */
 
+import { v } from "convex/values";
 import { internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { Scrypt } from "lucia";
@@ -658,6 +659,44 @@ export const seedTestUsers = internalAction({
   },
 });
 
+/**
+ * Bulk-create N test users for k6 load testing.
+ * Creates loaduser-001@test.com through loaduser-NNN@test.com with pre-hashed passwords.
+ *
+ * Run: npx convex run seedActions:createLoadTestUsers '{"count": 100}'
+ */
+export const createLoadTestUsers = internalAction({
+  args: { count: v.optional(v.number()) },
+  handler: async (ctx, { count }) => {
+    assertNotProduction();
+    const numUsers = count ?? 50;
+    const password = "loadtest12345";
+    const results: string[] = [];
+
+    for (let i = 1; i <= numUsers; i++) {
+      const padded = String(i).padStart(3, "0");
+      const email = `loaduser-${padded}@test.com`;
+
+      try {
+        const hashedPassword = await hashPassword(password);
+        const result = await ctx.runMutation(internal.seed.insertAuthUser, {
+          email,
+          hashedPassword,
+          fullName: `Load Test User ${padded}`,
+          isCoach: false,
+        });
+        results.push(result);
+      } catch (error) {
+        results.push(
+          `ERROR creating ${email}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+
+    return `Created ${results.filter((r) => r.startsWith("Created")).length}/${numUsers} load test users.\n${results.join("\n")}`;
+  },
+});
+
 // ============================================================================
 // Food database seeding (previously seedFoodDatabase.ts)
 // ============================================================================
@@ -1108,5 +1147,119 @@ export const seedFoods = internalAction({
       count++;
     }
     console.log(`[Seed] Inserted ${count} foods into foodDatabase.`);
+  },
+});
+
+// ============================================================================
+// Fresh users seed — wipe all and create 1 admin + 3 clients
+// ============================================================================
+
+/**
+ * Delete ALL users and create a fresh set:
+ *   1. coach@fitfast.app — Admin/Coach
+ *   2. new@fitfast.app — Brand new client (no assessment → goes to onboarding)
+ *   3. expiring@fitfast.app — Active client with 3 days left on subscription
+ *   4. done@fitfast.app — Client whose subscription has expired
+ *
+ * Run: npx convex run seedActions:seedFreshUsers
+ */
+export const seedFreshUsers = internalAction({
+  args: {},
+  handler: async (ctx) => {
+    assertNotProduction();
+    const seedPassword = process.env.SEED_USER_PASSWORD;
+    if (!seedPassword) throw new Error("SEED_USER_PASSWORD env var is required");
+
+    const results: string[] = [];
+
+    // ── Step 1: Delete ALL existing users ──
+    const allEmails = await ctx.runQuery(internal.seed.listAllUserEmails);
+    results.push(`Found ${allEmails.length} existing users to delete.`);
+
+    for (const email of allEmails) {
+      try {
+        const r = await ctx.runMutation(internal.seed.deleteUserByEmail, { email });
+        results.push(r);
+      } catch (error) {
+        results.push(`Delete ${email}: ${error}`);
+      }
+    }
+
+    // ── Step 2: Create all 4 users ──
+    const hashedPassword = await hashPassword(seedPassword);
+
+    const users = [
+      { email: "coach@fitfast.app", fullName: "Coach Ahmed", isCoach: true },
+      { email: "new@fitfast.app", fullName: "Sara New", isCoach: false },
+      { email: "expiring@fitfast.app", fullName: "Omar Expiring", isCoach: false },
+      { email: "done@fitfast.app", fullName: "Layla Done", isCoach: false },
+    ];
+
+    for (const user of users) {
+      try {
+        const r = await ctx.runMutation(internal.seed.insertAuthUser, {
+          email: user.email,
+          hashedPassword,
+          fullName: user.fullName,
+          isCoach: user.isCoach,
+        });
+        results.push(r);
+      } catch (error) {
+        results.push(`Create ${user.email}: ERROR ${error}`);
+      }
+    }
+
+    // ── Step 3: Configure each client's state ──
+
+    // Client A (new@fitfast.app) — NO assessment, status stays "active" from insertAuthUser
+    // They'll be redirected to onboarding/assessment automatically.
+    // Just update their profile to "pending_approval" so they go through the full flow.
+    try {
+      const newAccount = await ctx.runQuery(internal.seed.findAuthAccountByEmail, {
+        email: "new@fitfast.app",
+      });
+      if (newAccount) {
+        await ctx.runMutation(internal.seed.setProfileStatus, {
+          userId: newAccount.userId,
+          status: "active",
+          clearPlanDates: true,
+        });
+        results.push("new@fitfast.app: set to active, no assessment (will onboard)");
+      }
+    } catch (error) {
+      results.push(`Configure new@fitfast.app: ERROR ${error}`);
+    }
+
+    // Client B (expiring@fitfast.app) — 3 days left, full demo data
+    try {
+      const expiringAccount = await ctx.runQuery(internal.seed.findAuthAccountByEmail, {
+        email: "expiring@fitfast.app",
+      });
+      if (expiringAccount) {
+        const r = await ctx.runMutation(internal.seed.populateNearExpiryUser, {
+          userId: expiringAccount.userId,
+        });
+        results.push(r);
+      }
+    } catch (error) {
+      results.push(`Configure expiring@fitfast.app: ERROR ${error}`);
+    }
+
+    // Client C (done@fitfast.app) — subscription expired
+    try {
+      const doneAccount = await ctx.runQuery(internal.seed.findAuthAccountByEmail, {
+        email: "done@fitfast.app",
+      });
+      if (doneAccount) {
+        const r = await ctx.runMutation(internal.seed.populateExpiredUser, {
+          userId: doneAccount.userId,
+        });
+        results.push(r);
+      }
+    } catch (error) {
+      results.push(`Configure done@fitfast.app: ERROR ${error}`);
+    }
+
+    return results.join("\n");
   },
 });

@@ -77,7 +77,9 @@ ARABIC LANGUAGE REQUIREMENTS:
 - Instructions MUST be in Arabic
 - Notes MUST be in Arabic
 - Focus on Egyptian/Middle Eastern cuisine and locally available ingredients
-- Use Arabic numerals or spelled-out Arabic numbers`
+- Use Arabic numerals or spelled-out Arabic numbers
+- The "notes" field MUST be written in Arabic — never include English sentences like "Remember to stay hydrated"
+- Double-check every single field value is in Arabic before outputting`
     : ""
 }`;
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { useTranslations } from "next-intl";
 import { Bell, User, LogOut, Settings } from "lucide-react";
 import {
@@ -50,6 +51,7 @@ export function MobileHeader({ userName }: MobileHeaderProps) {
   const titleKey = PAGE_TITLES[pathWithoutLocale] || "nav.dashboard";
 
   const { signOut } = useAuthActions();
+  const menuId = useId();
 
   const switchLocale = () => {
     const newLocale = currentLocale === "en" ? "ar" : "en";
@@ -72,7 +74,7 @@ export function MobileHeader({ userName }: MobileHeaderProps) {
             </div>
             <div>
               <p className="text-sm font-bold">{userName.split(" ")[0]}</p>
-              <p className="text-muted-foreground text-xs">
+              <p className="text-muted-foreground text-xs" suppressHydrationWarning>
                 {new Date().toLocaleDateString(currentLocale === "ar" ? "ar-EG" : "en-US", {
                   weekday: "short",
                   month: "short",
@@ -111,6 +113,7 @@ export function MobileHeader({ userName }: MobileHeaderProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
+                id={`mobile-user-menu-${menuId}`}
                 className="text-muted-foreground hover:text-foreground flex h-11 w-11 items-center justify-center rounded-lg transition-colors hover:bg-neutral-100"
                 aria-label="User menu"
               >

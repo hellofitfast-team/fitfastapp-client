@@ -100,7 +100,9 @@ export const checkInAndGeneratePlans = workflow.define({
     ]);
 
     // Steps 4 & 5: Poll workpool until both finish
-    // The workflow's built-in step retry handles the polling loop
+    // The workflow's built-in step retry handles the polling loop.
+    // Workpool states: "pending" | "running" | "finished".
+    // If a job errors, the workpool action itself throws, so we only poll for "finished".
     let mealStatus = await step.runQuery(internal.workpoolManager.getWorkStatus, {
       workId: mealWorkId,
     });
@@ -120,8 +122,8 @@ export const checkInAndGeneratePlans = workflow.define({
     }
 
     // Extract plan IDs from workpool results
-    const mealPlanId = (mealStatus as any)?.result as unknown as Id<"mealPlans">;
-    const workoutPlanId = (workoutStatus as any)?.result as unknown as Id<"workoutPlans">;
+    const mealPlanId = (mealStatus as Record<string, unknown>)?.result as Id<"mealPlans">;
+    const workoutPlanId = (workoutStatus as Record<string, unknown>)?.result as Id<"workoutPlans">;
 
     if (!mealPlanId || !workoutPlanId) {
       throw new Error("AI plan generation failed in workpool");

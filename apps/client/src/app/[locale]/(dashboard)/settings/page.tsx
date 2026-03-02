@@ -65,7 +65,6 @@ export default function SettingsPage() {
     permission,
     toggleSubscription,
     loading: notifLoading,
-    error: notifError,
   } = useNotifications();
   const updateProfile = useMutation(api.profiles.updateProfile);
 
@@ -143,14 +142,11 @@ export default function SettingsPage() {
     const daysPassed = totalDays - daysRemaining;
     const progressPercentage =
       totalDays > 0 ? Math.min(100, Math.max(0, (daysPassed / totalDays) * 100)) : 0;
-    const formattedEndDate = endDate.toLocaleDateString(
-      locale === "ar" ? "ar-u-nu-latn" : "en-US",
-      {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      },
-    );
+    const formattedEndDate = endDate.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
     return { daysRemaining, progressPercentage, formattedEndDate };
   };
 
@@ -243,7 +239,7 @@ export default function SettingsPage() {
         animationDelay="50ms"
       >
         <div className="space-y-5 p-4">
-          {notifError ? (
+          {!isSupported ? (
             <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
               <div className="flex items-start gap-2.5">
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
@@ -345,7 +341,7 @@ export default function SettingsPage() {
                 <span className="text-sm font-semibold">
                   {profile.planStartDate
                     ? new Date(profile.planStartDate).toLocaleDateString(
-                        locale === "ar" ? "ar-u-nu-latn" : "en-US",
+                        locale === "ar" ? "ar-EG" : "en-US",
                         { month: "long", day: "numeric", year: "numeric" },
                       )
                     : "—"}
@@ -361,7 +357,7 @@ export default function SettingsPage() {
                   className={cn(
                     "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
                     profile.status === "active"
-                      ? "bg-nutrition-500/10 text-nutrition-500"
+                      ? "bg-nutrition/10 text-nutrition"
                       : profile.status === "expired"
                         ? "bg-error-500/10 text-error-500"
                         : "bg-amber-500/10 text-amber-600",

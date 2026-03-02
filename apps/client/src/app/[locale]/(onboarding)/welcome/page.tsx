@@ -21,15 +21,15 @@ function WelcomeContent() {
       icon: UtensilsCrossed,
       title: t("features.mealPlans"),
       description: t("features.mealPlansDesc"),
-      color: "text-nutrition-500",
-      bg: "bg-nutrition-500/12",
+      color: "text-nutrition",
+      bg: "bg-nutrition/12",
     },
     {
       icon: Dumbbell,
       title: t("features.workoutPlans"),
       description: t("features.workoutPlansDesc"),
-      color: "text-fitness-500",
-      bg: "bg-fitness-500/12",
+      color: "text-fitness",
+      bg: "bg-fitness/12",
     },
     {
       icon: TrendingUp,
@@ -42,8 +42,8 @@ function WelcomeContent() {
       icon: MessageSquare,
       title: t("features.coachSupport"),
       description: t("features.coachSupportDesc"),
-      color: "text-routine-500",
-      bg: "bg-routine-500/12",
+      color: "text-routine",
+      bg: "bg-routine/12",
     },
   ];
 

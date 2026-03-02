@@ -2,10 +2,12 @@ import { z } from "zod";
 
 /**
  * Schema for subscribing to push notifications.
- * Used by /api/notifications/subscribe route.
+ * Uses standard Web Push subscription fields.
  */
 export const SubscriptionSchema = z.object({
-  onesignal_subscription_id: z.string().min(1, "Subscription ID is required"),
+  endpoint: z.string().url("Valid push endpoint URL is required"),
+  p256dh: z.string().min(1, "p256dh key is required"),
+  auth: z.string().min(1, "auth key is required"),
   device_type: z.string().optional().default("web"),
 });
 
@@ -13,10 +15,9 @@ export type SubscriptionInput = z.infer<typeof SubscriptionSchema>;
 
 /**
  * Schema for unsubscribing from push notifications.
- * Used by /api/notifications/unsubscribe route.
  */
 export const UnsubscribeSchema = z.object({
-  onesignal_subscription_id: z.string().min(1, "Subscription ID is required"),
+  endpoint: z.string().url("Valid push endpoint URL is required"),
 });
 
 export type UnsubscribeInput = z.infer<typeof UnsubscribeSchema>;

@@ -64,7 +64,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             rel="stylesheet"
           />
         </head>
-        <body className="bg-background text-foreground min-h-dvh antialiased">{children}</body>
+        <body className="bg-background text-foreground min-h-dvh overflow-x-hidden antialiased">
+          {children}
+        </body>
       </html>
     </ConvexAuthNextjsServerProvider>
   );

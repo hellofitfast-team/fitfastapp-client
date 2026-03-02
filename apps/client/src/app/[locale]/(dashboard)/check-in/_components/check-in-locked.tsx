@@ -2,6 +2,7 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { Lock, Calendar } from "lucide-react";
+import { toLocalDigits } from "@/lib/utils";
 
 interface CheckInLockedProps {
   nextCheckInDate: Date;
@@ -35,10 +36,10 @@ export function CheckInLocked({
           {t("nextCheckInAvailable", { default: "Next Check-In Available" })}
         </h3>
         <p className="text-primary mt-3 text-4xl font-bold">
-          {daysUntilNextCheckIn} {t("days", { default: "days" })}
+          {toLocalDigits(daysUntilNextCheckIn, locale)} {t("days", { default: "days" })}
         </p>
         <p className="text-muted-foreground mt-3 text-sm">
-          {nextCheckInDate.toLocaleDateString(locale === "ar" ? "ar-u-nu-latn" : "en-US", {
+          {nextCheckInDate.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
             weekday: "long",
             year: "numeric",
             month: "long",

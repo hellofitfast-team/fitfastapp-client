@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
+import { toLocalDigits } from "@/lib/utils";
 import { useCurrentWorkoutPlan } from "@/hooks/use-workout-plans";
 import {
   Dumbbell,
@@ -195,6 +196,7 @@ export default function WorkoutPlanPage() {
   const t = useTranslations("workouts");
   const tCommon = useTranslations("common");
   const tEmpty = useTranslations("emptyStates");
+  const tUnits = useTranslations("units");
   const locale = useLocale();
   const { workoutPlan, isLoading, error } = useCurrentWorkoutPlan();
   const assessment = useQuery(api.assessments.getMyAssessment);
@@ -301,10 +303,10 @@ export default function WorkoutPlanPage() {
           <h1 className="text-2xl font-bold">{t("title")}</h1>
           <p className="text-muted-foreground mt-0.5 text-sm">{t("generating")}</p>
         </div>
-        <div className="border-fitness-500/30 bg-fitness-500/5 rounded-xl border p-5">
+        <div className="border-fitness/30 bg-fitness/5 rounded-xl border p-5">
           <div className="mb-3 flex items-center gap-2">
-            <Sparkles className="text-fitness-500 h-4 w-4 animate-pulse" />
-            <span className="text-fitness-500 text-sm font-semibold">{t("aiGenerating")}</span>
+            <Sparkles className="text-fitness h-4 w-4 animate-pulse" />
+            <span className="text-fitness text-sm font-semibold">{t("aiGenerating")}</span>
           </div>
           <pre className="text-muted-foreground max-h-96 overflow-y-auto font-sans text-sm leading-relaxed whitespace-pre-wrap">
             {streamedText}
@@ -362,10 +364,10 @@ export default function WorkoutPlanPage() {
 
       {/* Training Split Overview Card */}
       {planData.splitName && (
-        <div className="border-fitness-500/20 from-fitness-500/5 to-fitness-500/10 rounded-xl border bg-gradient-to-r p-4">
+        <div className="border-fitness/20 from-fitness/5 to-fitness/10 rounded-xl border bg-gradient-to-r p-4">
           <div className="mb-1.5 flex items-center gap-2">
-            <Target className="text-fitness-500 h-4 w-4" />
-            <span className="text-fitness-500 text-sm font-bold">{t("trainingSplit")}</span>
+            <Target className="text-fitness h-4 w-4" />
+            <span className="text-fitness text-sm font-bold">{t("trainingSplit")}</span>
           </div>
           <h3 className="text-lg font-bold">{planData.splitName}</h3>
           {planData.splitDescription && (
@@ -415,12 +417,16 @@ export default function WorkoutPlanPage() {
                   </div>
                   <div className="bg-border h-8 w-px" />
                   <div className="flex-1 text-center">
-                    <p className="text-lg font-bold">{dayPlan.exercises?.length || 0}</p>
+                    <p className="text-lg font-bold">
+                      {toLocalDigits(dayPlan.exercises?.length || 0, locale)}
+                    </p>
                     <p className="text-muted-foreground text-[10px]">{t("exercises")}</p>
                   </div>
                   <div className="bg-border h-8 w-px" />
                   <div className="flex-1 text-center">
-                    <p className="text-lg font-bold">{dayPlan.duration || "-"}</p>
+                    <p className="text-lg font-bold">
+                      {dayPlan.duration ? toLocalDigits(dayPlan.duration, locale) : "-"}
+                    </p>
                     <p className="text-muted-foreground text-[10px]">{t("duration")}</p>
                   </div>
                 </div>
@@ -431,8 +437,8 @@ export default function WorkoutPlanPage() {
                 Array.isArray(dayPlan.warmup.exercises) &&
                 dayPlan.warmup.exercises.length > 0 && (
                   <div className="border-border bg-card shadow-card animate-slide-up overflow-hidden rounded-xl border">
-                    <div className="border-border bg-fitness-500/8 flex items-center gap-2 border-b p-4">
-                      <span className="bg-fitness-500/12 text-fitness-500 flex h-6 w-6 items-center justify-center rounded-md text-xs font-bold">
+                    <div className="border-border bg-fitness/8 flex items-center gap-2 border-b p-4">
+                      <span className="bg-fitness/12 text-fitness flex h-6 w-6 items-center justify-center rounded-md text-xs font-bold">
                         W
                       </span>
                       <h3 className="text-sm font-semibold">{t("warmup")}</h3>
@@ -443,7 +449,8 @@ export default function WorkoutPlanPage() {
                           <div className="mb-1.5 flex items-center justify-between">
                             <span className="text-sm font-medium">{exercise.name}</span>
                             <span className="text-muted-foreground rounded-md bg-neutral-100 px-2 py-0.5 text-xs">
-                              {exercise.duration}s
+                              {toLocalDigits(exercise.duration, locale)}
+                              {tUnits("sec")}
                             </span>
                           </div>
                           <ul className="text-muted-foreground space-y-0.5 text-xs">
@@ -487,19 +494,20 @@ export default function WorkoutPlanPage() {
                               isExpanded ? "bg-primary text-white" : "bg-fitness/10 text-fitness",
                             )}
                           >
-                            {String(index + 1).padStart(2, "0")}
+                            {toLocalDigits(String(index + 1).padStart(2, "0"), locale)}
                           </div>
                           <div className="min-w-0">
                             <h4 className="truncate text-sm font-semibold">{exercise.name}</h4>
                             <p className="text-muted-foreground mt-0.5 text-xs">
-                              {exercise.sets}x{exercise.reps} {t("reps")}
+                              {toLocalDigits(exercise.sets, locale)}x
+                              {toLocalDigits(exercise.reps, locale)} {t("reps")}
                             </p>
                           </div>
                         </div>
                         <div className="flex shrink-0 items-center gap-2">
                           {/* Muscle group tags (WORK-03) */}
                           {exercise.targetMuscles && exercise.targetMuscles.length > 0 && (
-                            <span className="bg-fitness-500/10 text-fitness-500 hidden rounded-full px-2 py-0.5 text-[10px] font-medium sm:inline-block">
+                            <span className="bg-fitness/10 text-fitness hidden rounded-full px-2 py-0.5 text-[10px] font-medium sm:inline-block">
                               {exercise.targetMuscles.join(", ")}
                             </span>
                           )}
@@ -526,7 +534,7 @@ export default function WorkoutPlanPage() {
                               {exercise.targetMuscles.map((muscle: string, mi: number) => (
                                 <span
                                   key={mi}
-                                  className="bg-fitness-500/10 text-fitness-500 rounded-full px-2 py-0.5 text-[10px] font-medium"
+                                  className="bg-fitness/10 text-fitness rounded-full px-2 py-0.5 text-[10px] font-medium"
                                 >
                                   {muscle}
                                 </span>
@@ -537,22 +545,28 @@ export default function WorkoutPlanPage() {
                           {/* Sets / Reps / Rest grid */}
                           <div className="grid grid-cols-3 gap-2">
                             <div className="rounded-lg bg-neutral-50 p-2 text-center">
-                              <p className="text-sm font-bold">{exercise.sets}</p>
+                              <p className="text-sm font-bold">
+                                {toLocalDigits(exercise.sets, locale)}
+                              </p>
                               <p className="text-muted-foreground text-[10px]">{t("sets")}</p>
                             </div>
                             <div className="rounded-lg bg-neutral-50 p-2 text-center">
-                              <p className="text-sm font-bold">{exercise.reps}</p>
+                              <p className="text-sm font-bold">
+                                {toLocalDigits(exercise.reps, locale)}
+                              </p>
                               <p className="text-muted-foreground text-[10px]">{t("reps")}</p>
                             </div>
                             <div className="rounded-lg bg-neutral-50 p-2 text-center">
-                              <p className="text-sm font-bold">{exercise.rest || "-"}</p>
+                              <p className="text-sm font-bold">
+                                {exercise.rest ? toLocalDigits(exercise.rest, locale) : "-"}
+                              </p>
                               <p className="text-muted-foreground text-[10px]">{t("rest")}</p>
                             </div>
                           </div>
 
                           {/* Equipment */}
                           {exercise.equipment && (
-                            <span className="bg-fitness-500/12 text-fitness-500 inline-block rounded-md px-2.5 py-1 text-xs font-medium">
+                            <span className="bg-fitness/12 text-fitness inline-block rounded-md px-2.5 py-1 text-xs font-medium">
                               {exercise.equipment}
                             </span>
                           )}
@@ -587,7 +601,8 @@ export default function WorkoutPlanPage() {
                           <div className="mb-1.5 flex items-center justify-between">
                             <span className="text-sm font-medium">{exercise.name}</span>
                             <span className="text-muted-foreground rounded-md bg-neutral-100 px-2 py-0.5 text-xs">
-                              {exercise.duration}s
+                              {toLocalDigits(exercise.duration, locale)}
+                              {tUnits("sec")}
                             </span>
                           </div>
                           <ul className="text-muted-foreground space-y-0.5 text-xs">
@@ -610,7 +625,7 @@ export default function WorkoutPlanPage() {
 
       {/* Progression Notes */}
       {planData.progressionNotes && (
-        <div className="border-fitness-500/20 bg-fitness-500/8 rounded-xl border p-4">
+        <div className="border-fitness/20 bg-fitness/8 rounded-xl border p-4">
           <p className="text-muted-foreground mb-1 text-xs font-medium">{t("progressionNotes")}</p>
           <p className="text-sm font-medium">{planData.progressionNotes}</p>
         </div>

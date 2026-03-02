@@ -16,6 +16,9 @@
     "analyze:client": "ANALYZE=true pnpm --filter @fitfast/client build",
     "analyze:admin": "ANALYZE=true pnpm --filter @fitfast/admin build",
     "test:e2e": "playwright test",
+    "test:load": "echo 'Requires k6 binary. Run: k6 run e2e/load/scenarios/dashboard-reads.js'",
+    "generate:handoff-report": "tsx scripts/generate-handoff-report.ts",
+    "handoff:validate": "tsx scripts/handoff-validate.ts",
     "prepare": "husky"
   },
   "dependencies": {
@@ -36,13 +39,16 @@
     "lucia": "^3.2.2",
     "pdf-parse": "^2.4.5",
     "pino": "^9.6.0",
-    "resend": "^6.9.2"
+    "resend": "^6.9.2",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.1",
     "@playwright/test": "^1.58.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/pdf-parse": "^1.1.5",
+    "@types/web-push": "^3.6.4",
     "@vitejs/plugin-react": "^5.1.4",
     "convex-test": "^0.0.41",
     "eslint-config-prettier": "^10.1.8",

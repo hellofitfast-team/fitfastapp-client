@@ -73,6 +73,7 @@ function RejectModal({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const t = useTranslations("admin");
   const rejectClient = useMutation(api.profiles.rejectClient);
   const [reason, setReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -126,12 +127,14 @@ function RejectModal({
 
         {/* Reason input */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-stone-500">Rejection Reason</label>
+          <label className="text-xs font-medium text-stone-500">
+            {t("clientDetail.rejectionReason")}
+          </label>
           <textarea
             ref={textareaRef}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder="Explain why this client is being rejected..."
+            placeholder={t("clientDetail.rejectionPlaceholder")}
             rows={3}
             className="w-full resize-none rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-900 transition-all placeholder:text-stone-400 focus:border-red-300 focus:ring-2 focus:ring-red-200 focus:outline-none"
           />

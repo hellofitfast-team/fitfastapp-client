@@ -6,7 +6,6 @@ import { SectionCard } from "@fitfast/ui/section-card";
 import { FormField } from "@fitfast/ui/form-field";
 import { Input } from "@fitfast/ui/input";
 import { cn } from "@fitfast/ui/cn";
-import { EQUIPMENT_OPTIONS, GENDER_OPTIONS } from "./constants";
 
 interface BasicInfoSectionProps {
   currentWeight: string;
@@ -27,6 +26,17 @@ interface BasicInfoSectionProps {
   setEquipmentOther: (value: string) => void;
   isLoading: boolean;
 }
+
+const GENDER_IDS = ["male", "female"] as const;
+const EXPERIENCE_IDS = ["beginner", "intermediate", "advanced"] as const;
+const EQUIPMENT_IDS = [
+  "full_gym",
+  "home_basic",
+  "home_advanced",
+  "bodyweight",
+  "resistance_bands",
+  "other",
+] as const;
 
 export function BasicInfoSection({
   currentWeight,
@@ -53,9 +63,9 @@ export function BasicInfoSection({
   return (
     <>
       {/* Basic Information */}
-      <SectionCard icon={User} title="Basic Information">
+      <SectionCard icon={User} title={t("basicInfo")}>
         <div className="grid gap-4 sm:grid-cols-2">
-          <FormField label="Current Weight">
+          <FormField label={t("currentWeightLabel")}>
             <div className="flex items-center gap-2">
               <Input
                 type="number"
@@ -68,7 +78,7 @@ export function BasicInfoSection({
               <span className="text-muted-foreground text-sm font-semibold">{tUnits("kg")}</span>
             </div>
           </FormField>
-          <FormField label="Height">
+          <FormField label={t("heightLabel")}>
             <div className="flex items-center gap-2">
               <Input
                 type="number"
@@ -80,7 +90,7 @@ export function BasicInfoSection({
               <span className="text-muted-foreground text-sm font-semibold">{tUnits("cm")}</span>
             </div>
           </FormField>
-          <FormField label="Age">
+          <FormField label={t("ageLabel")}>
             <Input
               type="number"
               min={14}
@@ -91,25 +101,25 @@ export function BasicInfoSection({
               disabled={isLoading}
             />
           </FormField>
-          <FormField label="Gender">
+          <FormField label={t("genderLabel")}>
             <div className="flex gap-2">
-              {GENDER_OPTIONS.map((option) => (
+              {GENDER_IDS.map((id) => (
                 <button
-                  key={option.id}
+                  key={id}
                   type="button"
-                  onClick={() => setGender(option.id)}
+                  onClick={() => setGender(id)}
                   disabled={isLoading}
                   className={cn(
                     "flex-1 rounded-lg border p-2.5 text-sm font-medium transition-colors",
-                    gender === option.id
-                      ? "border-fitness-500/30 bg-fitness-500/8 text-fitness-500"
+                    gender === id
+                      ? "border-fitness/30 bg-fitness/8 text-fitness"
                       : "border-border bg-card hover:bg-neutral-50",
                     isLoading
                       ? "cursor-not-allowed opacity-50"
                       : "cursor-pointer active:scale-[0.97]",
                   )}
                 >
-                  {option.label}
+                  {t(`genders.${id}`)}
                 </button>
               ))}
             </div>
@@ -137,7 +147,7 @@ export function BasicInfoSection({
               className={cn(
                 "flex items-center gap-3 rounded-lg border p-3.5 text-start transition-colors",
                 activityLevel === level.id
-                  ? "border-fitness-500/30 bg-fitness-500/8"
+                  ? "border-fitness/30 bg-fitness/8"
                   : "border-border bg-card hover:bg-neutral-50",
                 isLoading ? "cursor-not-allowed opacity-50" : "cursor-pointer active:scale-[0.97]",
               )}
@@ -146,7 +156,7 @@ export function BasicInfoSection({
                 className={cn(
                   "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-xs font-bold",
                   activityLevel === level.id
-                    ? "border-fitness-500/30 bg-fitness-500/12 text-fitness-500"
+                    ? "border-fitness/30 bg-fitness/12 text-fitness"
                     : "border-border text-muted-foreground bg-neutral-50",
                 )}
               >
@@ -156,7 +166,7 @@ export function BasicInfoSection({
                 <span
                   className={cn(
                     "block text-sm font-semibold",
-                    activityLevel === level.id && "text-fitness-500",
+                    activityLevel === level.id && "text-fitness",
                   )}
                 >
                   {t(`activityLevels.${level.id}`)}
@@ -171,24 +181,18 @@ export function BasicInfoSection({
       </SectionCard>
 
       {/* Experience Level */}
-      <SectionCard icon={Dumbbell} title="Experience Level" variant="fitness">
+      <SectionCard icon={Dumbbell} title={t("experienceLevel")} variant="fitness">
         <div className="flex flex-col gap-2">
-          {(
-            [
-              { id: "beginner", label: "Beginner", desc: "New to fitness" },
-              { id: "intermediate", label: "Intermediate", desc: "1-2 years" },
-              { id: "advanced", label: "Advanced", desc: "3+ years" },
-            ] as const
-          ).map((level) => (
+          {EXPERIENCE_IDS.map((id) => (
             <button
-              key={level.id}
+              key={id}
               type="button"
-              onClick={() => setExperienceLevel(level.id)}
+              onClick={() => setExperienceLevel(id)}
               disabled={isLoading}
               className={cn(
                 "flex items-center gap-3 rounded-lg border p-3.5 text-start transition-colors",
-                experienceLevel === level.id
-                  ? "border-fitness-500/30 bg-fitness-500/8"
+                experienceLevel === id
+                  ? "border-fitness/30 bg-fitness/8"
                   : "border-border bg-card hover:bg-neutral-50",
                 isLoading ? "cursor-not-allowed opacity-50" : "cursor-pointer active:scale-[0.97]",
               )}
@@ -196,23 +200,25 @@ export function BasicInfoSection({
               <div
                 className={cn(
                   "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-xs font-bold",
-                  experienceLevel === level.id
-                    ? "border-fitness-500/30 bg-fitness-500/12 text-fitness-500"
+                  experienceLevel === id
+                    ? "border-fitness/30 bg-fitness/12 text-fitness"
                     : "border-border text-muted-foreground bg-neutral-50",
                 )}
               >
-                {level.id === "beginner" ? "1" : level.id === "intermediate" ? "2" : "3"}
+                {id === "beginner" ? "1" : id === "intermediate" ? "2" : "3"}
               </div>
               <div>
                 <span
                   className={cn(
                     "block text-sm font-semibold",
-                    experienceLevel === level.id && "text-fitness-500",
+                    experienceLevel === id && "text-fitness",
                   )}
                 >
-                  {level.label}
+                  {t(`levels.${id}`)}
                 </span>
-                <span className="text-muted-foreground block text-xs">{level.desc}</span>
+                <span className="text-muted-foreground block text-xs">
+                  {t(`levels.${id}_desc`)}
+                </span>
               </div>
             </button>
           ))}
@@ -220,19 +226,19 @@ export function BasicInfoSection({
       </SectionCard>
 
       {/* Equipment */}
-      <SectionCard icon={Wrench} title="Available Equipment" variant="fitness">
+      <SectionCard icon={Wrench} title={t("equipmentTitle")} variant="fitness">
         <div className="space-y-3">
           <div className="flex flex-col gap-2">
-            {EQUIPMENT_OPTIONS.map((option) => (
+            {EQUIPMENT_IDS.map((id) => (
               <button
-                key={option.id}
+                key={id}
                 type="button"
-                onClick={() => setEquipment(option.id)}
+                onClick={() => setEquipment(id)}
                 disabled={isLoading}
                 className={cn(
                   "flex items-center gap-3 rounded-lg border p-3.5 text-start transition-colors",
-                  equipment === option.id
-                    ? "border-fitness-500/30 bg-fitness-500/8"
+                  equipment === id
+                    ? "border-fitness/30 bg-fitness/8"
                     : "border-border bg-card hover:bg-neutral-50",
                   isLoading
                     ? "cursor-not-allowed opacity-50"
@@ -242,20 +248,15 @@ export function BasicInfoSection({
                 <div
                   className={cn(
                     "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs",
-                    equipment === option.id
-                      ? "border-fitness-500/30 bg-fitness-500/12 text-fitness-500"
+                    equipment === id
+                      ? "border-fitness/30 bg-fitness/12 text-fitness"
                       : "border-border text-muted-foreground bg-neutral-50",
                   )}
                 >
-                  {equipment === option.id ? "✓" : ""}
+                  {equipment === id ? "✓" : ""}
                 </div>
-                <span
-                  className={cn(
-                    "text-sm font-medium",
-                    equipment === option.id && "text-fitness-500",
-                  )}
-                >
-                  {option.label}
+                <span className={cn("text-sm font-medium", equipment === id && "text-fitness")}>
+                  {t(`equipmentOptions.${id}`)}
                 </span>
               </button>
             ))}
@@ -263,7 +264,7 @@ export function BasicInfoSection({
           {equipment === "other" && (
             <Input
               type="text"
-              placeholder="Describe your equipment..."
+              placeholder={t("equipmentOtherPlaceholder")}
               value={equipmentOther}
               onChange={(e) => setEquipmentOther(e.target.value)}
               disabled={isLoading}

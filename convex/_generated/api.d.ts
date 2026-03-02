@@ -9,6 +9,7 @@
  */
 
 import type * as actionCache from "../actionCache.js";
+import type * as adminNotifications from "../adminNotifications.js";
 import type * as adminStats from "../adminStats.js";
 import type * as ai from "../ai.js";
 import type * as assessments from "../assessments.js";
@@ -30,6 +31,7 @@ import type * as knowledgeBaseActions from "../knowledgeBaseActions.js";
 import type * as mealPlans from "../mealPlans.js";
 import type * as migrations from "../migrations.js";
 import type * as navBadges from "../navBadges.js";
+import type * as notificationLog from "../notificationLog.js";
 import type * as notifications from "../notifications.js";
 import type * as nutritionEngine from "../nutritionEngine.js";
 import type * as ocrExtraction from "../ocrExtraction.js";
@@ -59,6 +61,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   actionCache: typeof actionCache;
+  adminNotifications: typeof adminNotifications;
   adminStats: typeof adminStats;
   ai: typeof ai;
   assessments: typeof assessments;
@@ -80,6 +83,7 @@ declare const fullApi: ApiFromModules<{
   mealPlans: typeof mealPlans;
   migrations: typeof migrations;
   navBadges: typeof navBadges;
+  notificationLog: typeof notificationLog;
   notifications: typeof notifications;
   nutritionEngine: typeof nutritionEngine;
   ocrExtraction: typeof ocrExtraction;

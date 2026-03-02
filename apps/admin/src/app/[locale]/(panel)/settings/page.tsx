@@ -10,7 +10,7 @@ export default function AdminSettingsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-stone-900">{t("settingsPage")}</h1>
-        <p className="mt-1 text-sm text-stone-500">System configuration</p>
+        <p className="mt-1 text-sm text-stone-500">{t("systemConfiguration")}</p>
       </div>
 
       <AdminSettingsForm />

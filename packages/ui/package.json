@@ -35,6 +35,7 @@
     "./toast": "./src/toast.tsx",
     "./toaster": "./src/toaster.tsx",
     "./use-toast": "./src/use-toast.ts",
+    "./format": "./src/format.ts",
     "./widget-card": "./src/widget-card.tsx"
   },
   "dependencies": {

@@ -1,14 +1,25 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useAuth } from "@/hooks/use-auth";
 import * as Sentry from "@sentry/nextjs";
 
+/**
+ * Hook for managing native Web Push notification subscriptions.
+ * Uses the standard PushManager API — no third-party SDK needed.
+ */
 export function useNotifications() {
   const [isSupported, setIsSupported] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission>("default");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
+  const { profile } = useAuth();
+  const saveSubscription = useMutation(api.pushSubscriptions.saveSubscription);
+  const deactivateSubscription = useMutation(api.pushSubscriptions.deactivateSubscription);
+  const vapidPublicKey = useQuery(api.pushSubscriptions.getVapidPublicKey);
 
   useEffect(() => {
     const supported =
@@ -16,7 +27,8 @@ export function useNotifications() {
       "Notification" in window &&
       !!window.Notification &&
       "serviceWorker" in navigator &&
-      !!navigator.serviceWorker;
+      !!navigator.serviceWorker &&
+      "PushManager" in window;
     setIsSupported(supported);
 
     if (!supported) {
@@ -26,20 +38,16 @@ export function useNotifications() {
 
     setPermission(Notification.permission);
 
-    // Check subscription state: try OneSignal, fall back to permission check
+    // Check if already subscribed
     async function checkSubscription() {
       try {
-        const OneSignal = (await import("react-onesignal")).default;
-        const optedIn = OneSignal.User.PushSubscription.optedIn;
-        setIsSubscribed(optedIn ?? false);
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        setIsSubscribed(!!subscription);
       } catch (err) {
-        setIsSubscribed(Notification.permission === "granted");
-        setError("onesignal_unavailable");
         Sentry.captureException(
-          err instanceof Error ? err : new Error("OneSignal subscription check failed"),
-          {
-            tags: { feature: "push-notifications", operation: "check-subscription" },
-          },
+          err instanceof Error ? err : new Error("Push subscription check failed"),
+          { tags: { feature: "push-notifications", operation: "check-subscription" } },
         );
       } finally {
         setLoading(false);
@@ -49,91 +57,99 @@ export function useNotifications() {
     checkSubscription();
   }, []);
 
-  const requestPermission = useCallback(async () => {
-    if (!isSupported) return;
+  const subscribe = useCallback(async () => {
+    if (!isSupported || !vapidPublicKey || !profile?._id) return;
     setLoading(true);
 
     try {
+      // Request notification permission
       const result = await Notification.requestPermission();
       setPermission(result);
-      setIsSubscribed(result === "granted");
 
-      // Best-effort OneSignal sync
-      if (result === "granted") {
-        import("react-onesignal")
-          .then((mod) => mod.default.User.PushSubscription.optIn())
-          .catch((err) => {
-            Sentry.captureException(err, {
-              tags: { feature: "push-notifications", operation: "onesignal-sync" },
-              level: "warning",
-            });
-          });
+      if (result !== "granted") {
+        setLoading(false);
+        return;
       }
+
+      const registration = await navigator.serviceWorker.ready;
+
+      // Convert VAPID key from base64url to ArrayBuffer for PushManager
+      const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey).buffer as ArrayBuffer;
+
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey,
+      });
+
+      // Extract the subscription data and save to Convex
+      const json = subscription.toJSON();
+      await saveSubscription({
+        endpoint: json.endpoint!,
+        p256dh: json.keys!.p256dh,
+        auth: json.keys!.auth,
+        deviceType: "web",
+      });
+
+      setIsSubscribed(true);
     } catch (err) {
-      Sentry.captureException(err instanceof Error ? err : new Error("Permission request failed"), {
-        tags: { feature: "push-notifications", operation: "request-permission" },
+      Sentry.captureException(err instanceof Error ? err : new Error("Push subscribe failed"), {
+        tags: { feature: "push-notifications", operation: "subscribe" },
       });
     } finally {
       setLoading(false);
     }
-  }, [isSupported]);
+  }, [isSupported, vapidPublicKey, profile?._id, saveSubscription]);
 
-  const toggleSubscription = useCallback(async () => {
+  const unsubscribe = useCallback(async () => {
     if (!isSupported) return;
     setLoading(true);
 
     try {
-      if (isSubscribed) {
-        // Opt out: update UI immediately, try OneSignal in background
-        setIsSubscribed(false);
-        import("react-onesignal")
-          .then((mod) => mod.default.User.PushSubscription.optOut())
-          .catch((err) => {
-            Sentry.captureException(err, {
-              tags: { feature: "push-notifications", operation: "onesignal-sync" },
-              level: "warning",
-            });
-          });
-      } else {
-        // Opt in: request permission via native API first
-        let perm = Notification.permission;
-        if (perm === "default") {
-          perm = await Notification.requestPermission();
-          setPermission(perm);
-        }
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
 
-        if (perm === "granted") {
-          setIsSubscribed(true);
-          // Best-effort OneSignal sync
-          import("react-onesignal")
-            .then((mod) => mod.default.User.PushSubscription.optIn())
-            .catch((err) => {
-              Sentry.captureException(err, {
-                tags: { feature: "push-notifications", operation: "onesignal-sync" },
-                level: "warning",
-              });
-            });
-        }
+      if (subscription) {
+        const endpoint = subscription.endpoint;
+        await subscription.unsubscribe();
+        await deactivateSubscription({ endpoint });
       }
+
+      setIsSubscribed(false);
     } catch (err) {
-      Sentry.captureException(
-        err instanceof Error ? err : new Error("Toggle subscription failed"),
-        {
-          tags: { feature: "push-notifications", operation: "toggle-subscription" },
-        },
-      );
+      Sentry.captureException(err instanceof Error ? err : new Error("Push unsubscribe failed"), {
+        tags: { feature: "push-notifications", operation: "unsubscribe" },
+      });
     } finally {
       setLoading(false);
     }
-  }, [isSupported, isSubscribed]);
+  }, [isSupported, deactivateSubscription]);
+
+  const toggleSubscription = useCallback(async () => {
+    if (isSubscribed) {
+      await unsubscribe();
+    } else {
+      await subscribe();
+    }
+  }, [isSubscribed, subscribe, unsubscribe]);
 
   return {
     isSupported,
     permission,
     isSubscribed,
-    requestPermission,
+    requestPermission: subscribe,
     toggleSubscription,
     loading,
-    error,
   };
+}
+
+/** Convert a base64url-encoded VAPID public key to a Uint8Array for PushManager.subscribe() */
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const raw = atob(base64);
+  const output = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) {
+    output[i] = raw.charCodeAt(i);
+  }
+  return output;
 }

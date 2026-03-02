@@ -252,16 +252,16 @@ Use these throughout the demo:
 
 ### "How much does it cost to run?"
 
-| Service         | Free Tier            | Typical Monthly Cost (500 clients) |
-| --------------- | -------------------- | ---------------------------------- |
-| Vercel          | Hobby free           | $0 - $20/month                     |
-| Convex          | Free tier generous   | $0 - $25/month                     |
-| OpenRouter (AI) | Pay per use          | ~$100/month                        |
-| Convex Auth     | Included with Convex | $0                                 |
-| Resend          | 3000 emails/day free | $0                                 |
-| OneSignal       | Free tier            | $0                                 |
-| Sentry          | Free tier            | $0                                 |
-| **Total**       |                      | **~$100-145/month**                |
+| Service          | Free Tier            | Typical Monthly Cost (500 clients) |
+| ---------------- | -------------------- | ---------------------------------- |
+| Vercel           | Hobby free           | $0 - $20/month                     |
+| Convex           | Free tier generous   | $0 - $25/month                     |
+| OpenRouter (AI)  | Pay per use          | ~$100/month                        |
+| Convex Auth      | Included with Convex | $0                                 |
+| Resend           | 3000 emails/day free | $0                                 |
+| Web Push (VAPID) | Free (native)        | $0                                 |
+| Sentry           | Free tier            | $0                                 |
+| **Total**        |                      | **~$100-145/month**                |
 
 ### "Can I customize the branding?"
 

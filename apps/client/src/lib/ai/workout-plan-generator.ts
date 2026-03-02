@@ -79,7 +79,9 @@ ARABIC LANGUAGE REQUIREMENTS:
 - Muscle group names MUST be in Arabic (e.g., "الصدر، الظهر" not "chest, back")
 - Instructions MUST be in Arabic
 - Notes and tips MUST be in Arabic
-- Equipment names SHOULD be in Arabic where possible`
+- Equipment names SHOULD be in Arabic where possible
+- The "progressionNotes" and "safetyTips" fields MUST be in Arabic — never include English text
+- Double-check every single field value is in Arabic before outputting`
     : ""
 }`;
 

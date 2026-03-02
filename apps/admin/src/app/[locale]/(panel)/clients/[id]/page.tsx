@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useRouter } from "@fitfast/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
-import { useConvexAuth, useQuery, useMutation } from "convex/react";
+import { useConvexAuth, useQuery, useMutation, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { createLogger } from "@fitfast/config/logger";
@@ -23,51 +23,28 @@ import {
   CreditCard,
   Clock,
   MinusCircle,
+  Bell,
+  Send,
 } from "lucide-react";
 import { Link } from "@fitfast/i18n/navigation";
 import { formatDate } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { PaymentScreenshot } from "@/components/payment-screenshot";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@fitfast/ui/dialog";
 
 const tierOptions = [
   { value: "monthly" as const, months: 1 },
   { value: "quarterly" as const, months: 3 },
 ];
 
-function PaymentScreenshot({ storageId }: { storageId: Id<"_storage"> }) {
-  const url = useQuery(api.storage.getFileUrl, { storageId });
-  const [showLightbox, setShowLightbox] = useState(false);
-
-  if (url === undefined) {
-    return <div className="h-40 w-full animate-pulse rounded-lg bg-stone-100" />;
-  }
-  if (!url) {
-    return <p className="text-xs text-stone-400">Unable to load image</p>;
-  }
-
-  return (
-    <>
-      <img
-        src={url}
-        alt="Payment screenshot"
-        className="h-40 w-full cursor-pointer rounded-lg border border-stone-200 object-cover transition-opacity hover:opacity-90"
-        onClick={() => setShowLightbox(true)}
-      />
-      {showLightbox && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
-          onClick={() => setShowLightbox(false)}
-        >
-          <img
-            src={url}
-            alt="Payment screenshot"
-            className="max-h-[85vh] max-w-[90vw] rounded-lg shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
-      )}
-    </>
-  );
-}
+// PaymentScreenshot imported from shared component
 
 /** OCR-extracted payment data from a signup screenshot */
 interface OcrExtractedData {
@@ -94,6 +71,7 @@ const statusBadge: Record<string, string> = {
 };
 
 function SignupPaymentCard({ signup }: { signup: SignupRecord }) {
+  const t = useTranslations("admin");
   const ocr = signup.ocrExtractedData;
 
   return (
@@ -108,7 +86,7 @@ function SignupPaymentCard({ signup }: { signup: SignupRecord }) {
           {signup.status === "pending" && <Clock className="h-3 w-3" />}
           {signup.status === "approved" && <Check className="h-3 w-3" />}
           {signup.status === "rejected" && <X className="h-3 w-3" />}
-          {signup.status}
+          {t(`clientDetail.paymentStatus.${signup.status}`)}
         </span>
         <span className="text-xs text-stone-400">
           {new Date(signup._creationTime).toLocaleDateString()}
@@ -124,7 +102,7 @@ function SignupPaymentCard({ signup }: { signup: SignupRecord }) {
         ) : (
           <div className="w-36 shrink-0">
             <div className="flex h-32 w-full items-center justify-center rounded-lg border border-dashed border-stone-200 bg-white">
-              <p className="text-xs text-stone-400">No screenshot</p>
+              <p className="text-xs text-stone-400">{t("clientDetail.noScreenshot")}</p>
             </div>
           </div>
         )}
@@ -133,36 +111,36 @@ function SignupPaymentCard({ signup }: { signup: SignupRecord }) {
         <dl className="min-w-0 flex-1 space-y-1.5 text-sm">
           {signup.planTier && (
             <div className="flex justify-between">
-              <dt className="text-stone-500">Plan</dt>
+              <dt className="text-stone-500">{t("clientDetail.plan")}</dt>
               <dd className="text-primary font-medium">{signup.planTier.replace("_", " ")}</dd>
             </div>
           )}
           {ocr?.reference_number && (
             <div className="flex justify-between">
-              <dt className="text-stone-500">Reference #</dt>
+              <dt className="text-stone-500">{t("clientDetail.referenceNumber")}</dt>
               <dd className="font-mono font-medium text-stone-900">{ocr.reference_number}</dd>
             </div>
           )}
           {ocr?.amount && (
             <div className="flex justify-between">
-              <dt className="text-stone-500">Amount</dt>
+              <dt className="text-stone-500">{t("clientDetail.amount")}</dt>
               <dd className="font-medium text-stone-900">{ocr.amount}</dd>
             </div>
           )}
           {ocr?.sender_name && (
             <div className="flex justify-between">
-              <dt className="text-stone-500">Sender</dt>
+              <dt className="text-stone-500">{t("clientDetail.sender")}</dt>
               <dd className="text-stone-900">{ocr.sender_name}</dd>
             </div>
           )}
           {ocr?.bank && (
             <div className="flex justify-between">
-              <dt className="text-stone-500">Bank</dt>
+              <dt className="text-stone-500">{t("clientDetail.bank")}</dt>
               <dd className="text-stone-900">{ocr.bank}</dd>
             </div>
           )}
           {!ocr && !signup.paymentScreenshotId && (
-            <p className="text-xs text-stone-400">No payment details submitted.</p>
+            <p className="text-xs text-stone-400">{t("clientDetail.noPaymentDetails")}</p>
           )}
         </dl>
       </div>
@@ -202,9 +180,11 @@ export default function ClientDetailPage() {
   // Latest signup (for pre-selecting plan tier)
   const latestSignup = signups?.[0] ?? null;
 
+  const tNotif = useTranslations("notifications");
   const router = useRouter();
   const updateStatus = useMutation(api.profiles.updateClientStatus);
   const rejectClient = useMutation(api.profiles.rejectClient);
+  const sendNotification = useAction(api.adminNotifications.sendToIndividual);
 
   const [selectedTier, setSelectedTier] = useState<"monthly" | "quarterly">("monthly");
   const [isActing, setIsActing] = useState(false);
@@ -215,6 +195,11 @@ export default function ClientDetailPage() {
   const initialTier = latestSignup?.planTier as "monthly" | "quarterly" | undefined;
   const [tierOverridden, setTierOverridden] = useState(false);
   const effectiveTier = tierOverridden ? selectedTier : (initialTier ?? selectedTier);
+
+  const [showNotifDialog, setShowNotifDialog] = useState(false);
+  const [notifTitle, setNotifTitle] = useState("");
+  const [notifBody, setNotifBody] = useState("");
+  const [isSendingNotif, setIsSendingNotif] = useState(false);
 
   const [now] = useState(() => Date.now());
   const isLoading = profile === undefined || assessment === undefined;
@@ -240,6 +225,36 @@ export default function ClientDetailPage() {
       </div>
     );
   }
+
+  const handleSendNotification = async () => {
+    if (!notifTitle.trim() || !notifBody.trim()) return;
+    setIsSendingNotif(true);
+    try {
+      await sendNotification({
+        userId,
+        title: notifTitle.trim(),
+        body: notifBody.trim(),
+      });
+      toast({
+        title: tNotif("sent"),
+        description: tNotif("sentDesc"),
+        variant: "success",
+      });
+      setShowNotifDialog(false);
+      setNotifTitle("");
+      setNotifBody("");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+      toast({
+        title: tNotif("sendFailed"),
+        description: message.includes("disabled")
+          ? tNotif("notificationsDisabled")
+          : tNotif("sendFailedDesc"),
+        variant: "destructive",
+      });
+    }
+    setIsSendingNotif(false);
+  };
 
   const handleActivate = async () => {
     setIsActing(true);
@@ -332,7 +347,7 @@ export default function ClientDetailPage() {
 
   return (
     <div className="space-y-6">
-      {/* Back button + name */}
+      {/* Back button + name + actions */}
       <div className="flex items-center gap-4">
         <Link
           href="/clients"
@@ -340,13 +355,119 @@ export default function ClientDetailPage() {
         >
           <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
         </Link>
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl font-bold tracking-tight text-stone-900">
             {profile.fullName ?? t("client")}
           </h1>
           <p className="mt-0.5 text-xs text-stone-400">ID: {userId.slice(0, 8)}...</p>
         </div>
+        {profile.status === "active" && (
+          <button
+            onClick={() => setShowNotifDialog(true)}
+            className="hover:border-primary/30 hover:text-primary flex items-center gap-2 rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-500 transition-colors"
+          >
+            <Bell className="h-4 w-4" />
+            <span className="hidden sm:inline">{t("clientDetail.sendNotification")}</span>
+          </button>
+        )}
       </div>
+
+      {/* Send Notification Dialog */}
+      <Dialog
+        open={showNotifDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowNotifDialog(false);
+            setNotifTitle("");
+            setNotifBody("");
+          }
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-2">
+              <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-lg">
+                <Bell className="h-4 w-4" />
+              </div>
+              <div>
+                <DialogTitle className="text-sm font-semibold text-stone-900">
+                  {tNotif("sendToClient")}
+                </DialogTitle>
+                <DialogDescription className="mt-0.5 text-xs text-stone-400">
+                  {profile.fullName ?? ""}
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <div>
+              <label
+                htmlFor="notif-title"
+                className="mb-1 block text-xs font-medium text-stone-500"
+              >
+                {tNotif("notificationTitle")}
+              </label>
+              <input
+                id="notif-title"
+                type="text"
+                value={notifTitle}
+                onChange={(e) => setNotifTitle(e.target.value)}
+                placeholder={tNotif("titlePlaceholder")}
+                maxLength={50}
+                className="focus:ring-primary/20 focus:border-primary h-10 w-full rounded-lg border border-stone-200 bg-stone-50 px-3 text-sm text-stone-900 transition-all placeholder:text-stone-400 focus:ring-2 focus:outline-none"
+                autoFocus
+              />
+              <span className="mt-1 block text-end text-xs text-stone-400">
+                {notifTitle.length}/50
+              </span>
+            </div>
+            <div>
+              <label htmlFor="notif-body" className="mb-1 block text-xs font-medium text-stone-500">
+                {tNotif("notificationBody")}
+              </label>
+              <textarea
+                id="notif-body"
+                value={notifBody}
+                onChange={(e) => setNotifBody(e.target.value)}
+                placeholder={tNotif("bodyPlaceholder")}
+                rows={3}
+                maxLength={150}
+                className="focus:ring-primary/20 focus:border-primary w-full resize-none rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-900 transition-all placeholder:text-stone-400 focus:ring-2 focus:outline-none"
+              />
+              <span className="mt-1 block text-end text-xs text-stone-400">
+                {notifBody.length}/150
+              </span>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <button
+              onClick={() => {
+                setShowNotifDialog(false);
+                setNotifTitle("");
+                setNotifBody("");
+              }}
+              disabled={isSendingNotif}
+              className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-50 disabled:opacity-50"
+            >
+              {tNotif("cancelSend")}
+            </button>
+            <button
+              onClick={handleSendNotification}
+              disabled={isSendingNotif || !notifTitle.trim() || !notifBody.trim()}
+              className="bg-primary hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-50"
+            >
+              {isSendingNotif ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+              {isSendingNotif ? tNotif("sending") : tNotif("confirmSend")}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Info cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

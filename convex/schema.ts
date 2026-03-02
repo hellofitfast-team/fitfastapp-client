@@ -249,13 +249,15 @@ export default defineSchema({
 
   pushSubscriptions: defineTable({
     userId: v.string(),
-    onesignalSubscriptionId: v.string(),
+    endpoint: v.string(),
+    p256dh: v.string(),
+    auth: v.string(),
     deviceType: v.optional(v.string()),
     isActive: v.boolean(),
     updatedAt: v.number(),
   })
     .index("by_userId", ["userId"])
-    .index("by_subscriptionId", ["onesignalSubscriptionId"]),
+    .index("by_endpoint", ["endpoint"]),
 
   fileMetadata: defineTable({
     storageId: v.id("_storage"),
@@ -301,6 +303,23 @@ export default defineSchema({
       searchField: "name",
       filterFields: ["category", "isRecipe"],
     }),
+
+  notificationLog: defineTable({
+    type: v.union(
+      v.literal("plan_ready"),
+      v.literal("reminder"),
+      v.literal("broadcast"),
+      v.literal("individual"),
+    ),
+    title: v.string(),
+    body: v.string(),
+    recipientCount: v.number(),
+    recipientUserId: v.optional(v.string()),
+    sentAt: v.number(),
+    sentBy: v.string(),
+    status: v.union(v.literal("sent"), v.literal("failed"), v.literal("partial")),
+    failedCount: v.optional(v.number()),
+  }).index("by_sentAt", ["sentAt"]),
 
   coachKnowledge: defineTable({
     title: v.string(),

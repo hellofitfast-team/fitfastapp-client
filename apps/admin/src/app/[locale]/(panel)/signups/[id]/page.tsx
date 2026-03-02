@@ -26,18 +26,11 @@ const statusStyles: Record<string, string> = {
   rejected: "bg-red-50 text-red-700 border-red-200",
 };
 
-const ocrFieldLabels: Record<string, string> = {
-  amount: "Amount",
-  sender_name: "Sender",
-  reference_number: "Ref #",
-  date: "Date",
-  bank: "Bank",
-};
-
 export default function SignupDetailPage() {
   const params = useParams();
   const signupId = params.id as string;
   const t = useTranslations("signupDetail");
+  const tAdmin = useTranslations("admin");
   const locale = useLocale();
   const { isAuthenticated } = useConvexAuth();
 
@@ -269,7 +262,7 @@ export default function SignupDetailPage() {
                 className="flex items-baseline gap-3 border-b border-stone-100 pb-2 last:border-0 last:pb-0"
               >
                 <span className="text-primary w-24 shrink-0 text-xs font-medium tracking-wide uppercase">
-                  {ocrFieldLabels[key] || key}
+                  {tAdmin(`ocrLabels.${key}` as Parameters<typeof tAdmin>[0]) || key}
                 </span>
                 <span className="text-sm text-stone-900">{String(value)}</span>
               </div>

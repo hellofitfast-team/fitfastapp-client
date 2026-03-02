@@ -32,7 +32,7 @@
 | Forms      | React Hook Form + Zod                                |
 | Monitoring | Sentry                                               |
 | Email      | Resend                                               |
-| Push       | OneSignal                                            |
+| Push       | Native Web Push (VAPID)                              |
 | Deployment | Vercel                                               |
 
 ---

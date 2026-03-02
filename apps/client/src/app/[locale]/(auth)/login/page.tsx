@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -21,6 +21,7 @@ const ALLOWED_MESSAGES = new Set(["session_expired", "account_pending", "passwor
 
 export default function LoginPage() {
   const t = useTranslations("auth");
+  const locale = useLocale();
 
   const loginSchema = z.object({
     email: z.string().email(t("validEmail")),
@@ -46,6 +47,9 @@ export default function LoginPage() {
       signOut().then(() => {
         isSigningOut.current = false;
         setError(t("coachAccountError"));
+        // Hard reload to clear any stale server-side auth state and stop the
+        // server-redirect → client-signout loop that causes a blank page.
+        window.location.replace(`/${locale}/login`);
       });
       return;
     }
@@ -54,7 +58,7 @@ export default function LoginPage() {
     if (isAuthenticated) {
       router.replace("/");
     }
-  }, [isAuthenticated, profile, router, signOut, t]);
+  }, [isAuthenticated, profile, router, signOut, t, locale]);
 
   // Auto-clear stale coach session when redirected with coach_not_allowed
   useEffect(() => {
@@ -68,7 +72,8 @@ export default function LoginPage() {
       isSigningOut.current = true;
       signOut().then(() => {
         isSigningOut.current = false;
-        setError(t("coachAccountError"));
+        // Hard reload to break server-redirect ↔ client-signout loop
+        window.location.replace(`/${locale}/login`);
       });
       return;
     }
@@ -79,7 +84,7 @@ export default function LoginPage() {
     } else if (messageParam && ALLOWED_MESSAGES.has(messageParam)) {
       setError(t(`loginMessages.${messageParam}`));
     }
-  }, [searchParams, t, isAuthenticated, signOut]);
+  }, [searchParams, t, isAuthenticated, signOut, locale]);
 
   const {
     register,

@@ -10,7 +10,7 @@ Complete technical guide for deploying the FitFast platform from scratch.
 2. [Repository Setup](#repository-setup)
 3. [Convex Setup](#convex-setup)
 4. [Vercel Deployment](#vercel-deployment)
-5. [OneSignal Setup](#onesignal-setup)
+5. [Web Push Setup](#web-push-setup)
 6. [Resend Setup](#resend-setup)
 7. [Sentry Setup](#sentry-setup)
 8. [OpenRouter Setup](#openrouter-setup)
@@ -24,14 +24,14 @@ Complete technical guide for deploying the FitFast platform from scratch.
 
 ### Accounts Required
 
-| Service    | Purpose                          | Signup URL             |
-| ---------- | -------------------------------- | ---------------------- |
-| Vercel     | Hosting (client + admin apps)    | https://vercel.com     |
-| Convex     | Backend / database / auth        | https://www.convex.dev |
-| OpenRouter | AI model access (DeepSeek, Qwen) | https://openrouter.ai  |
-| Resend     | Transactional emails             | https://resend.com     |
-| OneSignal  | Push notifications               | https://onesignal.com  |
-| Sentry     | Error monitoring                 | https://sentry.io      |
+| Service    | Purpose                           | Signup URL             |
+| ---------- | --------------------------------- | ---------------------- |
+| Vercel     | Hosting (client + admin apps)     | https://vercel.com     |
+| Convex     | Backend / database / auth         | https://www.convex.dev |
+| OpenRouter | AI model access (DeepSeek, Qwen)  | https://openrouter.ai  |
+| Resend     | Transactional emails              | https://resend.com     |
+| _(none)_   | Push notifications (native VAPID) | _(built-in)_           |
+| Sentry     | Error monitoring                  | https://sentry.io      |
 
 ### Local Tools
 
@@ -115,9 +115,10 @@ npx convex env set OPENROUTER_API_KEY "sk-or-v1-..."
 npx convex env set RESEND_API_KEY "re_..."
 npx convex env set RESEND_FROM_EMAIL "FitFast <noreply@yourdomain.com>"
 
-# Required for push notifications
-npx convex env set ONESIGNAL_REST_API_KEY "..."
-npx convex env set ONESIGNAL_APP_ID "..."
+# Required for push notifications (generate keys: npx web-push generate-vapid-keys)
+npx convex env set VAPID_PUBLIC_KEY "..."
+npx convex env set VAPID_PRIVATE_KEY "..."
+npx convex env set VAPID_SUBJECT "mailto:noreply@yourdomain.com"
 
 # Client app URL (used in email links)
 npx convex env set CLIENT_APP_URL "https://app.yourdomain.com"
@@ -159,17 +160,15 @@ You need to deploy **two separate Vercel projects** from the same repository.
 
 3. Add environment variables:
 
-   | Variable                       | Value                         |
-   | ------------------------------ | ----------------------------- |
-   | `NEXT_PUBLIC_CONVEX_URL`       | Your Convex deployment URL    |
-   | `NEXT_PUBLIC_SENTRY_DSN`       | Sentry DSN for client project |
-   | `SENTRY_AUTH_TOKEN`            | Sentry auth token             |
-   | `SENTRY_ORG`                   | Sentry organization slug      |
-   | `SENTRY_PROJECT`               | Sentry project slug (client)  |
-   | `NEXT_PUBLIC_ONESIGNAL_APP_ID` | OneSignal app ID              |
-   | `ONESIGNAL_REST_API_KEY`       | OneSignal REST API key        |
-   | `OPENROUTER_API_KEY`           | OpenRouter API key            |
-   | `NEXT_PUBLIC_APP_URL`          | `https://app.yourdomain.com`  |
+   | Variable                 | Value                         |
+   | ------------------------ | ----------------------------- |
+   | `NEXT_PUBLIC_CONVEX_URL` | Your Convex deployment URL    |
+   | `NEXT_PUBLIC_SENTRY_DSN` | Sentry DSN for client project |
+   | `SENTRY_AUTH_TOKEN`      | Sentry auth token             |
+   | `SENTRY_ORG`             | Sentry organization slug      |
+   | `SENTRY_PROJECT`         | Sentry project slug (client)  |
+   | `OPENROUTER_API_KEY`     | OpenRouter API key            |
+   | `NEXT_PUBLIC_APP_URL`    | `https://app.yourdomain.com`  |
 
 4. Deploy.
 
@@ -205,24 +204,27 @@ After deployment, add custom domains in each Vercel project's settings:
 
 ---
 
-## OneSignal Setup
+## Web Push Setup
 
-### 1. Create a OneSignal App
+Push notifications use the standard Web Push protocol (VAPID) — no third-party service needed.
 
-1. Go to https://app.onesignal.com and create a new app.
-2. Select **Web Push** as the platform.
-3. Configure:
-   - **Site URL**: `https://app.yourdomain.com`
-   - **Default notification icon**: Upload your app icon
+### 1. Generate VAPID Keys
 
-### 2. Get Credentials
+```bash
+npx web-push generate-vapid-keys
+```
 
-- **App ID** -- visible on the app settings page
-- **REST API Key** -- found under Settings > Keys & IDs
+This outputs a public key and a private key. Save both.
 
-### 3. Configure Service Worker
+### 2. Set Convex Environment Variables
 
-The client app includes `public/OneSignalSDKWorker.js` which is already configured. No additional setup needed.
+```bash
+npx convex env set VAPID_PUBLIC_KEY "BPz..."
+npx convex env set VAPID_PRIVATE_KEY "..."
+npx convex env set VAPID_SUBJECT "mailto:noreply@yourdomain.com"
+```
+
+That's it — no account to create, no dashboard to manage. The service worker at `public/sw.js` handles push events automatically.
 
 ---
 
@@ -339,8 +341,8 @@ Run through this checklist after deploying everything:
 ### Push Notifications
 
 - [ ] Client app prompts for notification permission
-- [ ] OneSignal dashboard shows registered subscribers
-- [ ] Test notification sends successfully
+- [ ] Accepting creates a `pushSubscriptions` record in Convex
+- [ ] Test notification sends successfully after a check-in
 
 ### Sentry
 
@@ -365,17 +367,15 @@ Run through this checklist after deploying everything:
 
 ### Client App (`apps/client/.env.local`)
 
-| Variable                       | Required | Description                    |
-| ------------------------------ | -------- | ------------------------------ |
-| `NEXT_PUBLIC_CONVEX_URL`       | Yes      | Convex deployment URL          |
-| `NEXT_PUBLIC_SENTRY_DSN`       | Yes      | Sentry DSN for client project  |
-| `SENTRY_AUTH_TOKEN`            | Yes      | Sentry auth token (build-time) |
-| `SENTRY_ORG`                   | Yes      | Sentry organization slug       |
-| `SENTRY_PROJECT`               | Yes      | Sentry project slug            |
-| `NEXT_PUBLIC_ONESIGNAL_APP_ID` | Yes      | OneSignal app ID               |
-| `ONESIGNAL_REST_API_KEY`       | Yes      | OneSignal REST API key         |
-| `OPENROUTER_API_KEY`           | Yes      | OpenRouter API key for AI      |
-| `NEXT_PUBLIC_APP_URL`          | Yes      | Public URL of the client app   |
+| Variable                 | Required | Description                    |
+| ------------------------ | -------- | ------------------------------ |
+| `NEXT_PUBLIC_CONVEX_URL` | Yes      | Convex deployment URL          |
+| `NEXT_PUBLIC_SENTRY_DSN` | Yes      | Sentry DSN for client project  |
+| `SENTRY_AUTH_TOKEN`      | Yes      | Sentry auth token (build-time) |
+| `SENTRY_ORG`             | Yes      | Sentry organization slug       |
+| `SENTRY_PROJECT`         | Yes      | Sentry project slug            |
+| `OPENROUTER_API_KEY`     | Yes      | OpenRouter API key for AI      |
+| `NEXT_PUBLIC_APP_URL`    | Yes      | Public URL of the client app   |
 
 ### Admin App (`apps/admin/.env.local`)
 
@@ -389,13 +389,14 @@ Run through this checklist after deploying everything:
 
 ### Convex Backend (`convex/.env`)
 
-| Variable                 | Required | Description                                               |
-| ------------------------ | -------- | --------------------------------------------------------- |
-| `OPENROUTER_API_KEY`     | Yes      | AI plan generation + OCR                                  |
-| `RESEND_API_KEY`         | Yes      | Transactional email sending                               |
-| `RESEND_FROM_EMAIL`      | Yes      | Sender address (e.g., `FitFast <noreply@yourdomain.com>`) |
-| `ONESIGNAL_REST_API_KEY` | Yes      | Push notification sending                                 |
-| `ONESIGNAL_APP_ID`       | Yes      | OneSignal application ID                                  |
-| `CLIENT_APP_URL`         | Yes      | Client app URL (used in email links)                      |
-| `MARKETING_SITE_URL`     | Yes      | Marketing site URL (CORS)                                 |
-| `SEED_USER_PASSWORD`     | No       | Password for seeded test users (dev only)                 |
+| Variable             | Required | Description                                               |
+| -------------------- | -------- | --------------------------------------------------------- |
+| `OPENROUTER_API_KEY` | Yes      | AI plan generation + OCR                                  |
+| `RESEND_API_KEY`     | Yes      | Transactional email sending                               |
+| `RESEND_FROM_EMAIL`  | Yes      | Sender address (e.g., `FitFast <noreply@yourdomain.com>`) |
+| `VAPID_PUBLIC_KEY`   | Yes      | Web Push VAPID public key                                 |
+| `VAPID_PRIVATE_KEY`  | Yes      | Web Push VAPID private key                                |
+| `VAPID_SUBJECT`      | Yes      | VAPID subject (e.g., `mailto:noreply@yourdomain.com`)     |
+| `CLIENT_APP_URL`     | Yes      | Client app URL (used in email links)                      |
+| `MARKETING_SITE_URL` | Yes      | Marketing site URL (CORS)                                 |
+| `SEED_USER_PASSWORD` | No       | Password for seeded test users (dev only)                 |

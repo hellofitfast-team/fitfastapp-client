@@ -5,6 +5,7 @@ import { internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { ActionRetrier } from "@convex-dev/action-retrier";
 import { components } from "./_generated/api";
+import webpush from "web-push";
 
 const retrier = new ActionRetrier(components.actionRetrier, {
   initialBackoffMs: 1000,
@@ -12,10 +13,35 @@ const retrier = new ActionRetrier(components.actionRetrier, {
   maxFailures: 3,
 });
 
+function getWebPushConfig() {
+  const publicKey = process.env.VAPID_PUBLIC_KEY;
+  const privateKey = process.env.VAPID_PRIVATE_KEY;
+  const subject = process.env.VAPID_SUBJECT || "mailto:noreply@fitfast.app";
+
+  if (!publicKey || !privateKey) {
+    throw new Error("VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY env vars not configured");
+  }
+
+  return { publicKey, privateKey, subject };
+}
+
+/** Check if the global notifications toggle is enabled */
+async function isNotificationsEnabled(ctx: {
+  runQuery: (
+    ref: typeof internal.systemConfig.getConfigInternal,
+    args: { key: string },
+  ) => Promise<{ value: unknown } | null>;
+}): Promise<boolean> {
+  const config = await ctx.runQuery(internal.systemConfig.getConfigInternal, {
+    key: "notifications_enabled",
+  });
+  // Default to enabled if no config exists
+  return config?.value !== false;
+}
+
 /**
  * Called as a workflow step after plans are ready.
  * Schedules the push notification with automatic retry on failure.
- * Returns immediately with a RunId — notification delivery is fire-and-retry.
  */
 export const sendPlanReadyNotification = internalAction({
   args: {
@@ -24,23 +50,74 @@ export const sendPlanReadyNotification = internalAction({
     workoutPlanId: v.id("workoutPlans"),
   },
   handler: async (ctx, { userId }) => {
-    const subscription = await ctx.runQuery(internal.pushSubscriptions.getSubscriptionByUserId, {
-      userId,
-    });
-    if (!subscription?.isActive || !subscription.onesignalSubscriptionId) return;
+    // Check global toggle and fetch subscription in parallel
+    const [enabled, subscription] = await Promise.all([
+      isNotificationsEnabled(ctx),
+      ctx.runQuery(internal.pushSubscriptions.getSubscriptionByUserId, { userId }),
+    ]);
+    if (!enabled) return;
+    if (!subscription?.isActive || !subscription.endpoint) return;
 
-    await retrier.run(ctx, internal.notifications.sendPlanReadyPush, {
-      subscriptionId: subscription.onesignalSubscriptionId,
-    });
+    const title = "FitFast";
+    const body = "Your new meal and workout plans are ready!";
+
+    try {
+      await retrier.run(ctx, internal.notifications.sendPushToEndpoint, {
+        endpoint: subscription.endpoint,
+        p256dh: subscription.p256dh,
+        auth: subscription.auth,
+        title,
+        body,
+        url: "/",
+      });
+
+      await ctx.runMutation(internal.notificationLog.logNotification, {
+        type: "plan_ready",
+        title,
+        body,
+        recipientCount: 1,
+        recipientUserId: userId,
+        sentBy: "system",
+        status: "sent",
+      });
+    } catch {
+      await ctx.runMutation(internal.notificationLog.logNotification, {
+        type: "plan_ready",
+        title,
+        body,
+        recipientCount: 1,
+        recipientUserId: userId,
+        sentBy: "system",
+        status: "failed",
+        failedCount: 1,
+      });
+    }
   },
 });
 
-export const sendPlanReadyPush = internalAction({
-  args: { subscriptionId: v.string() },
-  handler: async (_ctx, { subscriptionId }) => {
-    await sendOneSignalNotification(subscriptionId, {
-      en: "Your new meal and workout plans are ready!",
-    });
+/**
+ * Generic push action: sends a web push notification and auto-deactivates expired subscriptions.
+ * Used by orchestrators (sendPlanReadyNotification, sendReminderToUser) via the retrier.
+ */
+export const sendPushToEndpoint = internalAction({
+  args: {
+    endpoint: v.string(),
+    p256dh: v.string(),
+    auth: v.string(),
+    title: v.string(),
+    body: v.string(),
+    url: v.optional(v.string()),
+  },
+  handler: async (ctx, { endpoint, p256dh, auth, title, body, url }) => {
+    try {
+      await sendWebPushNotification({ endpoint, p256dh, auth }, { title, body, url });
+    } catch (err) {
+      if (err instanceof SubscriptionExpiredError) {
+        await ctx.runMutation(internal.pushSubscriptions.deactivateByEndpoint, { endpoint });
+        return; // Don't re-throw — stops the retrier
+      }
+      throw err;
+    }
   },
 });
 
@@ -50,53 +127,94 @@ export const sendPlanReadyPush = internalAction({
 export const sendReminderToUser = internalAction({
   args: { userId: v.string() },
   handler: async (ctx, { userId }) => {
-    const subscription = await ctx.runQuery(internal.pushSubscriptions.getSubscriptionByUserId, {
-      userId,
-    });
+    // Check global toggle and fetch subscription in parallel
+    const [enabled, subscription] = await Promise.all([
+      isNotificationsEnabled(ctx),
+      ctx.runQuery(internal.pushSubscriptions.getSubscriptionByUserId, { userId }),
+    ]);
 
-    if (subscription?.isActive && subscription.onesignalSubscriptionId) {
-      await retrier.run(ctx, internal.notifications.sendReminderPush, {
-        subscriptionId: subscription.onesignalSubscriptionId,
-      });
+    const title = "FitFast";
+    const body = "Time for your check-in! Track your progress today";
+
+    if (enabled && subscription?.isActive && subscription.endpoint) {
+      try {
+        await retrier.run(ctx, internal.notifications.sendPushToEndpoint, {
+          endpoint: subscription.endpoint,
+          p256dh: subscription.p256dh,
+          auth: subscription.auth,
+          title,
+          body,
+          url: "/check-in",
+        });
+
+        await ctx.runMutation(internal.notificationLog.logNotification, {
+          type: "reminder",
+          title,
+          body,
+          recipientCount: 1,
+          recipientUserId: userId,
+          sentBy: "system",
+          status: "sent",
+        });
+      } catch {
+        await ctx.runMutation(internal.notificationLog.logNotification, {
+          type: "reminder",
+          title,
+          body,
+          recipientCount: 1,
+          recipientUserId: userId,
+          sentBy: "system",
+          status: "failed",
+          failedCount: 1,
+        });
+      }
     } else {
-      // Fallback to email when no active push subscription
+      // Fallback to email when no active push subscription or notifications disabled
       await ctx.runAction(internal.email.sendReminderEmail, { userId });
     }
   },
 });
 
-export const sendReminderPush = internalAction({
-  args: { subscriptionId: v.string() },
-  handler: async (_ctx, { subscriptionId }) => {
-    await sendOneSignalNotification(subscriptionId, {
-      en: "Time for your check-in! Track your progress today 💪",
-    });
-  },
-});
+/** Sentinel error class for expired subscriptions (410 Gone / 404 Not Found) */
+export class SubscriptionExpiredError extends Error {
+  endpoint: string;
+  constructor(endpoint: string) {
+    super(`Push subscription expired (410/404): ${endpoint}`);
+    this.name = "SubscriptionExpiredError";
+    this.endpoint = endpoint;
+  }
+}
 
-async function sendOneSignalNotification(
-  subscriptionId: string,
-  contents: { en: string; ar?: string },
+let vapidConfigured = false;
+function ensureVapidConfigured() {
+  if (vapidConfigured) return;
+  const { publicKey, privateKey, subject } = getWebPushConfig();
+  webpush.setVapidDetails(subject, publicKey, privateKey);
+  vapidConfigured = true;
+}
+
+/** Exported for use by adminNotifications.ts */
+export async function sendWebPushNotification(
+  sub: { endpoint: string; p256dh: string; auth: string },
+  payload: { title: string; body: string; url?: string },
 ) {
-  const apiKey = process.env.ONESIGNAL_REST_API_KEY;
-  const appId = process.env.ONESIGNAL_APP_ID;
-  if (!apiKey || !appId) throw new Error("OneSignal env vars not configured");
+  ensureVapidConfigured();
 
-  const res = await fetch("https://onesignal.com/api/v1/notifications", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Basic ${apiKey}`,
+  const pushSubscription = {
+    endpoint: sub.endpoint,
+    keys: {
+      p256dh: sub.p256dh,
+      auth: sub.auth,
     },
-    body: JSON.stringify({
-      app_id: appId,
-      include_subscription_ids: [subscriptionId],
-      contents,
-    }),
-  });
+  };
 
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`OneSignal error ${res.status}: ${body}`);
+  try {
+    await webpush.sendNotification(pushSubscription, JSON.stringify(payload));
+  } catch (err: unknown) {
+    const statusCode = (err as { statusCode?: number }).statusCode;
+    if (statusCode === 410 || statusCode === 404) {
+      throw new SubscriptionExpiredError(sub.endpoint);
+    }
+    throw err;
   }
 }

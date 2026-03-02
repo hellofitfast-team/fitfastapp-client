@@ -17,7 +17,6 @@ const nextConfig: NextConfig = {
       "@sentry/nextjs",
       "react-hook-form",
       "zod",
-      "react-onesignal",
     ],
   },
 
@@ -57,11 +56,11 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.onesignal.com",
-              "style-src 'self' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: blob: https://*.convex.cloud",
-              "font-src 'self' data:",
-              "connect-src 'self' https://*.convex.cloud wss://*.convex.cloud https://*.sentry.io https://cdn.onesignal.com https://*.onesignal.com",
+              "font-src 'self' data: https://fonts.gstatic.com",
+              "connect-src 'self' https://*.convex.cloud wss://*.convex.cloud https://*.sentry.io",
               "worker-src 'self' blob:",
               "frame-src 'self'",
               "frame-ancestors 'none'",

@@ -179,11 +179,12 @@ Access Vercel at https://vercel.com:
 
 ### Push Notification Issues
 
-| Symptom                           | Likely Cause           | Fix                                                                  |
-| --------------------------------- | ---------------------- | -------------------------------------------------------------------- |
-| No notification permission prompt | OneSignal App ID wrong | Verify `NEXT_PUBLIC_ONESIGNAL_APP_ID`                                |
-| Notifications don't arrive        | REST API key wrong     | Verify `ONESIGNAL_REST_API_KEY` in Convex env                        |
-| Service worker error              | Incorrect SW file      | Ensure `public/OneSignalSDKWorker.js` exists and is served correctly |
+| Symptom                           | Likely Cause            | Fix                                                             |
+| --------------------------------- | ----------------------- | --------------------------------------------------------------- |
+| No notification permission prompt | VAPID key not set       | Verify `VAPID_PUBLIC_KEY` is set in Convex env                  |
+| Notifications don't arrive        | VAPID private key wrong | Verify `VAPID_PRIVATE_KEY` in Convex env matches the public key |
+| Service worker error              | SW not registered       | Ensure `public/sw.js` exists and is served with correct headers |
+| iOS doesn't show notifications    | PWA not installed       | iOS requires the PWA to be added to home screen for Web Push    |
 
 ### Payment Verification Issues
 
@@ -251,13 +252,13 @@ Convex provides data export functionality through the dashboard:
 
 FitFast is designed for **500-1000 clients per coach instance**:
 
-| Resource           | Capacity                | Notes                             |
-| ------------------ | ----------------------- | --------------------------------- |
-| Convex database    | No hard limit           | Convex scales automatically       |
-| AI plan generation | ~50 concurrent          | Limited by OpenRouter rate limits |
-| Push notifications | 10K+ subscribers        | OneSignal free tier supports this |
-| Email sending      | 3000/day (Resend free)  | Upgrade plan for higher volume    |
-| File storage       | Scales with Convex plan | Monitor storage usage             |
+| Resource           | Capacity                | Notes                              |
+| ------------------ | ----------------------- | ---------------------------------- |
+| Convex database    | No hard limit           | Convex scales automatically        |
+| AI plan generation | ~50 concurrent          | Limited by OpenRouter rate limits  |
+| Push notifications | Unlimited               | Native Web Push — no vendor limits |
+| Email sending      | 3000/day (Resend free)  | Upgrade plan for higher volume     |
+| File storage       | Scales with Convex plan | Monitor storage usage              |
 
 ### When to Upgrade
 

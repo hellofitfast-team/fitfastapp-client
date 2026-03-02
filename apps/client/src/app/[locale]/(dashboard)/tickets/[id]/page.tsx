@@ -10,6 +10,7 @@ import type { Id } from "@/convex/_generated/dataModel";
 import { ArrowLeft, MessageSquare, Shield, Send, Loader2 } from "lucide-react";
 import { Skeleton } from "@fitfast/ui/skeleton";
 import { cn } from "@fitfast/ui/cn";
+import { formatTime } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
 interface TicketMessage {
@@ -40,7 +41,7 @@ function groupMessagesByDate(
       } else if (dateKey === yesterday) {
         label = t("chat.yesterday");
       } else {
-        label = new Date(dateKey).toLocaleDateString(locale === "ar" ? "ar-u-nu-latn" : "en-US", {
+        label = new Date(dateKey).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
           month: "short",
           day: "numeric",
         });
@@ -49,13 +50,6 @@ function groupMessagesByDate(
     }
   }
   return groups;
-}
-
-function formatTime(timestamp: number, locale: string): string {
-  return new Date(timestamp).toLocaleTimeString(locale === "ar" ? "ar-u-nu-latn" : "en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 }
 
 export default function TicketDetailPage() {
@@ -230,7 +224,7 @@ export default function TicketDetailPage() {
                     >
                       <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.message}</p>
                       <p className="text-muted-foreground mt-1 text-[10px]">
-                        {formatTime(msg.timestamp, locale)}
+                        {formatTime(new Date(msg.timestamp), locale)}
                       </p>
                     </div>
                   </div>
@@ -252,7 +246,7 @@ export default function TicketDetailPage() {
                   >
                     <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.message}</p>
                     <p className="text-primary-foreground/70 mt-1 text-[10px]">
-                      {formatTime(msg.timestamp, locale)}
+                      {formatTime(new Date(msg.timestamp), locale)}
                     </p>
                   </div>
                 </div>

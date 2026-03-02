@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { PaymentScreenshot } from "@/components/payment-screenshot";
 
 interface OcrData {
   amount?: string;
@@ -29,86 +30,13 @@ interface OcrData {
   [key: string]: unknown;
 }
 
-const tierLabels: Record<string, string> = {
-  monthly: "Monthly",
-  quarterly: "Quarterly",
-};
-
 const statusStyles: Record<string, string> = {
   pending: "bg-primary/10 text-primary border-primary/20",
   approved: "bg-emerald-50 text-emerald-700 border-emerald-200",
   rejected: "bg-red-50 text-red-700 border-red-200",
 };
 
-const ocrFieldLabels: Record<string, string> = {
-  amount: "Amount",
-  sender_name: "Sender",
-  reference_number: "Ref #",
-  date: "Date",
-  bank: "Bank",
-};
-
-function PaymentScreenshot({ storageId }: { storageId: Id<"_storage"> }) {
-  const url = useQuery(api.storage.getFileUrl, { storageId });
-  const [isZoomed, setIsZoomed] = useState(false);
-
-  if (url === undefined) {
-    return (
-      <div className="flex w-64 shrink-0 items-center justify-center rounded-lg border border-stone-200 bg-stone-50 p-8">
-        <Loader2 className="h-6 w-6 animate-spin text-stone-300" />
-      </div>
-    );
-  }
-
-  if (!url) {
-    return (
-      <div className="flex w-64 shrink-0 items-center justify-center rounded-lg border border-dashed border-stone-200 p-8">
-        <div className="text-center">
-          <ImageIcon className="mx-auto mb-2 h-8 w-8 text-stone-300" />
-          <p className="text-xs text-stone-400">Image unavailable</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <button
-        type="button"
-        onClick={() => setIsZoomed(true)}
-        className="hover:border-primary/40 w-64 shrink-0 cursor-zoom-in overflow-hidden rounded-lg border border-stone-200 transition-colors"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={url}
-          alt="Payment screenshot"
-          className="h-48 w-full bg-stone-50 object-contain"
-        />
-      </button>
-
-      {isZoomed && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-          onClick={() => setIsZoomed(false)}
-        >
-          <button
-            onClick={() => setIsZoomed(false)}
-            className="absolute end-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/40"
-          >
-            <X className="h-5 w-5" />
-          </button>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={url}
-            alt="Payment screenshot full size"
-            className="max-h-full max-w-full rounded-lg object-contain"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
-      )}
-    </>
-  );
-}
+// PaymentScreenshot imported from shared component
 
 export function SignupsTable() {
   const t = useTranslations("admin");
@@ -189,19 +117,34 @@ export function SignupsTable() {
       <table className="w-full">
         <thead>
           <tr className="border-b border-stone-100 bg-stone-50/50">
-            <th className="px-4 py-3 text-start text-xs font-medium tracking-wide text-stone-500 uppercase">
+            <th
+              scope="col"
+              className="px-4 py-3 text-start text-xs font-medium tracking-wide text-stone-500 uppercase"
+            >
               {t("client")}
             </th>
-            <th className="px-4 py-3 text-start text-xs font-medium tracking-wide text-stone-500 uppercase">
+            <th
+              scope="col"
+              className="px-4 py-3 text-start text-xs font-medium tracking-wide text-stone-500 uppercase"
+            >
               {t("plan")}
             </th>
-            <th className="px-4 py-3 text-start text-xs font-medium tracking-wide text-stone-500 uppercase">
+            <th
+              scope="col"
+              className="px-4 py-3 text-start text-xs font-medium tracking-wide text-stone-500 uppercase"
+            >
               {t("status")}
             </th>
-            <th className="px-4 py-3 text-start text-xs font-medium tracking-wide text-stone-500 uppercase">
+            <th
+              scope="col"
+              className="px-4 py-3 text-start text-xs font-medium tracking-wide text-stone-500 uppercase"
+            >
               {t("date")}
             </th>
-            <th className="px-4 py-3 text-end text-xs font-medium tracking-wide text-stone-500 uppercase">
+            <th
+              scope="col"
+              className="px-4 py-3 text-end text-xs font-medium tracking-wide text-stone-500 uppercase"
+            >
               {t("actions")}
             </th>
           </tr>
@@ -232,7 +175,7 @@ export function SignupsTable() {
                     {/* Plan */}
                     <div className="px-4 py-4">
                       <span className="text-primary text-xs font-semibold">
-                        {signup.planTier ? tierLabels[signup.planTier] || signup.planTier : "---"}
+                        {signup.planTier ? t(`tierLabels.${signup.planTier}`) : "---"}
                       </span>
                     </div>
 
@@ -246,7 +189,7 @@ export function SignupsTable() {
                         {signup.status === "pending" && <Clock className="h-3 w-3" />}
                         {signup.status === "approved" && <Check className="h-3 w-3" />}
                         {signup.status === "rejected" && <X className="h-3 w-3" />}
-                        {signup.status}
+                        {t(`clientDetail.paymentStatus.${signup.status}`)}
                       </span>
                     </div>
 
@@ -350,7 +293,10 @@ export function SignupsTable() {
                     <div className="border-t border-stone-100 bg-stone-50/50 p-4">
                       <div className="flex flex-col gap-4 lg:flex-row">
                         {signup.paymentScreenshotId ? (
-                          <PaymentScreenshot storageId={signup.paymentScreenshotId} />
+                          <PaymentScreenshot
+                            storageId={signup.paymentScreenshotId}
+                            variant="card"
+                          />
                         ) : (
                           <div className="flex w-64 shrink-0 items-center justify-center rounded-lg border border-dashed border-stone-200 p-8">
                             <div className="text-center">
@@ -373,7 +319,7 @@ export function SignupsTable() {
                                   className="flex items-baseline gap-3 border-b border-stone-100 pb-2"
                                 >
                                   <span className="text-primary w-16 shrink-0 text-[10px] font-medium tracking-wide uppercase">
-                                    {ocrFieldLabels[key] || key}
+                                    {t(`ocrLabels.${key}` as Parameters<typeof t>[0]) || key}
                                   </span>
                                   <span className="text-sm text-stone-900">{String(value)}</span>
                                 </div>

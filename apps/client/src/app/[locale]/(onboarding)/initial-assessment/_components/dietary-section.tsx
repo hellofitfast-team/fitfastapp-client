@@ -69,6 +69,8 @@ export function DietarySection({
           onOtherChange={setFoodPrefsOther}
           disabled={isLoading}
           featureColor="nutrition"
+          otherLabel={t("otherOption")}
+          otherPlaceholder={t("specifyPlaceholder")}
         />
       </SectionCard>
 
@@ -116,6 +118,8 @@ export function DietarySection({
           disabled={isLoading}
           hasNoneOption={true}
           featureColor="nutrition"
+          otherLabel={t("otherOption")}
+          otherPlaceholder={t("specifyPlaceholder")}
         />
       </SectionCard>
 
@@ -133,6 +137,8 @@ export function DietarySection({
           disabled={isLoading}
           hasNoneOption={true}
           featureColor="nutrition"
+          otherLabel={t("otherOption")}
+          otherPlaceholder={t("specifyPlaceholder")}
         />
       </SectionCard>
     </div>

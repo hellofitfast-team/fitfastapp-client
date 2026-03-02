@@ -55,6 +55,7 @@ function StatCard({
   href: string;
   accent?: boolean;
 }) {
+  const t = useTranslations("admin");
   return (
     <Link
       href={href}
@@ -80,7 +81,7 @@ function StatCard({
         </div>
       </div>
       <div className="group-hover:text-primary mt-3 flex items-center gap-1 text-xs font-medium text-stone-400 transition-colors">
-        View <ArrowRight className="h-3 w-3 rtl:rotate-180" />
+        {t("view")} <ArrowRight className="h-3 w-3 rtl:rotate-180" />
       </div>
     </Link>
   );

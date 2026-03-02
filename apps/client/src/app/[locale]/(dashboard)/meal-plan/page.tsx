@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
+import { toLocalDigits, formatDateShort } from "@/lib/utils";
 import { useCurrentMealPlan } from "@/hooks/use-meal-plans";
 import {
   UtensilsCrossed,
@@ -47,9 +48,24 @@ interface RawMeal {
   carbs?: number;
   fat?: number;
   macros?: { calories?: number; protein?: number; carbs?: number; fat?: number };
-  ingredients?: string[] | string;
-  instructions?: string[] | string;
+  ingredients?: unknown[] | string;
+  instructions?: unknown[] | string;
   alternatives?: (string | RawMeal)[];
+}
+
+/** Coerce an ingredient/instruction to a plain string (handles {item,quantity} objects from Gemini) */
+function toStringItem(val: unknown): string {
+  if (typeof val === "string") return val;
+  if (val && typeof val === "object") {
+    const obj = val as Record<string, unknown>;
+    // Gemini format: {item: "chicken breast", quantity: "200g"}
+    if (obj.item) return obj.quantity ? `${obj.quantity} ${obj.item}` : String(obj.item);
+    // Generic: {name: "...", amount: "..."}
+    if (obj.name) return obj.amount ? `${obj.amount} ${obj.name}` : String(obj.name);
+    // Fallback: join all values
+    return Object.values(obj).filter(Boolean).join(" ");
+  }
+  return String(val ?? "");
 }
 
 /** Day plan structure from AI-generated meal plan */
@@ -69,9 +85,9 @@ function normalizeMeal(raw: RawMeal): NormalizedMeal {
     protein: raw.protein ?? macros.protein ?? 0,
     carbs: raw.carbs ?? macros.carbs ?? 0,
     fat: raw.fat ?? macros.fat ?? 0,
-    ingredients: Array.isArray(raw.ingredients) ? raw.ingredients : [],
+    ingredients: Array.isArray(raw.ingredients) ? raw.ingredients.map(toStringItem) : [],
     instructions: Array.isArray(raw.instructions)
-      ? raw.instructions
+      ? raw.instructions.map(toStringItem)
       : typeof raw.instructions === "string"
         ? raw.instructions.split(/\.\s+/).filter(Boolean)
         : [],
@@ -105,6 +121,7 @@ export default function MealPlanPage() {
   const t = useTranslations("meals");
   const tCommon = useTranslations("common");
   const tEmpty = useTranslations("emptyStates");
+  const tUnits = useTranslations("units");
   const locale = useLocale();
   const { mealPlan, isLoading, error } = useCurrentMealPlan();
   const assessment = useQuery(api.assessments.getMyAssessment);
@@ -208,10 +225,10 @@ export default function MealPlanPage() {
           <h1 className="text-2xl font-bold">{t("title")}</h1>
           <p className="text-muted-foreground mt-0.5 text-sm">{t("generating")}</p>
         </div>
-        <div className="border-nutrition-500/30 bg-nutrition-500/5 rounded-xl border p-5">
+        <div className="border-nutrition/30 bg-nutrition/5 rounded-xl border p-5">
           <div className="mb-3 flex items-center gap-2">
-            <Sparkles className="text-nutrition-500 h-4 w-4 animate-pulse" />
-            <span className="text-nutrition-500 text-sm font-semibold">{t("aiGenerating")}</span>
+            <Sparkles className="text-nutrition h-4 w-4 animate-pulse" />
+            <span className="text-nutrition text-sm font-semibold">{t("aiGenerating")}</span>
           </div>
           <pre className="text-muted-foreground max-h-96 overflow-y-auto font-sans text-sm leading-relaxed whitespace-pre-wrap">
             {streamedText}
@@ -251,15 +268,25 @@ export default function MealPlanPage() {
               </div>
             )}
             <div className="flex justify-center">
-              <Button
-                onClick={handleGenerate}
-                disabled={isGenerating}
-                loading={isGenerating}
-                variant="gradient"
-              >
-                <Sparkles className="h-4 w-4" />
-                {t("generatePlan")}
-              </Button>
+              {assessment === null ? (
+                <Button
+                  onClick={() => (window.location.href = `/${locale}/initial-assessment`)}
+                  variant="gradient"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  {tCommon("completeAssessment")}
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleGenerate}
+                  disabled={isGenerating || assessment === undefined}
+                  loading={isGenerating}
+                  variant="gradient"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  {t("generatePlan")}
+                </Button>
+              )}
             </div>
           </>
         )}
@@ -315,7 +342,8 @@ export default function MealPlanPage() {
       <div>
         <h1 className="text-2xl font-bold">{t("title")}</h1>
         <p className="text-muted-foreground mt-0.5 text-sm">
-          {mealPlan.startDate} - {mealPlan.endDate}
+          {formatDateShort(mealPlan.startDate, locale)} -{" "}
+          {formatDateShort(mealPlan.endDate, locale)}
         </p>
       </div>
 
@@ -337,9 +365,12 @@ export default function MealPlanPage() {
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
           <p className="text-xs text-blue-700">
             {t("calorieExplanation", {
-              calories: planData.dailyTargets.calories,
-              protein: planData.dailyTargets.protein,
-              trainingDays: assessment?.scheduleAvailability?.days?.length ?? "—",
+              calories: toLocalDigits(planData.dailyTargets.calories, locale),
+              protein: toLocalDigits(planData.dailyTargets.protein, locale),
+              trainingDays: toLocalDigits(
+                assessment?.scheduleAvailability?.days?.length ?? "—",
+                locale,
+              ),
             })}
           </p>
         </div>
@@ -348,17 +379,20 @@ export default function MealPlanPage() {
       {/* Daily Nutrition Summary */}
       {dailyTotals && (
         <div className="scrollbar-hide flex gap-2 overflow-x-auto">
-          <span className="bg-nutrition-500/10 text-nutrition-500 flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold">
-            {dailyTotals.calories} {t("calories")}
+          <span className="bg-nutrition/10 text-nutrition flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold">
+            {toLocalDigits(dailyTotals.calories, locale)} {t("calories")}
           </span>
-          <span className="bg-nutrition-500/10 text-nutrition-500 flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold">
-            {dailyTotals.protein}g {t("protein")}
+          <span className="bg-nutrition/10 text-nutrition flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold">
+            {toLocalDigits(dailyTotals.protein, locale)}
+            {tUnits("g")} {t("protein")}
           </span>
-          <span className="bg-nutrition-500/10 text-nutrition-500 flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold">
-            {dailyTotals.carbs}g {t("carbs")}
+          <span className="bg-nutrition/10 text-nutrition flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold">
+            {toLocalDigits(dailyTotals.carbs, locale)}
+            {tUnits("g")} {t("carbs")}
           </span>
-          <span className="bg-nutrition-500/10 text-nutrition-500 flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold">
-            {dailyTotals.fat}g {t("fat")}
+          <span className="bg-nutrition/10 text-nutrition flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold">
+            {toLocalDigits(dailyTotals.fat, locale)}
+            {tUnits("g")} {t("fat")}
           </span>
         </div>
       )}
@@ -393,7 +427,7 @@ export default function MealPlanPage() {
                         isExpanded ? "bg-primary text-white" : "bg-neutral-100 text-neutral-500",
                       )}
                     >
-                      {String(index + 1).padStart(2, "0")}
+                      {toLocalDigits(String(index + 1).padStart(2, "0"), locale)}
                     </div>
                     <div className="min-w-0">
                       <h3 className="truncate text-sm font-semibold">{meal.name}</h3>
@@ -406,11 +440,11 @@ export default function MealPlanPage() {
                   <div className="flex shrink-0 items-center gap-2">
                     {hasAlternatives && (
                       <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-medium">
-                        &#8596; {meal.alternatives!.length}
+                        &#8596; {toLocalDigits(meal.alternatives!.length, locale)}
                       </span>
                     )}
-                    <span className="text-nutrition-500 text-sm font-semibold">
-                      {meal.calories} {t("kcal")}
+                    <span className="text-nutrition text-sm font-semibold">
+                      {toLocalDigits(meal.calories, locale)} {t("kcal")}
                     </span>
                     <ChevronDown
                       className={cn(
@@ -432,13 +466,16 @@ export default function MealPlanPage() {
                     {/* Macros */}
                     <div className="flex flex-wrap gap-2">
                       <span className="rounded-md bg-neutral-100 px-2.5 py-1 text-xs font-medium">
-                        {t("protein")}: {meal.protein}g
+                        {t("protein")}: {toLocalDigits(meal.protein, locale)}
+                        {tUnits("g")}
                       </span>
                       <span className="rounded-md bg-neutral-100 px-2.5 py-1 text-xs font-medium">
-                        {t("carbs")}: {meal.carbs}g
+                        {t("carbs")}: {toLocalDigits(meal.carbs, locale)}
+                        {tUnits("g")}
                       </span>
                       <span className="rounded-md bg-neutral-100 px-2.5 py-1 text-xs font-medium">
-                        {t("fat")}: {meal.fat}g
+                        {t("fat")}: {toLocalDigits(meal.fat, locale)}
+                        {tUnits("g")}
                       </span>
                     </div>
 
@@ -450,7 +487,7 @@ export default function MealPlanPage() {
                           {(Array.isArray(meal.ingredients) ? meal.ingredients : []).map(
                             (ingredient: string, i: number) => (
                               <li key={i} className="flex items-start gap-2">
-                                <span className="text-nutrition-500 mt-0.5">&#8226;</span>
+                                <span className="text-nutrition mt-0.5">&#8226;</span>
                                 {ingredient}
                               </li>
                             ),
@@ -467,8 +504,8 @@ export default function MealPlanPage() {
                           {(Array.isArray(meal.instructions) ? meal.instructions : []).map(
                             (instruction: string, i: number) => (
                               <li key={i} className="flex items-start gap-2.5">
-                                <span className="bg-nutrition-500/12 text-nutrition-500 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold">
-                                  {i + 1}
+                                <span className="bg-nutrition/12 text-nutrition mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold">
+                                  {toLocalDigits(i + 1, locale)}
                                 </span>
                                 {instruction}
                               </li>
@@ -482,13 +519,13 @@ export default function MealPlanPage() {
                     {hasAlternatives && (
                       <div>
                         <h4 className="mb-2 text-sm font-semibold">{t("alternatives")}</h4>
-                        <div className="border-nutrition-500/30 bg-nutrition-500/5 space-y-1.5 rounded-lg border border-dashed p-3">
+                        <div className="border-nutrition/30 bg-nutrition/5 space-y-1.5 rounded-lg border border-dashed p-3">
                           {meal.alternatives!.map((alt, i) => {
                             if (typeof alt === "string") {
                               // Old format: plain string
                               return (
                                 <div key={i} className="flex items-start gap-2 text-sm">
-                                  <span className="text-nutrition-500">&#8596;</span>
+                                  <span className="text-nutrition">&#8596;</span>
                                   {alt}
                                 </div>
                               );
@@ -513,29 +550,27 @@ export default function MealPlanPage() {
                             return (
                               <div
                                 key={i}
-                                className="border-nutrition-500/20 overflow-hidden rounded-md border bg-white/60"
+                                className="border-nutrition/20 overflow-hidden rounded-md border bg-white/60"
                               >
                                 {/* Collapsed header */}
                                 <button
                                   onClick={toggleAlt}
                                   aria-expanded={isAltExpanded}
-                                  className="hover:bg-nutrition-500/5 flex w-full items-center justify-between gap-2 px-3 py-2 text-start transition-colors"
+                                  className="hover:bg-nutrition/5 flex w-full items-center justify-between gap-2 px-3 py-2 text-start transition-colors"
                                 >
                                   <div className="flex min-w-0 items-center gap-2">
-                                    <span className="text-nutrition-500 shrink-0 text-sm">
-                                      &#8596;
-                                    </span>
+                                    <span className="text-nutrition shrink-0 text-sm">&#8596;</span>
                                     <span className="truncate text-sm font-medium">
                                       {normalizedAlt.name}
                                     </span>
                                   </div>
                                   <div className="flex shrink-0 items-center gap-2">
-                                    <span className="bg-nutrition-500/10 text-nutrition-500 rounded-full px-2 py-0.5 text-[10px] font-semibold">
-                                      {normalizedAlt.calories} {t("kcal")}
+                                    <span className="bg-nutrition/10 text-nutrition rounded-full px-2 py-0.5 text-[10px] font-semibold">
+                                      {toLocalDigits(normalizedAlt.calories, locale)} {t("kcal")}
                                     </span>
                                     <ChevronDown
                                       className={cn(
-                                        "text-nutrition-500/60 h-3.5 w-3.5 transition-transform duration-150",
+                                        "text-nutrition/60 h-3.5 w-3.5 transition-transform duration-150",
                                         isAltExpanded && "rotate-180",
                                       )}
                                     />
@@ -551,17 +586,21 @@ export default function MealPlanPage() {
                                       : "max-h-0 opacity-0",
                                   )}
                                 >
-                                  <div className="border-nutrition-500/15 space-y-3 border-t px-3 pt-2 pb-3">
+                                  <div className="border-nutrition/15 space-y-3 border-t px-3 pt-2 pb-3">
                                     {/* Macro chips */}
                                     <div className="flex flex-wrap gap-1.5">
-                                      <span className="bg-nutrition-500/10 text-nutrition-500 rounded-md px-2 py-0.5 text-[10px] font-medium">
-                                        {t("protein")}: {normalizedAlt.protein}g
+                                      <span className="bg-nutrition/10 text-nutrition rounded-md px-2 py-0.5 text-[10px] font-medium">
+                                        {t("protein")}:{" "}
+                                        {toLocalDigits(normalizedAlt.protein, locale)}
+                                        {tUnits("g")}
                                       </span>
-                                      <span className="bg-nutrition-500/10 text-nutrition-500 rounded-md px-2 py-0.5 text-[10px] font-medium">
-                                        {t("carbs")}: {normalizedAlt.carbs}g
+                                      <span className="bg-nutrition/10 text-nutrition rounded-md px-2 py-0.5 text-[10px] font-medium">
+                                        {t("carbs")}: {toLocalDigits(normalizedAlt.carbs, locale)}
+                                        {tUnits("g")}
                                       </span>
-                                      <span className="bg-nutrition-500/10 text-nutrition-500 rounded-md px-2 py-0.5 text-[10px] font-medium">
-                                        {t("fat")}: {normalizedAlt.fat}g
+                                      <span className="bg-nutrition/10 text-nutrition rounded-md px-2 py-0.5 text-[10px] font-medium">
+                                        {t("fat")}: {toLocalDigits(normalizedAlt.fat, locale)}
+                                        {tUnits("g")}
                                       </span>
                                     </div>
 
@@ -575,7 +614,7 @@ export default function MealPlanPage() {
                                           {normalizedAlt.ingredients.map(
                                             (ingredient: string, j: number) => (
                                               <li key={j} className="flex items-start gap-1.5">
-                                                <span className="text-nutrition-500 mt-0.5">
+                                                <span className="text-nutrition mt-0.5">
                                                   &#8226;
                                                 </span>
                                                 {ingredient}
@@ -596,8 +635,8 @@ export default function MealPlanPage() {
                                           {normalizedAlt.instructions.map(
                                             (instruction: string, j: number) => (
                                               <li key={j} className="flex items-start gap-1.5">
-                                                <span className="bg-nutrition-500/12 text-nutrition-500 mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-bold">
-                                                  {j + 1}
+                                                <span className="bg-nutrition/12 text-nutrition mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-bold">
+                                                  {toLocalDigits(j + 1, locale)}
                                                 </span>
                                                 {instruction}
                                               </li>

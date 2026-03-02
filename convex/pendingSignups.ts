@@ -103,7 +103,7 @@ export const createSignup = mutation({
     phone: v.optional(v.string()),
     planId: v.optional(v.string()),
     planTier: v.optional(v.union(v.literal("monthly"), v.literal("quarterly"))),
-    paymentScreenshotId: v.optional(v.id("_storage")),
+    paymentScreenshotId: v.id("_storage"),
   },
   handler: async (ctx, args) => {
     await rateLimiter.limit(ctx, "createSignup", { key: args.email });

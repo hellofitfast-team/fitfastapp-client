@@ -56,8 +56,9 @@ export const getFoodReferenceForPrompt = internalQuery({
     const foods = await ctx.db.query("foodDatabase").collect();
     if (foods.length === 0) return "";
 
-    const ingredients = foods.filter((f) => !f.isRecipe);
-    const recipes = foods.filter((f) => f.isRecipe);
+    // Cap at 80 ingredients + 20 recipes to keep prompt under ~1500 tokens
+    const ingredients = foods.filter((f) => !f.isRecipe).slice(0, 80);
+    const recipes = foods.filter((f) => f.isRecipe).slice(0, 20);
 
     let result = "";
 
@@ -83,9 +84,6 @@ export const getFoodReferenceForPrompt = internalQuery({
           result += ` | Serving: ${recipe.servingSize}`;
         }
         result += "\n";
-        if (recipe.ingredients && recipe.ingredients.length > 0) {
-          result += `  Ingredients: ${recipe.ingredients.join(", ")}\n`;
-        }
       }
       result +=
         "\nINSTRUCTION: Include at least 1 fun/treat meal per day from the recipe database (healthy desserts or 'junk made healthy').\n";

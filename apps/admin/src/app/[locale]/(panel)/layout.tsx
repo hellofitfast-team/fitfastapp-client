@@ -14,7 +14,7 @@ export default async function AdminPanelLayout({ children }: { children: React.R
 
   // Fetch profile, pending signups count, and open tickets count in parallel
   const [profile, pendingSignups, openTickets] = await Promise.all([
-    fetchQuery(api.profiles.getMyProfile, {}, { token }),
+    fetchQuery(api.profiles.getMyProfile, {}, { token }).catch(() => null),
     fetchQuery(api.pendingSignups.getPendingSignups, {}, { token }).catch(() => []),
     fetchQuery(api.tickets.getAllTickets, {}, { token }).catch(() => []),
   ]);

@@ -122,49 +122,49 @@ export function CheckoutForm({ selectedPlan, onSuccess }: CheckoutFormProps) {
 
   const onSubmit = async (data: CheckoutFormValues) => {
     setSubmitError(null);
+    setFileError(null);
+
+    // Payment screenshot is required
+    if (!screenshotFile) {
+      setFileError(t("screenshotRequired"));
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      let storageId: string | undefined;
-
-      // Upload screenshot if provided
-      if (screenshotFile) {
-        const convexSiteUrl = process.env.NEXT_PUBLIC_CONVEX_SITE_URL;
-        if (!convexSiteUrl) {
-          throw new Error("Convex site URL not configured");
-        }
-
-        // Get upload URL from Convex HTTP action
-        const urlResponse = await fetch(`${convexSiteUrl}/marketing/upload-url`, {
-          method: "POST",
-        });
-
-        if (!urlResponse.ok) {
-          throw new Error(`Failed to get upload URL: ${urlResponse.statusText}`);
-        }
-
-        const { uploadUrl } = (await urlResponse.json()) as { uploadUrl: string };
-        if (!uploadUrl || typeof uploadUrl !== "string") throw new Error("Invalid upload response");
-
-        // Upload file directly to Convex storage
-        const uploadResponse = await fetch(uploadUrl, {
-          method: "PUT",
-          body: screenshotFile,
-          headers: {
-            "Content-Type": screenshotFile.type,
-          },
-        });
-
-        if (!uploadResponse.ok) {
-          throw new Error(`Upload failed: ${uploadResponse.statusText}`);
-        }
-
-        const uploadResult = (await uploadResponse.json()) as { storageId: string };
-        const { storageId: resolvedStorageId } = uploadResult;
-        if (!resolvedStorageId || typeof resolvedStorageId !== "string")
-          throw new Error("Invalid storage response");
-        storageId = resolvedStorageId;
+      // Upload screenshot (required — validated above)
+      const convexSiteUrl = process.env.NEXT_PUBLIC_CONVEX_SITE_URL;
+      if (!convexSiteUrl) {
+        throw new Error("Convex site URL not configured");
       }
+
+      const urlResponse = await fetch(`${convexSiteUrl}/marketing/upload-url`, {
+        method: "POST",
+      });
+
+      if (!urlResponse.ok) {
+        throw new Error(`Failed to get upload URL: ${urlResponse.statusText}`);
+      }
+
+      const { uploadUrl } = (await urlResponse.json()) as { uploadUrl: string };
+      if (!uploadUrl || typeof uploadUrl !== "string") throw new Error("Invalid upload response");
+
+      const uploadResponse = await fetch(uploadUrl, {
+        method: "PUT",
+        body: screenshotFile,
+        headers: {
+          "Content-Type": screenshotFile.type,
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error(`Upload failed: ${uploadResponse.statusText}`);
+      }
+
+      const uploadResult = (await uploadResponse.json()) as { storageId: string };
+      const { storageId } = uploadResult;
+      if (!storageId || typeof storageId !== "string") throw new Error("Invalid storage response");
 
       // Submit signup mutation
       const planTier = durationToTier[selectedPlan.duration];
@@ -245,9 +245,7 @@ export function CheckoutForm({ selectedPlan, onSuccess }: CheckoutFormProps) {
       <div className="space-y-1.5">
         <Label className="text-sm font-medium text-[var(--color-foreground)]">
           {t("uploadScreenshot")}
-          <span className="ms-1 font-normal text-[var(--color-muted-foreground)]">
-            ({t("optional")})
-          </span>
+          <span className="ms-1 text-red-500">*</span>
         </Label>
 
         {screenshotPreview ? (

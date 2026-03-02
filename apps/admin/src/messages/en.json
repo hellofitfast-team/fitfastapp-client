@@ -104,6 +104,11 @@
     "view": "View",
     "coachResponse": "Coach Response",
     "typeResponse": "Type your response...",
+    "ticketStatuses": {
+      "open": "Open",
+      "coach_responded": "Responded",
+      "closed": "Closed"
+    },
     "close": "Close",
     "cancel": "Cancel",
     "addFaq": "Add FAQ",
@@ -150,7 +155,26 @@
       "deactivateFailed": "Failed to deactivate",
       "rejected": "Client rejected",
       "rejectFailed": "Failed to reject client",
-      "activateFailed": "Failed to activate client"
+      "activateFailed": "Failed to activate client",
+      "sendNotification": "Send Notification",
+      "referenceNumber": "Reference #",
+      "amount": "Amount",
+      "sender": "Sender",
+      "bank": "Bank",
+      "noPaymentDetails": "No payment details submitted.",
+      "noScreenshot": "No screenshot",
+      "paymentStatus": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      }
+    },
+    "ocrLabels": {
+      "amount": "Amount",
+      "sender_name": "Sender",
+      "reference_number": "Ref #",
+      "date": "Date",
+      "bank": "Bank"
     },
     "tierLabels": {
       "monthly": "Monthly",
@@ -256,7 +280,9 @@
     "accountTypeOther": "Other",
     "socialLinks": "Social Links",
     "socialLinksDesc": "Configure your social media links. Only platforms with a URL will be shown on the marketing site.",
-    "saveSocialLinks": "Save Social Links"
+    "saveSocialLinks": "Save Social Links",
+    "pushNotifications": "Push Notifications",
+    "pushNotificationsDesc": "Enable or disable push notifications sent to all clients (plan-ready, reminders, manual sends)."
   },
   "adminNav": {
     "dashboard": "Dashboard",
@@ -265,7 +291,48 @@
     "tickets": "Tickets",
     "faqs": "FAQs",
     "knowledge": "Knowledge Base",
-    "settings": "Settings"
+    "settings": "Settings",
+    "notifications": "Notifications"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "broadcast": "Broadcast",
+    "broadcastDesc": "Send a push notification to all active clients.",
+    "notificationTitle": "Title",
+    "titlePlaceholder": "Notification title...",
+    "notificationBody": "Message",
+    "bodyPlaceholder": "Notification message...",
+    "sendToAll": "Send to All",
+    "sending": "Sending...",
+    "sendToClient": "Send Notification",
+    "confirmBroadcast": "Send Broadcast?",
+    "confirmBroadcastDesc": "This will send a push notification to all active clients with push subscriptions enabled.",
+    "confirmSend": "Send",
+    "cancelSend": "Cancel",
+    "sent": "Notification Sent",
+    "sentDesc": "Push notification has been delivered.",
+    "broadcastSent": "Broadcast Sent",
+    "broadcastSentDesc": "{sent} delivered, {failed} failed",
+    "sendFailed": "Send Failed",
+    "sendFailedDesc": "Failed to send notification. The client may not have push enabled.",
+    "notificationsDisabled": "Notifications are currently disabled. Enable them in Settings first.",
+    "history": "History",
+    "historyEmpty": "No notifications sent yet.",
+    "date": "Date",
+    "type": "Type",
+    "typeLabels": {
+      "plan_ready": "Plan Ready",
+      "reminder": "Reminder",
+      "broadcast": "Broadcast",
+      "individual": "Individual"
+    },
+    "recipients": "Recipients",
+    "statusLabel": "Status",
+    "statusLabels": {
+      "sent": "Sent",
+      "failed": "Failed",
+      "partial": "Partial"
+    }
   },
   "brand": {
     "name": "FITFAST",

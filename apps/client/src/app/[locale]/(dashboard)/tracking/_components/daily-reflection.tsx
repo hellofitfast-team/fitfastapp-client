@@ -30,8 +30,8 @@ export function DailyReflection({ defaultReflection, onSubmit }: DailyReflection
       className="border-border bg-card shadow-card animate-slide-up overflow-hidden rounded-xl border"
       style={{ animationDelay: "100ms" }}
     >
-      <div className="border-border bg-routine-500/8 flex items-center gap-2 border-b p-4">
-        <BookOpen className="text-routine-500 h-4 w-4" />
+      <div className="border-border bg-routine/8 flex items-center gap-2 border-b p-4">
+        <BookOpen className="text-routine h-4 w-4" />
         <div>
           <h2 className="text-sm font-semibold">{t("dailyReflection")}</h2>
           <p className="text-muted-foreground text-xs">{t("howWasYourDay")}</p>

@@ -624,7 +624,12 @@ function Pricing() {
                   const badge = locale === "ar" ? plan.badgeAr : plan.badge;
                   const name = locale === "ar" ? plan.nameAr : plan.name;
                   const duration = locale === "ar" ? plan.durationAr : plan.duration;
-                  const features = locale === "ar" ? plan.featuresAr : plan.features;
+                  const features =
+                    locale === "ar"
+                      ? plan.featuresAr?.length
+                        ? plan.featuresAr
+                        : plan.features
+                      : plan.features;
                   const isHighlighted = Boolean(badge);
 
                   return (
@@ -750,7 +755,7 @@ function Pricing() {
                 feats.forEach((f, i) => {
                   if (!allFeatures.includes(f)) {
                     allFeatures.push(f);
-                    allFeaturesAr.push(featsAr[i] ?? f);
+                    allFeaturesAr.push(featsAr?.[i] || f);
                   }
                 });
               }
@@ -967,7 +972,7 @@ export default function LandingPage() {
   }, [locale]);
 
   return (
-    <main className="min-h-screen selection:bg-[var(--color-accent)] selection:text-white">
+    <main className="min-h-screen overflow-x-hidden selection:bg-[var(--color-accent)] selection:text-white">
       <Navbar />
       <Hero />
       <Features />

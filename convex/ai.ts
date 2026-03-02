@@ -257,6 +257,39 @@ async function getCoachKnowledgeContext(
 }
 
 // ---------------------------------------------------------------------------
+// Shared helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch client context with a single retry — when triggered from assessment
+ * submission via scheduler.runAfter(0), the assessment may not yet be visible
+ * in the action's read snapshot.
+ */
+async function fetchClientContextWithRetry(
+  ctx: ActionCtx,
+  userId: string,
+  checkInId?: Id<"checkIns">,
+): Promise<ClientContext> {
+  let clientCtx: ClientContext = await ctx.runQuery(internal.clientContext.buildClientContext, {
+    userId,
+    checkInId,
+  });
+
+  if (!clientCtx.assessment) {
+    console.warn(`[AI] Assessment not found on first try for user ${userId}, retrying in 2s...`);
+    await new Promise((r) => setTimeout(r, 2000));
+    clientCtx = await ctx.runQuery(internal.clientContext.buildClientContext, {
+      userId,
+      checkInId,
+    });
+  }
+  if (!clientCtx.assessment)
+    throw new Error("Please complete your initial assessment before generating a plan.");
+
+  return clientCtx;
+}
+
+// ---------------------------------------------------------------------------
 // Shared generation logic
 // ---------------------------------------------------------------------------
 
@@ -274,16 +307,10 @@ async function generateMealPlanHandler(
     planDuration: number;
   },
 ): Promise<Id<"mealPlans">> {
-  // Build rich progressive context (profile, assessment, check-in history, adherence, reflections)
-  const clientCtx: ClientContext = await ctx.runQuery(internal.clientContext.buildClientContext, {
-    userId,
-    checkInId,
-  });
-
-  if (!clientCtx.assessment) throw new Error("Assessment not found");
+  const clientCtx = await fetchClientContextWithRetry(ctx, userId, checkInId);
 
   // Pre-calculate nutrition targets deterministically
-  const assessment = clientCtx.assessment;
+  const assessment = clientCtx.assessment!;
   const scheduleData = assessment.scheduleAvailability as { days?: string[] } | null;
   const trainingDays = scheduleData?.days?.length ?? 4;
   console.log(
@@ -301,7 +328,7 @@ async function generateMealPlanHandler(
   });
 
   // Fetch coach knowledge context via RAG (filtered to nutrition/general docs)
-  const knowledgeSection = await getCoachKnowledgeContext(ctx, clientCtx.assessment, "meal");
+  const knowledgeSection = await getCoachKnowledgeContext(ctx, assessment, "meal");
 
   // Fetch food database reference for the AI prompt
   const foodReference: string = await ctx.runQuery(
@@ -311,7 +338,9 @@ async function generateMealPlanHandler(
 
   const { createOpenRouter } = await import("@openrouter/ai-sdk-provider");
   const { generateText } = await import("ai");
-  const openrouter = createOpenRouter({ apiKey: process.env.OPENROUTER_API_KEY });
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) throw new Error("OPENROUTER_API_KEY environment variable is not set");
+  const openrouter = createOpenRouter({ apiKey });
   const isArabic = language === "ar";
 
   const contextBlock = formatContextForPrompt(clientCtx);
@@ -378,6 +407,11 @@ ${isArabic ? "ALL content MUST be in Arabic language. Focus on Egyptian/Middle E
 ${foodReference}
 IMPORTANT: Respond ONLY with valid JSON. No markdown, no code blocks, just raw JSON.`;
 
+  // Token budget: Gemini Flash-Lite runs ~290 tok/s, so even 16K takes ~55s (well within 4-min timeout).
+  // Each meal day with alternatives, ingredients, instructions ≈ 900-1200 tokens.
+  // Use generous caps — truncation is far worse than a slightly larger response.
+  const mealOutputTokens = isArabic ? 16000 : 12000;
+
   const userPrompt = `Create a ${planDuration}-day meal plan ${isArabic ? "ENTIRELY IN ARABIC" : "in English"}:
 
 CLIENT PROFILE:
@@ -385,64 +419,79 @@ ${contextBlock}
 
 DAILY NUTRITION TARGETS: ${nutritionTargets.calories} kcal | ${nutritionTargets.protein}g protein | ${nutritionTargets.carbs}g carbs | ${nutritionTargets.fat}g fat
 
-Return a JSON object with this EXACT structure (include ALL fields for every meal):
+Be concise — short ingredient lists (3-5 per meal), 1-2 instruction steps, 1 alternative per meal.
+
+Return a JSON object with this structure:
 {
-  "dailyTargets": { "calories": ${nutritionTargets.calories}, "protein": ${nutritionTargets.protein}, "carbs": ${nutritionTargets.carbs}, "fat": ${nutritionTargets.fat} },
+  "dailyTargets": { "calories": number, "protein": number, "carbs": number, "fat": number },
   "weeklyPlan": {
     "day1": {
-      "dailyTotals": { "calories": ${nutritionTargets.calories}, "protein": ${nutritionTargets.protein}, "carbs": ${nutritionTargets.carbs}, "fat": ${nutritionTargets.fat} },
+      "dailyTotals": { "calories": number, "protein": number, "carbs": number, "fat": number },
       "meals": [
         {
-          "name": "Breakfast - Scrambled Eggs",
-          "type": "breakfast",
-          "calories": 450,
-          "protein": 30,
-          "carbs": 35,
-          "fat": 20,
-          "ingredients": ["3 eggs", "2 slices whole wheat toast", "1 tbsp olive oil", "salt and pepper to taste"],
-          "instructions": ["Heat olive oil in a non-stick pan over medium-low heat for 30 seconds", "Crack eggs into a bowl, season with salt and pepper, and whisk for 15 seconds", "Pour eggs into pan and stir gently with a spatula for 2-3 minutes until just set but still soft", "Toast bread until golden (~2 minutes) and serve alongside eggs"],
-          "alternatives": [
-            {
-              "name": "Oatmeal with Protein Powder",
-              "type": "breakfast",
-              "calories": 450,
-              "protein": 30,
-              "carbs": 55,
-              "fat": 8,
-              "ingredients": ["50g rolled oats", "1 scoop whey protein", "200ml milk", "1 tbsp honey"],
-              "instructions": ["Combine oats and milk in a pot, bring to a simmer over medium heat, stirring occasionally for 4-5 minutes until thick and creamy", "Remove from heat and let cool for 1-2 minutes (hot liquid denatures whey protein)", "Stir in protein powder until fully dissolved", "Drizzle honey on top and serve warm"]
-            }
-          ]
+          "name": "string",
+          "type": "breakfast|snack|lunch|dinner",
+          "calories": number, "protein": number, "carbs": number, "fat": number,
+          "ingredients": ["string with amount"],
+          "instructions": ["step with time/temp"],
+          "alternatives": [{ same fields as meal, without alternatives }]
         }
       ]
     },
-    "day2": { ... },
     ...up to "day${planDuration}"
   },
   "notes": "string"
 }
-Each meal MUST have: name, type, calories, protein, carbs, fat, ingredients, instructions, alternatives.
-Each alternative MUST be a full meal object with: name, type, calories, protein, carbs, fat, ingredients, instructions.
-
-VALIDATION RULES (the plan will be programmatically verified — violations will be rejected):
-- Daily meal calories MUST sum to exactly ${nutritionTargets.calories} kcal (±20 cal tolerance)
-- Daily protein MUST sum to exactly ${nutritionTargets.protein}g (±5g tolerance)
-- Daily carbs MUST sum to exactly ${nutritionTargets.carbs}g (±5g tolerance)
-- Daily fat MUST sum to exactly ${nutritionTargets.fat}g (±5g tolerance)
-- For each meal: Protein(g)×4 + Carbs(g)×4 + Fat(g)×9 must equal that meal's calories (±30 cal tolerance)
-- Do NOT round the daily target to a "nice" number — use the EXACT values provided above`;
+Each meal MUST have: name, type, calories, protein, carbs, fat, ingredients, instructions, alternatives (1 per meal).
+Keep instructions to 1-2 steps with cooking times. Keep ingredient lists to 3-5 items.
+Daily meal macros MUST sum to the targets above (±5% tolerance). Respond ONLY with valid JSON.`;
 
   // Create stream for live progress
   const streamId: string = await ctx.runMutation(internal.streamingManager.createStream, {});
 
-  const result = await generateText({
-    model: openrouter("deepseek/deepseek-chat"),
+  // --- Attempt 1: full plan ---
+  let result = await generateText({
+    model: openrouter("google/gemini-2.5-flash-lite"),
     system: systemPrompt,
     prompt: userPrompt,
     temperature: 0.4,
-    maxOutputTokens: 16000,
-    maxRetries: 3,
+    maxOutputTokens: mealOutputTokens,
+    maxRetries: 2,
+    abortSignal: AbortSignal.timeout(4 * 60 * 1000),
   });
+
+  // --- Truncation detection + retry with reduced scope ---
+  if (result.finishReason === "length") {
+    console.warn(
+      `[AI] Meal plan truncated for user ${userId} (finishReason=length, ${result.text.length} chars). Retrying with simplified prompt.`,
+    );
+    const retryPrompt = `Create a ${planDuration}-day meal plan ${isArabic ? "ENTIRELY IN ARABIC" : "in English"}:
+
+CLIENT PROFILE:
+${contextBlock}
+
+DAILY NUTRITION TARGETS: ${nutritionTargets.calories} kcal | ${nutritionTargets.protein}g protein | ${nutritionTargets.carbs}g carbs | ${nutritionTargets.fat}g fat
+
+IMPORTANT: Keep output concise to avoid truncation.
+- 4 meals per day (breakfast, lunch, snack, dinner)
+- 3 ingredients per meal max
+- 1 instruction step per meal
+- NO alternatives
+- Short ingredient descriptions
+
+Return JSON: { "dailyTargets": {...}, "weeklyPlan": { "day1": { "dailyTotals": {...}, "meals": [{ "name", "type", "calories", "protein", "carbs", "fat", "ingredients": [...], "instructions": [...] }] }, ...up to "day${planDuration}" }, "notes": "string" }
+Respond ONLY with valid JSON.`;
+
+    result = await generateText({
+      model: openrouter("google/gemini-2.5-flash-lite"),
+      system: systemPrompt,
+      prompt: retryPrompt,
+      temperature: 0.3,
+      maxOutputTokens: 16000,
+      maxRetries: 1,
+      abortSignal: AbortSignal.timeout(4 * 60 * 1000),
+    });
+  }
 
   let planData: Record<string, unknown>;
   try {
@@ -452,7 +501,9 @@ VALIDATION RULES (the plan will be programmatically verified — violations will
     console.error(
       `[AI] Meal plan JSON parse failed for user ${userId}. Text length: ${result.text.length}, finish reason: ${result.finishReason}`,
     );
-    planData = { raw: result.text, parseError: true };
+    throw new Error(
+      `Meal plan generation failed: AI returned invalid JSON (finish reason: ${result.finishReason})`,
+    );
   }
 
   // Post-generation validation & auto-correction
@@ -498,16 +549,10 @@ async function generateWorkoutPlanHandler(
     planDuration: number;
   },
 ): Promise<Id<"workoutPlans">> {
-  // Build rich progressive context (profile, assessment, check-in history, adherence, reflections)
-  const clientCtx: ClientContext = await ctx.runQuery(internal.clientContext.buildClientContext, {
-    userId,
-    checkInId,
-  });
-
-  if (!clientCtx.assessment) throw new Error("Assessment not found");
+  const clientCtx = await fetchClientContextWithRetry(ctx, userId, checkInId);
 
   // Pre-select workout split deterministically
-  const assessment = clientCtx.assessment;
+  const assessment = clientCtx.assessment!;
   const scheduleData = assessment.scheduleAvailability as { days?: string[] } | null;
   const trainingDays = scheduleData?.days?.length ?? 4;
   const split: WorkoutSplit = selectWorkoutSplit(
@@ -517,11 +562,13 @@ async function generateWorkoutPlanHandler(
   );
 
   // Fetch coach knowledge context via RAG (filtered to workout/recovery/general docs)
-  const knowledgeSection = await getCoachKnowledgeContext(ctx, clientCtx.assessment, "workout");
+  const knowledgeSection = await getCoachKnowledgeContext(ctx, assessment, "workout");
 
   const { createOpenRouter } = await import("@openrouter/ai-sdk-provider");
   const { generateText } = await import("ai");
-  const openrouter = createOpenRouter({ apiKey: process.env.OPENROUTER_API_KEY });
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) throw new Error("OPENROUTER_API_KEY environment variable is not set");
+  const openrouter = createOpenRouter({ apiKey });
   const isArabic = language === "ar";
 
   const contextBlock = formatContextForPrompt(clientCtx);
@@ -608,6 +655,10 @@ GUIDELINES:
 ${isArabic ? "ALL content MUST be in Arabic language." : ""}${knowledgeSection}
 IMPORTANT: Respond ONLY with valid JSON. No markdown, no code blocks, just raw JSON.`;
 
+  // Token budget: each workout day with warmup/cooldown/exercises ≈ 400-600 tokens.
+  // Rest days ≈ 30 tokens. Gemini Flash-Lite at ~290 tok/s makes generous caps safe.
+  const workoutOutputTokens = isArabic ? 20000 : 16000;
+
   const userPrompt = `Create a ${planDuration}-day workout plan ${isArabic ? "ENTIRELY IN ARABIC" : "in English"}:
 
 CLIENT PROFILE:
@@ -615,6 +666,8 @@ ${contextBlock}
 
 TRAINING SPLIT: ${isArabic ? split.splitNameAr : split.splitName}
 DAY LABELS: ${dayLabelsStr}
+
+Be concise — 1-2 instructions per exercise, short warmup/cooldown.
 
 Return a JSON object with this EXACT structure (include ALL fields for every exercise):
 {
@@ -638,27 +691,63 @@ Return a JSON object with this EXACT structure (include ALL fields for every exe
   "safetyTips": ["string"]
 }
 Each workout day MUST have: workoutName, duration, targetMuscles, restDay, warmup, exercises, cooldown.
-Each exercise MUST have: name, sets, reps, restBetweenSets, targetMuscles, instructions.
-Rest days only need: restDay=true, workoutName.`;
+Each exercise MUST have: name, sets, reps, restBetweenSets, targetMuscles, instructions (1 concise step).
+Rest days only need: restDay=true, workoutName. Respond ONLY with valid JSON.`;
 
   // Create stream for live progress
   const streamId: string = await ctx.runMutation(internal.streamingManager.createStream, {});
 
-  const result = await generateText({
-    model: openrouter("deepseek/deepseek-chat"),
+  // --- Attempt 1: full plan ---
+  let result = await generateText({
+    model: openrouter("google/gemini-2.5-flash-lite"),
     system: systemPrompt,
     prompt: userPrompt,
     temperature: 0.4,
-    maxOutputTokens: 6000,
-    maxRetries: 3,
+    maxOutputTokens: workoutOutputTokens,
+    maxRetries: 2,
+    abortSignal: AbortSignal.timeout(4 * 60 * 1000),
   });
+
+  // --- Truncation detection + retry with reduced scope ---
+  if (result.finishReason === "length") {
+    console.warn(
+      `[AI] Workout plan truncated for user ${userId} (finishReason=length, ${result.text.length} chars). Retrying simplified.`,
+    );
+    const retryPrompt = `Create a ${planDuration}-day workout plan ${isArabic ? "ENTIRELY IN ARABIC" : "in English"}:
+
+CLIENT PROFILE:
+${contextBlock}
+
+TRAINING SPLIT: ${isArabic ? split.splitNameAr : split.splitName}
+DAY LABELS: ${dayLabelsStr}
+
+IMPORTANT: Keep output SHORT. 4-5 exercises per training day, 1 instruction per exercise, minimal warmup/cooldown (2 exercises each).
+
+Return JSON: { "splitType": "...", "splitName": "...", "splitDescription": "...", "weeklyPlan": { "day1": { "workoutName", "duration", "targetMuscles", "restDay": false, "warmup": { "exercises": [...] }, "exercises": [...], "cooldown": { "exercises": [...] } }, ... }, "progressionNotes": "...", "safetyTips": [...] }
+Respond ONLY with valid JSON.`;
+
+    result = await generateText({
+      model: openrouter("google/gemini-2.5-flash-lite"),
+      system: systemPrompt,
+      prompt: retryPrompt,
+      temperature: 0.3,
+      maxOutputTokens: 16000,
+      maxRetries: 1,
+      abortSignal: AbortSignal.timeout(4 * 60 * 1000),
+    });
+  }
 
   let planData: Record<string, unknown>;
   try {
     const cleaned = result.text.replace(/```json\n?|```\n?/g, "").trim();
     planData = JSON.parse(cleaned);
   } catch {
-    planData = { raw: result.text, parseError: true };
+    console.error(
+      `[AI] Workout plan JSON parse failed for user ${userId}. Text length: ${result.text.length}, finish reason: ${result.finishReason}`,
+    );
+    throw new Error(
+      `Workout plan generation failed: AI returned invalid JSON (finish reason: ${result.finishReason})`,
+    );
   }
 
   // Post-generation validation
@@ -843,28 +932,34 @@ export const translateToArabic = action({
     const { createOpenRouter } = await import("@openrouter/ai-sdk-provider");
     const { generateText } = await import("ai");
 
-    const openrouter = createOpenRouter({
-      apiKey: process.env.OPENROUTER_API_KEY,
-    });
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey) throw new Error("OPENROUTER_API_KEY environment variable is not set");
 
-    const { text: translated } = await generateText({
-      model: openrouter("deepseek/deepseek-chat"),
-      maxOutputTokens: 100,
-      temperature: 0.3,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a professional Arabic translator for a fitness coaching app. " +
-            "Translate the given English text into natural, modern Arabic as it would be used in fitness/gym marketing in Egypt. " +
-            "Do NOT do literal word-for-word translation. Use the Arabic word or phrase that conveys the same meaning and feeling. " +
-            "For example: 'Starter' → 'مبتدئ', 'Premium' → 'مميز', 'Pro' → 'احترافي', 'Ultimate' → 'شامل'. " +
-            "Return ONLY the Arabic translation, nothing else.",
-        },
-        { role: "user", content: text },
-      ],
-    });
+    const openrouter = createOpenRouter({ apiKey });
 
-    return translated.trim();
+    try {
+      const { text: translated } = await generateText({
+        model: openrouter("google/gemini-2.5-flash-lite"),
+        maxOutputTokens: 100,
+        temperature: 0.3,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a professional Arabic translator for a fitness coaching app. " +
+              "Translate the given English text into natural, modern Arabic as it would be used in fitness/gym marketing in Egypt. " +
+              "Do NOT do literal word-for-word translation. Use the Arabic word or phrase that conveys the same meaning and feeling. " +
+              "For example: 'Starter' → 'مبتدئ', 'Premium' → 'مميز', 'Pro' → 'احترافي', 'Ultimate' → 'شامل'. " +
+              "Return ONLY the Arabic translation, nothing else.",
+          },
+          { role: "user", content: text },
+        ],
+      });
+
+      return translated.trim();
+    } catch (err) {
+      console.error("[AI] Translation failed:", err);
+      throw new Error("Translation failed. Please try again.");
+    }
   },
 });

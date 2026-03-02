@@ -48,7 +48,7 @@ export function KnowledgeManager() {
               : "text-stone-500 hover:text-stone-700",
           )}
         >
-          <BookOpen className="-mt-0.5 mr-1.5 inline h-4 w-4" />
+          <BookOpen className="me-1.5 -mt-0.5 inline h-4 w-4" />
           {t("knowledgeTab")}
         </button>
         <button
@@ -60,7 +60,7 @@ export function KnowledgeManager() {
               : "text-stone-500 hover:text-stone-700",
           )}
         >
-          <UtensilsCrossed className="-mt-0.5 mr-1.5 inline h-4 w-4" />
+          <UtensilsCrossed className="me-1.5 -mt-0.5 inline h-4 w-4" />
           {t("foodTab")}
         </button>
       </div>
@@ -657,13 +657,13 @@ function FoodTab() {
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
         <div className="relative min-w-[200px] flex-1">
-          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-stone-400" />
+          <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
           <input
             type="text"
             placeholder={t("foodName") + "..."}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="focus:ring-primary/20 focus:border-primary w-full rounded-lg border border-stone-200 py-2 pr-3 pl-9 text-sm focus:ring-2 focus:outline-none"
+            className="focus:ring-primary/20 focus:border-primary w-full rounded-lg border border-stone-200 py-2 ps-9 pe-3 text-sm focus:ring-2 focus:outline-none"
           />
         </div>
         <select

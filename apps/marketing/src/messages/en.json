@@ -86,7 +86,8 @@
     "invalidFileType": "Please upload an image file (PNG, JPG, WEBP).",
     "paymentInstructions": "Send Payment To",
     "noPaymentMethods": "Contact us for payment details.",
-    "invalidPhone": "Please enter a valid phone number"
+    "invalidPhone": "Please enter a valid phone number",
+    "screenshotRequired": "Payment screenshot is required"
   },
   "confirmation": {
     "title": "Signup Submitted Successfully!",

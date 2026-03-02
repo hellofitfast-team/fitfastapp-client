@@ -26,6 +26,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { cn } from "@fitfast/ui/cn";
+import { toLocalDigits } from "@/lib/utils";
 
 const ticketSchema = z.object({
   subject: z
@@ -45,8 +46,9 @@ function getTimeAgo(timestamp: number, locale: string): string {
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
 
-  if (minutes < 60) return locale === "ar" ? `${minutes}د` : `${minutes}m ago`;
-  if (hours < 24) return locale === "ar" ? `${hours}س` : `${hours}h ago`;
+  if (minutes < 60)
+    return locale === "ar" ? `${toLocalDigits(minutes, locale)}د` : `${minutes}m ago`;
+  if (hours < 24) return locale === "ar" ? `${toLocalDigits(hours, locale)}س` : `${hours}h ago`;
 
   const date = new Date(timestamp);
   const today = new Date();
@@ -57,7 +59,7 @@ function getTimeAgo(timestamp: number, locale: string): string {
     return locale === "ar" ? "أمس" : "Yesterday";
   }
 
-  return date.toLocaleDateString(locale === "ar" ? "ar-u-nu-latn" : "en-US", {
+  return date.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
     month: "short",
     day: "numeric",
   });

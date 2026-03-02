@@ -40,6 +40,17 @@ export const getPricing = query({
   },
 });
 
+/** Internal query for server-to-server use (no auth) — used by actions that need config */
+export const getConfigInternal = internalQuery({
+  args: { key: v.string() },
+  handler: async (ctx, { key }) => {
+    return ctx.db
+      .query("systemConfig")
+      .withIndex("by_key", (q) => q.eq("key", key))
+      .unique();
+  },
+});
+
 // Internal query for server-to-server use (no auth) — used by the cache action
 export const getPricingInternal = internalQuery({
   args: {},

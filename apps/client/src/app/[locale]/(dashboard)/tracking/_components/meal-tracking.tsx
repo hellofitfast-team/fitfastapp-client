@@ -52,11 +52,11 @@ export function MealTracking({
     <div className="border-border bg-card shadow-card overflow-hidden rounded-xl border">
       <button
         onClick={onToggleExpand}
-        className="border-border bg-nutrition-500/8 hover:bg-nutrition-500/12 flex w-full items-center justify-between border-b p-4 transition-colors"
+        className="border-border bg-nutrition/8 hover:bg-nutrition/12 flex w-full items-center justify-between border-b p-4 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="bg-nutrition-500/12 flex h-9 w-9 items-center justify-center rounded-lg">
-            <UtensilsCrossed className="text-nutrition-500 h-4 w-4" />
+          <div className="bg-nutrition/12 flex h-9 w-9 items-center justify-center rounded-lg">
+            <UtensilsCrossed className="text-nutrition h-4 w-4" />
           </div>
           <div className="text-start">
             <h2 className="text-sm font-semibold">{t("mealTracking")}</h2>
