@@ -24,6 +24,8 @@ export function RenewalCheckout() {
 
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [selectedTier, setSelectedTier] = useState<"monthly" | "quarterly" | null>(null);
+  const [transferReferenceNumber, setTransferReferenceNumber] = useState("");
+  const [transferAmount, setTransferAmount] = useState("");
   const [screenshotId, setScreenshotId] = useState<Id<"_storage"> | null>(null);
   const [screenshotName, setScreenshotName] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -85,13 +87,27 @@ export function RenewalCheckout() {
       setError(t("selectPlanFirst"));
       return;
     }
+    if (!transferReferenceNumber.trim()) {
+      setError(t("refRequired"));
+      return;
+    }
+    if (!transferAmount.trim()) {
+      setError(t("amountRequired"));
+      return;
+    }
+    if (!screenshotId) {
+      setError(t("screenshotRequired"));
+      return;
+    }
     setSubmitting(true);
     setError(null);
     try {
       await createRenewal({
         planId: selectedPlan,
         planTier: selectedTier,
-        paymentScreenshotId: screenshotId ?? undefined,
+        transferReferenceNumber: transferReferenceNumber.trim(),
+        transferAmount: transferAmount.trim(),
+        paymentScreenshotId: screenshotId,
       });
       setSubmitted(true);
     } catch (err) {
@@ -186,11 +202,39 @@ export function RenewalCheckout() {
         </div>
       )}
 
+      {/* Transfer Reference Number */}
+      <div>
+        <label className="text-muted-foreground mb-2 block text-sm font-semibold">
+          {t("transferReferenceNumber")} <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          value={transferReferenceNumber}
+          onChange={(e) => setTransferReferenceNumber(e.target.value)}
+          placeholder={t("transferReferenceNumberPlaceholder")}
+          className="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition-all focus:ring-2 focus:outline-none"
+        />
+      </div>
+
+      {/* Transfer Amount */}
+      <div>
+        <label className="text-muted-foreground mb-2 block text-sm font-semibold">
+          {t("transferAmount")} <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          value={transferAmount}
+          onChange={(e) => setTransferAmount(e.target.value)}
+          placeholder={t("transferAmountPlaceholder")}
+          className="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition-all focus:ring-2 focus:outline-none"
+        />
+      </div>
+
       {/* Screenshot Upload */}
       <div>
         <h3 className="text-muted-foreground mb-3 flex items-center gap-2 text-sm font-semibold">
           <ImageIcon className="h-4 w-4" />
-          {t("uploadScreenshot")}
+          {t("uploadScreenshot")} <span className="text-red-500">*</span>
         </h3>
         <input
           ref={fileRef}
@@ -229,7 +273,13 @@ export function RenewalCheckout() {
       {/* Submit */}
       <Button
         onClick={handleSubmit}
-        disabled={submitting || !selectedPlan}
+        disabled={
+          submitting ||
+          !selectedPlan ||
+          !transferReferenceNumber.trim() ||
+          !transferAmount.trim() ||
+          !screenshotId
+        }
         className="w-full"
         size="lg"
       >

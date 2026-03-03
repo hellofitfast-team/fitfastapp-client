@@ -87,7 +87,13 @@
     "paymentInstructions": "Send Payment To",
     "noPaymentMethods": "Contact us for payment details.",
     "invalidPhone": "Please enter a valid phone number",
-    "screenshotRequired": "Payment screenshot is required"
+    "screenshotRequired": "Payment screenshot is required",
+    "transferReferenceNumber": "Transfer Reference Number",
+    "transferReferenceNumberPlaceholder": "Enter the transfer reference number",
+    "transferAmount": "Transfer Amount",
+    "transferAmountPlaceholder": "e.g. 2500",
+    "refRequired": "Transfer reference number is required",
+    "amountRequired": "Transfer amount is required"
   },
   "confirmation": {
     "title": "Signup Submitted Successfully!",

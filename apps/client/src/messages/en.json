@@ -803,6 +803,13 @@
       "pendingMessage": "Your renewal request has been submitted. Your coach will review it shortly. You'll be redirected to the dashboard once approved.",
       "alreadyPending": "You already have a pending renewal request. Your coach will review it shortly.",
       "selectPlanFirst": "Please select a plan",
+      "transferReferenceNumber": "Transfer Reference Number",
+      "transferReferenceNumberPlaceholder": "Enter the transfer reference number",
+      "transferAmount": "Transfer Amount",
+      "transferAmountPlaceholder": "e.g. 2500",
+      "refRequired": "Transfer reference number is required",
+      "amountRequired": "Transfer amount is required",
+      "screenshotRequired": "Payment screenshot is required",
       "perMonth": "/month",
       "perQuarter": "/quarter",
       "popular": "Popular"

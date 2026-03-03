@@ -18,6 +18,7 @@ import type * as checkInWorkflow from "../checkInWorkflow.js";
 import type * as checkIns from "../checkIns.js";
 import type * as clientContext from "../clientContext.js";
 import type * as completions from "../completions.js";
+import type * as constants from "../constants.js";
 import type * as cronJobs from "../cronJobs.js";
 import type * as dashboard from "../dashboard.js";
 import type * as dataRetention from "../dataRetention.js";
@@ -70,6 +71,7 @@ declare const fullApi: ApiFromModules<{
   checkIns: typeof checkIns;
   clientContext: typeof clientContext;
   completions: typeof completions;
+  constants: typeof constants;
   cronJobs: typeof cronJobs;
   dashboard: typeof dashboard;
   dataRetention: typeof dataRetention;

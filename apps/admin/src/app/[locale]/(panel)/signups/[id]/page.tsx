@@ -251,6 +251,35 @@ export default function SignupDetailPage() {
         )}
       </div>
 
+      {/* Submitted payment details */}
+      {(signup.transferReferenceNumber || signup.transferAmount) && (
+        <div className="rounded-xl border border-stone-200 bg-white p-6">
+          <h2 className="mb-4 text-sm font-semibold text-stone-900">
+            {t("submittedPaymentDetails")}
+          </h2>
+          <div className="space-y-2">
+            {signup.transferReferenceNumber && (
+              <div className="flex items-baseline gap-3 border-b border-stone-100 pb-2 last:border-0 last:pb-0">
+                <span className="text-primary w-24 shrink-0 text-xs font-medium tracking-wide uppercase">
+                  {t("transferRefLabel")}
+                </span>
+                <span className="text-sm font-medium text-stone-900">
+                  {signup.transferReferenceNumber}
+                </span>
+              </div>
+            )}
+            {signup.transferAmount && (
+              <div className="flex items-baseline gap-3 border-b border-stone-100 pb-2 last:border-0 last:pb-0">
+                <span className="text-primary w-24 shrink-0 text-xs font-medium tracking-wide uppercase">
+                  {t("transferAmountLabel")}
+                </span>
+                <span className="text-sm font-medium text-stone-900">{signup.transferAmount}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* OCR extracted data */}
       {ocrEntries.length > 0 && (
         <div className="rounded-xl border border-stone-200 bg-white p-6">

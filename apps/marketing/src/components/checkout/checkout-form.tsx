@@ -34,11 +34,17 @@ const durationToTier: Record<string, "monthly" | "quarterly"> = {
   "3 months": "quarterly",
 };
 
-function makeCheckoutSchema(invalidPhoneMsg: string) {
+function makeCheckoutSchema(
+  invalidPhoneMsg: string,
+  refRequiredMsg: string,
+  amountRequiredMsg: string,
+) {
   return z.object({
     fullName: z.string().min(2).max(100),
     email: z.string().email(),
     phone: z.string().regex(/^\+?[0-9\s-]{10,15}$/, invalidPhoneMsg),
+    transferReferenceNumber: z.string().min(1, refRequiredMsg),
+    transferAmount: z.string().min(1, amountRequiredMsg),
   });
 }
 
@@ -48,7 +54,11 @@ type CheckoutFormValues = z.infer<CheckoutSchema>;
 
 export function CheckoutForm({ selectedPlan, onSuccess }: CheckoutFormProps) {
   const t = useTranslations("checkout");
-  const checkoutSchema = makeCheckoutSchema(t("invalidPhone"));
+  const checkoutSchema = makeCheckoutSchema(
+    t("invalidPhone"),
+    t("refRequired"),
+    t("amountRequired"),
+  );
   const createSignup = useMutation(api.pendingSignups.createSignup);
 
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
@@ -177,6 +187,8 @@ export function CheckoutForm({ selectedPlan, onSuccess }: CheckoutFormProps) {
         phone: data.phone,
         planId: selectedPlan.id,
         ...(planTier ? { planTier } : {}),
+        transferReferenceNumber: data.transferReferenceNumber,
+        transferAmount: data.transferAmount,
         paymentScreenshotId: storageId as Parameters<typeof createSignup>[0]["paymentScreenshotId"],
       });
 
@@ -240,6 +252,50 @@ export function CheckoutForm({ selectedPlan, onSuccess }: CheckoutFormProps) {
 
       {/* Payment Instructions */}
       <PaymentInstructions />
+
+      {/* Transfer Reference Number */}
+      <div className="space-y-1.5">
+        <Label
+          htmlFor="transferReferenceNumber"
+          className="text-sm font-medium text-[var(--color-foreground)]"
+        >
+          {t("transferReferenceNumber")}
+          <span className="ms-1 text-red-500">*</span>
+        </Label>
+        <Input
+          id="transferReferenceNumber"
+          {...register("transferReferenceNumber")}
+          placeholder={t("transferReferenceNumberPlaceholder")}
+          className={cn(
+            errors.transferReferenceNumber && "border-red-500 focus-visible:ring-red-500",
+          )}
+          disabled={isSubmitting}
+        />
+        {errors.transferReferenceNumber && (
+          <p className="text-xs text-red-500">{errors.transferReferenceNumber.message}</p>
+        )}
+      </div>
+
+      {/* Transfer Amount */}
+      <div className="space-y-1.5">
+        <Label
+          htmlFor="transferAmount"
+          className="text-sm font-medium text-[var(--color-foreground)]"
+        >
+          {t("transferAmount")}
+          <span className="ms-1 text-red-500">*</span>
+        </Label>
+        <Input
+          id="transferAmount"
+          {...register("transferAmount")}
+          placeholder={t("transferAmountPlaceholder")}
+          className={cn(errors.transferAmount && "border-red-500 focus-visible:ring-red-500")}
+          disabled={isSubmitting}
+        />
+        {errors.transferAmount && (
+          <p className="text-xs text-red-500">{errors.transferAmount.message}</p>
+        )}
+      </div>
 
       {/* Screenshot Upload */}
       <div className="space-y-1.5">

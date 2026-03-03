@@ -104,6 +104,8 @@ export const createSignup = mutation({
     phone: v.optional(v.string()),
     planId: v.optional(v.string()),
     planTier: v.optional(v.union(v.literal("monthly"), v.literal("quarterly"))),
+    transferReferenceNumber: v.string(),
+    transferAmount: v.string(),
     paymentScreenshotId: v.id("_storage"),
   },
   handler: async (ctx, args) => {
@@ -215,7 +217,9 @@ export const createRenewalSignup = mutation({
   args: {
     planId: v.optional(v.string()),
     planTier: v.optional(v.union(v.literal("monthly"), v.literal("quarterly"))),
-    paymentScreenshotId: v.optional(v.id("_storage")),
+    transferReferenceNumber: v.string(),
+    transferAmount: v.string(),
+    paymentScreenshotId: v.id("_storage"),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -245,6 +249,8 @@ export const createRenewalSignup = mutation({
       fullName: profile.fullName ?? "Client",
       planId: args.planId,
       planTier: args.planTier,
+      transferReferenceNumber: args.transferReferenceNumber,
+      transferAmount: args.transferAmount,
       paymentScreenshotId: args.paymentScreenshotId,
       status: "pending",
     });

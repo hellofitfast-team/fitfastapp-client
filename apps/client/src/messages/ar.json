@@ -798,6 +798,13 @@
       "pendingMessage": "تم إرسال طلب التجديد. سيراجعه مدربك قريباً. سيتم توجيهك إلى لوحة التحكم بمجرد الموافقة.",
       "alreadyPending": "لديك بالفعل طلب تجديد قيد المراجعة. سيراجعه مدربك قريباً.",
       "selectPlanFirst": "يرجى اختيار خطة أولاً",
+      "transferReferenceNumber": "رقم مرجع التحويل",
+      "transferReferenceNumberPlaceholder": "أدخل رقم مرجع التحويل",
+      "transferAmount": "مبلغ التحويل",
+      "transferAmountPlaceholder": "مثال: 2500",
+      "refRequired": "رقم مرجع التحويل مطلوب",
+      "amountRequired": "مبلغ التحويل مطلوب",
+      "screenshotRequired": "لقطة شاشة الدفع مطلوبة",
       "perMonth": "/شهر",
       "perQuarter": "/ربع سنة",
       "popular": "الأكثر شيوعاً"

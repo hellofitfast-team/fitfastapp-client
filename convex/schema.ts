@@ -229,6 +229,8 @@ export default defineSchema({
         v.literal("12_months"),
       ),
     ),
+    transferReferenceNumber: v.optional(v.string()),
+    transferAmount: v.optional(v.string()),
     paymentScreenshotId: v.optional(v.id("_storage")),
     ocrExtractedData: v.optional(v.any()),
     status: v.union(v.literal("pending"), v.literal("approved"), v.literal("rejected")),

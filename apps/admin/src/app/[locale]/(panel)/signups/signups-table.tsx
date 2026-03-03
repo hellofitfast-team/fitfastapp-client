@@ -306,35 +306,69 @@ export function SignupsTable() {
                           </div>
                         )}
 
-                        {/* OCR extracted data */}
-                        {ocrEntries.length > 0 && (
-                          <div className="flex-1">
-                            <p className="mb-2 text-[10px] font-medium tracking-wide text-stone-400 uppercase">
-                              {t("extractedPaymentData")}
-                            </p>
-                            <div className="space-y-2">
-                              {ocrEntries.map(([key, value]) => (
-                                <div
-                                  key={key}
-                                  className="flex items-baseline gap-3 border-b border-stone-100 pb-2"
-                                >
-                                  <span className="text-primary w-16 shrink-0 text-[10px] font-medium tracking-wide uppercase">
-                                    {t(`ocrLabels.${key}` as Parameters<typeof t>[0]) || key}
-                                  </span>
-                                  <span className="text-sm text-stone-900">{String(value)}</span>
-                                </div>
-                              ))}
+                        {/* Submitted payment details + OCR extracted data */}
+                        <div className="flex-1">
+                          {/* Submitted reference & amount */}
+                          {(signup.transferReferenceNumber || signup.transferAmount) && (
+                            <div className="mb-3">
+                              <p className="mb-2 text-[10px] font-medium tracking-wide text-stone-400 uppercase">
+                                {t("submittedPaymentDetails")}
+                              </p>
+                              <div className="space-y-2">
+                                {signup.transferReferenceNumber && (
+                                  <div className="flex items-baseline gap-3 border-b border-stone-100 pb-2">
+                                    <span className="text-primary w-16 shrink-0 text-[10px] font-medium tracking-wide uppercase">
+                                      {t("transferRefLabel")}
+                                    </span>
+                                    <span className="text-sm font-medium text-stone-900">
+                                      {signup.transferReferenceNumber}
+                                    </span>
+                                  </div>
+                                )}
+                                {signup.transferAmount && (
+                                  <div className="flex items-baseline gap-3 border-b border-stone-100 pb-2">
+                                    <span className="text-primary w-16 shrink-0 text-[10px] font-medium tracking-wide uppercase">
+                                      {t("transferAmountLabel")}
+                                    </span>
+                                    <span className="text-sm font-medium text-stone-900">
+                                      {signup.transferAmount}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
-                        {ocrEntries.length === 0 && (
-                          <div className="flex flex-1 items-center">
-                            <p className="text-xs text-stone-400">
-                              {signup.paymentScreenshotId ? t("noOcrData") : t("noPaymentProof")}
-                            </p>
-                          </div>
-                        )}
+                          {/* OCR extracted data */}
+                          {ocrEntries.length > 0 && (
+                            <div>
+                              <p className="mb-2 text-[10px] font-medium tracking-wide text-stone-400 uppercase">
+                                {t("extractedPaymentData")}
+                              </p>
+                              <div className="space-y-2">
+                                {ocrEntries.map(([key, value]) => (
+                                  <div
+                                    key={key}
+                                    className="flex items-baseline gap-3 border-b border-stone-100 pb-2"
+                                  >
+                                    <span className="text-primary w-16 shrink-0 text-[10px] font-medium tracking-wide uppercase">
+                                      {t(`ocrLabels.${key}` as Parameters<typeof t>[0]) || key}
+                                    </span>
+                                    <span className="text-sm text-stone-900">{String(value)}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {ocrEntries.length === 0 &&
+                            !signup.transferReferenceNumber &&
+                            !signup.transferAmount && (
+                              <p className="text-xs text-stone-400">
+                                {signup.paymentScreenshotId ? t("noOcrData") : t("noPaymentProof")}
+                              </p>
+                            )}
+                        </div>
                       </div>
                     </div>
                   )}
