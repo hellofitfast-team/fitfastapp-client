@@ -95,6 +95,12 @@
     "refRequired": "Transfer reference number is required",
     "amountRequired": "Transfer amount is required"
   },
+  "error": {
+    "title": "Something went wrong",
+    "description": "We're sorry — something unexpected happened. Please try again.",
+    "errorId": "Error ID",
+    "tryAgain": "Try Again"
+  },
   "confirmation": {
     "title": "Signup Submitted Successfully!",
     "subtitle": "Check your email to complete your account setup",

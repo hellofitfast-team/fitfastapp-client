@@ -284,7 +284,7 @@ export function PlansManager() {
     <div className="space-y-4">
       {plans.length === 0 && (
         <div className="rounded-xl border border-dashed border-stone-200 p-8 text-center">
-          <p className="text-sm text-stone-400">No plans yet. Add your first pricing plan.</p>
+          <p className="text-sm text-stone-400">{t("noPlansEmpty")}</p>
         </div>
       )}
 
@@ -460,7 +460,7 @@ export function PlansManager() {
               >
                 {t("features")}
                 {invalidFields.has(`${plan.id}:features`) && (
-                  <span className="ms-1 font-normal">(at least one required)</span>
+                  <span className="ms-1 font-normal">({t("atLeastOneRequired")})</span>
                 )}
               </label>
               <div className="flex flex-wrap gap-2">
@@ -485,7 +485,7 @@ export function PlansManager() {
               </div>
               {plan.features.length > 0 && (
                 <p className="mt-2 text-[11px] text-stone-400">
-                  {plan.features.length} feature{plan.features.length !== 1 ? "s" : ""} selected
+                  {t("featuresSelected", { count: plan.features.length })}
                 </p>
               )}
             </div>

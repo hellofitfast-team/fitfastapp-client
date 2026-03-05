@@ -16,6 +16,7 @@ import { useTickets } from "@/hooks/use-tickets";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
+import { useToast } from "@/hooks/use-toast";
 import { EmptyState } from "@fitfast/ui/empty-state";
 import { SkeletonTicketItem } from "@fitfast/ui/skeleton";
 import { Input } from "@fitfast/ui/input";
@@ -29,15 +30,14 @@ import { z } from "zod";
 import { cn } from "@fitfast/ui/cn";
 import { toLocalDigits } from "@/lib/utils";
 
-const ticketSchema = z.object({
-  subject: z
-    .string()
-    .min(3, "Subject must be at least 3 characters")
-    .max(100, "Subject must be under 100 characters"),
-  category: z.enum(["meal_issue", "workout_issue", "technical", "bug_report", "other"]),
-  description: z.string().optional(),
-});
-type TicketFormData = z.infer<typeof ticketSchema>;
+function createTicketSchema(t: (key: string) => string) {
+  return z.object({
+    subject: z.string().min(3, t("subjectMinLength")).max(100, t("subjectMaxLength")),
+    category: z.enum(["meal_issue", "workout_issue", "technical", "bug_report", "other"]),
+    description: z.string().optional(),
+  });
+}
+type TicketFormData = z.infer<ReturnType<typeof createTicketSchema>>;
 
 // Relative time helper
 function getTimeAgo(timestamp: number, locale: string): string {
@@ -73,6 +73,9 @@ export default function TicketsPage() {
   const { tickets, isLoading, error, createTicket } = useTickets();
   const generateUploadUrl = useMutation(api.storage.generateUploadUrl);
 
+  const { toast } = useToast();
+  const ticketSchema = createTicketSchema((key) => t(key));
+
   const {
     register,
     handleSubmit,
@@ -93,7 +96,7 @@ export default function TicketsPage() {
     if (!screenshotFile) return undefined;
     setIsUploading(true);
     try {
-      const uploadUrl = await generateUploadUrl({});
+      const uploadUrl = await generateUploadUrl({ purpose: "ticket_screenshot" });
       const result = await fetch(uploadUrl, {
         method: "POST",
         headers: { "Content-Type": screenshotFile.type },
@@ -101,7 +104,12 @@ export default function TicketsPage() {
       });
       const { storageId } = await result.json();
       return storageId as Id<"_storage">;
-    } catch {
+    } catch (err) {
+      toast({
+        title: t("uploadFailed"),
+        description: t("uploadFailedDescription"),
+        variant: "destructive",
+      });
       return undefined;
     } finally {
       setIsUploading(false);

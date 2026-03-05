@@ -60,6 +60,7 @@
     "saveSuccess": "تم حفظ الإعدادات",
     "saveSuccessDescription": "تم حفظ تغييرات التكوين الخاصة بك.",
     "saveError": "فشل الحفظ",
+    "saveErrorRetry": "خطأ — حاول مرة أخرى",
     "saveErrorGeneric": "حدث خطأ غير متوقع أثناء حفظ الإعدادات.",
     "confirmAction": "هل أنت متأكد؟",
     "client": "العميل",
@@ -115,10 +116,24 @@
     "close": "إغلاق",
     "cancel": "إلغاء",
     "addFaq": "إضافة سؤال",
+    "faqSaveFailed": "فشل حفظ السؤال. يرجى المحاولة مرة أخرى.",
+    "faqDeleteFailed": "فشل حذف السؤال. يرجى المحاولة مرة أخرى.",
     "questionPlaceholder": "السؤال...",
     "answerPlaceholder": "الإجابة...",
     "noPlansYet": "لا توجد خطط بعد. أضف أول خطة أسعار.",
     "noPaymentMethods": "لا توجد طرق دفع بعد. أضف طريقة دفع للعملاء.",
+    "rejectDialogTitle": "رفض {name}",
+    "rejectDialogDescription": "سيتم إزالة العميل وإرسال بريد رفض مع السبب.",
+    "rejectSuccess": "تم رفض {name} وإزالته.",
+    "statusLabels": {
+      "active": "نشط",
+      "pending_approval": "بانتظار الموافقة",
+      "inactive": "غير نشط",
+      "expired": "منتهي"
+    },
+    "imageUnavailable": "الصورة غير متاحة",
+    "paymentScreenshot": "لقطة شاشة الدفع",
+    "viewClient": "عرض العميل",
     "clientNotFound": "العميل غير موجود.",
     "respondFailed": "فشل إرسال الرد. يرجى المحاولة مرة أخرى.",
     "closeFailed": "فشل إغلاق التذكرة. يرجى المحاولة مرة أخرى.",
@@ -166,6 +181,8 @@
       "bank": "البنك",
       "noPaymentDetails": "لم يتم تقديم تفاصيل الدفع.",
       "noScreenshot": "لا توجد صورة",
+      "id": "المعرّف",
+      "clientRequested": "طلب العميل: {tier} — يمكنك التغيير أدناه.",
       "paymentStatus": {
         "pending": "قيد الانتظار",
         "approved": "موافق عليه",
@@ -274,6 +291,7 @@
     "savePaymentMethodsSuccess": "تم حفظ طرق الدفع",
     "savePaymentMethodsSuccessDescription": "تم تحديث طرق الدفع.",
     "savePaymentMethodsError": "فشل الحفظ",
+    "noPlansEmpty": "لا توجد خطط بعد. أضف أول خطة أسعار.",
     "confirmRemovePlan": "حذف هذه الخطة؟",
     "confirmRemoveMethod": "حذف طريقة الدفع هذه؟",
     "planCard": "خطة",
@@ -288,7 +306,13 @@
     "socialLinksDesc": "أضف روابط التواصل الاجتماعي الخاصة بك. ستظهر فقط المنصات التي تحتوي على رابط في الموقع.",
     "saveSocialLinks": "حفظ الروابط",
     "pushNotifications": "الإشعارات الفورية",
-    "pushNotificationsDesc": "تفعيل أو تعطيل الإشعارات الفورية المرسلة لجميع العملاء (جاهزية الخطة، التذكيرات، الإرسال اليدوي)."
+    "pushNotificationsDesc": "تفعيل أو تعطيل الإشعارات الفورية المرسلة لجميع العملاء (جاهزية الخطة، التذكيرات، الإرسال اليدوي).",
+    "notificationToggleFailed": "فشل تحديث إعدادات الإشعارات.",
+    "noPaymentMethodsEmpty": "لا توجد طرق دفع بعد. أضف طريقة دفع للعملاء.",
+    "accountNamePlaceholder": "مثال: أحمد حسن",
+    "accountNumberPlaceholder": "مثال: 01XXXXXXXXX",
+    "atLeastOneRequired": "مطلوب واحدة على الأقل",
+    "featuresSelected": "{count, plural, one {ميزة واحدة محددة} other {# ميزات محددة}}"
   },
   "adminNav": {
     "dashboard": "لوحة التحكم",
@@ -338,7 +362,8 @@
       "sent": "مُرسل",
       "failed": "فشل",
       "partial": "جزئي"
-    }
+    },
+    "failedSuffix": "فشل"
   },
   "brand": {
     "name": "فيت فاست",
@@ -543,7 +568,14 @@
     "perServing": "لكل حصة",
     "per100g": "لكل ١٠٠ جم",
     "verified": "موثق",
-    "coach": "المدرب"
+    "coach": "المدرب",
+    "deleteFood": "حذف الطعام",
+    "errors": {
+      "saveFailed": "فشل الحفظ. يرجى المحاولة مرة أخرى.",
+      "uploadFailed": "فشل الرفع. يرجى المحاولة مرة أخرى.",
+      "deleteFailed": "فشل الحذف. يرجى المحاولة مرة أخرى.",
+      "invalidMacros": "يرجى إدخال قيم رقمية صحيحة لجميع المغذيات."
+    }
   },
   "tickets": {
     "title": "الدعم",

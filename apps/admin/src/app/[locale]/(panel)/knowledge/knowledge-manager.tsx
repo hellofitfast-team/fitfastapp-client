@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { cn } from "@fitfast/ui/cn";
 import type { Id } from "@/convex/_generated/dataModel";
+import { useToast } from "@/hooks/use-toast";
 
 const CATEGORY_OPTIONS = [
   "protein",
@@ -40,6 +41,7 @@ export function KnowledgeManager() {
       {/* Tabs */}
       <div className="flex gap-1 rounded-lg border border-stone-200 bg-stone-50 p-1">
         <button
+          type="button"
           onClick={() => setActiveTab("knowledge")}
           className={cn(
             "flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors",
@@ -52,6 +54,7 @@ export function KnowledgeManager() {
           {t("knowledgeTab")}
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab("food")}
           className={cn(
             "flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors",
@@ -73,6 +76,8 @@ export function KnowledgeManager() {
 /* ─── Knowledge Tab (original) ─── */
 function KnowledgeTab() {
   const t = useTranslations("knowledge");
+  const tCommon = useTranslations("common");
+  const { toast } = useToast();
   const { isAuthenticated } = useConvexAuth();
   const entries = useQuery(api.knowledgeBase.listKnowledgeEntries, isAuthenticated ? {} : "skip");
   const addTextEntry = useMutation(api.knowledgeBase.addTextEntry);
@@ -123,6 +128,8 @@ function KnowledgeTab() {
       setContent("");
       setSelectedTags([]);
       setShowAddText(false);
+    } catch (err) {
+      toast({ title: t("errors.saveFailed"), variant: "destructive" });
     } finally {
       setIsSubmitting(false);
     }
@@ -130,7 +137,17 @@ function KnowledgeTab() {
 
   const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !file.name.endsWith(".pdf")) return;
+    if (!file) return;
+    // Validate both extension and MIME type
+    if (!file.name.endsWith(".pdf") || (file.type && file.type !== "application/pdf")) {
+      toast({ title: t("errors.uploadFailed"), variant: "destructive" });
+      return;
+    }
+    // 10 MB limit for PDFs
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: t("errors.uploadFailed"), variant: "destructive" });
+      return;
+    }
 
     setIsUploading(true);
     try {
@@ -147,6 +164,8 @@ function KnowledgeTab() {
         storageId,
         tags: pdfTags.length > 0 ? pdfTags : undefined,
       });
+    } catch (err) {
+      toast({ title: t("errors.uploadFailed"), variant: "destructive" });
     } finally {
       setIsUploading(false);
       setPdfTags([]);
@@ -158,6 +177,8 @@ function KnowledgeTab() {
     setDeletingId(entryId);
     try {
       await deleteEntry({ entryId });
+    } catch (err) {
+      toast({ title: t("errors.deleteFailed"), variant: "destructive" });
     } finally {
       setDeletingId(null);
     }
@@ -194,6 +215,8 @@ function KnowledgeTab() {
         tags: editTags.length > 0 ? editTags : undefined,
       });
       cancelEditing();
+    } catch (err) {
+      toast({ title: t("errors.saveFailed"), variant: "destructive" });
     } finally {
       setIsSavingEdit(false);
     }
@@ -204,6 +227,7 @@ function KnowledgeTab() {
       {/* Action Buttons */}
       <div className="flex gap-3">
         <button
+          type="button"
           onClick={() => setShowAddText(!showAddText)}
           className="bg-primary hover:bg-primary/90 inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors"
         >
@@ -260,7 +284,9 @@ function KnowledgeTab() {
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">{t("addTextEntry")}</h3>
             <button
+              type="button"
               onClick={() => setShowAddText(false)}
+              aria-label={t("cancel")}
               className="text-stone-400 hover:text-stone-600"
             >
               <X className="h-4 w-4" />
@@ -303,6 +329,7 @@ function KnowledgeTab() {
             </div>
           </div>
           <button
+            type="button"
             onClick={handleAddText}
             disabled={isSubmitting || !title.trim() || !content.trim()}
             className="bg-primary hover:bg-primary/90 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50"
@@ -388,20 +415,24 @@ function KnowledgeTab() {
                   </div>
                   <div className="flex shrink-0 gap-1">
                     <button
+                      type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         startEditing(entry);
                       }}
+                      aria-label={tCommon("edit")}
                       className="hover:text-primary hover:bg-primary/10 rounded-lg p-2 text-stone-400 transition-colors"
                     >
                       <Pencil className="h-4 w-4" />
                     </button>
                     <button
+                      type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDelete(entry._id);
                       }}
                       disabled={deletingId === entry._id}
+                      aria-label={tCommon("delete")}
                       className="rounded-lg p-2 text-stone-400 transition-colors hover:bg-red-50 hover:text-red-500 disabled:opacity-50"
                     >
                       {deletingId === entry._id ? (
@@ -455,6 +486,7 @@ function KnowledgeTab() {
                     </div>
                     <div className="flex gap-2">
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleSaveEdit();
@@ -466,6 +498,7 @@ function KnowledgeTab() {
                         {t("save")}
                       </button>
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           cancelEditing();
@@ -495,6 +528,7 @@ function KnowledgeTab() {
 /* ─── Food & Recipes Tab ─── */
 function FoodTab() {
   const t = useTranslations("knowledge");
+  const { toast } = useToast();
   const { isAuthenticated } = useConvexAuth();
 
   const [showAddForm, setShowAddForm] = useState(false);
@@ -504,13 +538,17 @@ function FoodTab() {
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterCategory, setFilterCategory] = useState("");
+  const [filterCategory, setFilterCategory] = useState<
+    "protein" | "carb" | "fat" | "vegetable" | "fruit" | "dairy" | "dessert" | "recipe" | ""
+  >("");
   const [filterType, setFilterType] = useState<"all" | "ingredient" | "recipe">("all");
 
   // Form fields
   const [foodName, setFoodName] = useState("");
   const [foodNameAr, setFoodNameAr] = useState("");
-  const [foodCategory, setFoodCategory] = useState("protein");
+  const [foodCategory, setFoodCategory] = useState<
+    "protein" | "carb" | "fat" | "vegetable" | "fruit" | "dairy" | "dessert" | "recipe"
+  >("protein");
   const [foodTags, setFoodTags] = useState<string[]>([]);
   const [cal100, setCal100] = useState("");
   const [pro100, setPro100] = useState("");
@@ -580,6 +618,15 @@ function FoodTab() {
 
   const handleAdd = async () => {
     if (!foodName.trim() || !cal100 || !pro100 || !carb100 || !fat100) return;
+    // Guard against NaN macro values
+    const parsedCal = parseFloat(cal100);
+    const parsedPro = parseFloat(pro100);
+    const parsedCarb = parseFloat(carb100);
+    const parsedFat = parseFloat(fat100);
+    if ([parsedCal, parsedPro, parsedCarb, parsedFat].some((v) => isNaN(v) || v < 0)) {
+      toast({ title: t("errors.invalidMacros"), variant: "destructive" });
+      return;
+    }
     setIsSubmitting(true);
     try {
       await addFood({
@@ -588,10 +635,10 @@ function FoodTab() {
         category: foodCategory,
         tags: foodTags,
         per100g: {
-          calories: parseFloat(cal100),
-          protein: parseFloat(pro100),
-          carbs: parseFloat(carb100),
-          fat: parseFloat(fat100),
+          calories: parsedCal,
+          protein: parsedPro,
+          carbs: parsedCarb,
+          fat: parsedFat,
         },
         isRecipe: isRecipeMode,
         servingSize: isRecipeMode && servingSize ? servingSize : undefined,
@@ -614,6 +661,8 @@ function FoodTab() {
             : undefined,
       });
       resetForm();
+    } catch (err) {
+      toast({ title: t("errors.saveFailed"), variant: "destructive" });
     } finally {
       setIsSubmitting(false);
     }
@@ -623,6 +672,8 @@ function FoodTab() {
     setDeletingId(id);
     try {
       await deleteFood({ foodId: id });
+    } catch (err) {
+      toast({ title: t("errors.deleteFailed"), variant: "destructive" });
     } finally {
       setDeletingId(null);
     }
@@ -633,6 +684,7 @@ function FoodTab() {
       {/* Actions */}
       <div className="flex gap-3">
         <button
+          type="button"
           onClick={() => {
             setShowAddForm(true);
             setIsRecipeMode(false);
@@ -643,6 +695,7 @@ function FoodTab() {
           {t("addFood")}
         </button>
         <button
+          type="button"
           onClick={() => {
             setShowAddForm(true);
             setIsRecipeMode(true);
@@ -668,7 +721,7 @@ function FoodTab() {
         </div>
         <select
           value={filterCategory}
-          onChange={(e) => setFilterCategory(e.target.value)}
+          onChange={(e) => setFilterCategory(e.target.value as typeof filterCategory)}
           className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm"
         >
           <option value="">{t("allCategories")}</option>
@@ -682,6 +735,7 @@ function FoodTab() {
           {(["all", "ingredient", "recipe"] as const).map((type) => (
             <button
               key={type}
+              type="button"
               onClick={() => setFilterType(type)}
               className={cn(
                 "px-3 py-2 text-xs font-medium transition-colors",
@@ -705,7 +759,12 @@ function FoodTab() {
         <div className="space-y-4 rounded-xl border border-stone-200 bg-white p-5">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">{isRecipeMode ? t("addRecipe") : t("addFood")}</h3>
-            <button onClick={resetForm} className="text-stone-400 hover:text-stone-600">
+            <button
+              type="button"
+              onClick={resetForm}
+              aria-label={t("cancel")}
+              className="text-stone-400 hover:text-stone-600"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -730,7 +789,7 @@ function FoodTab() {
 
           <select
             value={foodCategory}
-            onChange={(e) => setFoodCategory(e.target.value)}
+            onChange={(e) => setFoodCategory(e.target.value as typeof foodCategory)}
             className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm"
           >
             {CATEGORY_OPTIONS.map((cat) => (
@@ -868,6 +927,7 @@ function FoodTab() {
           </div>
 
           <button
+            type="button"
             onClick={handleAdd}
             disabled={isSubmitting || !foodName.trim() || !cal100}
             className="bg-primary hover:bg-primary/90 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50"
@@ -946,8 +1006,10 @@ function FoodTab() {
                   )}
                 </div>
                 <button
+                  type="button"
                   onClick={() => handleDeleteFood(food._id)}
                   disabled={deletingId === food._id}
+                  aria-label={t("deleteFood")}
                   className="shrink-0 rounded-lg p-2 text-stone-400 transition-colors hover:bg-red-50 hover:text-red-500 disabled:opacity-50"
                 >
                   {deletingId === food._id ? (

@@ -45,13 +45,20 @@ export const embedEntry = internalAction({
       value: tag,
     }));
 
-    await rag.add(ctx, {
-      namespace: NAMESPACE,
-      key: entryId,
-      title: entry.title,
-      chunks,
-      filterValues,
-    });
+    try {
+      await rag.add(ctx, {
+        namespace: NAMESPACE,
+        key: entryId,
+        title: entry.title,
+        chunks,
+        filterValues,
+      });
+    } catch (err) {
+      console.error(
+        `[RAG] Embedding failed for entry ${entryId} ("${entry.title}"). Entry exists but is unsearchable.`,
+        err instanceof Error ? err.message : err,
+      );
+    }
   },
 });
 
@@ -63,16 +70,42 @@ export const processPdfUpload = internalAction({
   handler: async (ctx, { entryId, storageId }): Promise<void> => {
     // Download PDF from storage
     const blob = await ctx.storage.get(storageId);
-    if (!blob) throw new Error("PDF file not found in storage");
+    if (!blob) {
+      console.error(
+        `[KnowledgeBase] PDF file not found in storage (entryId: ${entryId}, storageId: ${storageId})`,
+      );
+      return;
+    }
 
-    const buffer = Buffer.from(await blob.arrayBuffer());
-    const pdfParseModule = await import("pdf-parse");
-    const pdfParse =
-      typeof pdfParseModule === "function" ? pdfParseModule : (pdfParseModule as any).default;
-    const pdf = await pdfParse(buffer);
-    const text = pdf.text.trim();
+    let text: string;
+    try {
+      const buffer = Buffer.from(await blob.arrayBuffer());
+      const pdfParseModule = await import("pdf-parse");
+      const pdfParse =
+        typeof pdfParseModule === "function" ? pdfParseModule : (pdfParseModule as any).default;
+      const pdf = await pdfParse(buffer);
+      text = pdf.text.trim();
+    } catch (err) {
+      console.error(
+        `[KnowledgeBase] PDF parsing failed for entry ${entryId}. Entry created with no content.`,
+        err instanceof Error ? err.message : err,
+      );
+      // Patch entry with empty content so it's visible in the UI as failed
+      await ctx.runMutation(internal.knowledgeBase.updateKnowledgeContent, {
+        entryId,
+        content: "",
+      });
+      return;
+    }
 
-    if (!text) throw new Error("No text extracted from PDF");
+    if (!text) {
+      console.warn(`[KnowledgeBase] No text extracted from PDF for entry ${entryId}`);
+      await ctx.runMutation(internal.knowledgeBase.updateKnowledgeContent, {
+        entryId,
+        content: "",
+      });
+      return;
+    }
 
     // Save extracted text to the knowledge entry
     await ctx.runMutation(internal.knowledgeBase.updateKnowledgeContent, {

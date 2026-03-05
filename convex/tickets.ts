@@ -30,7 +30,8 @@ export const getAllTickets = query({
       .unique();
     if (!profile?.isCoach) throw new Error("Not authorized");
 
-    return ctx.db.query("tickets").order("desc").collect();
+    // Capped at 200 most recent tickets to prevent unbounded live subscriptions
+    return ctx.db.query("tickets").withIndex("by_updatedAt").order("desc").take(200);
   },
 });
 

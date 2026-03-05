@@ -132,8 +132,10 @@ export function AdminSidebar({
             </div>
           </div>
           <button
+            type="button"
             className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-500 transition-colors hover:bg-white/5 hover:text-stone-300 lg:hidden"
             onClick={onClose}
+            aria-label={t("common.close")}
           >
             <X className="h-4 w-4" />
           </button>

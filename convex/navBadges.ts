@@ -33,8 +33,7 @@ export const getNavBadges = query({
     // Count tickets where coach responded but client hasn't read yet
     const coachRespondedTickets = await ctx.db
       .query("tickets")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .filter((q) => q.eq(q.field("status"), "coach_responded"))
+      .withIndex("by_userId_status", (q) => q.eq("userId", userId).eq("status", "coach_responded"))
       .collect();
 
     return {

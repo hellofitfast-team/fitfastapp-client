@@ -22,6 +22,12 @@ export const scheduleUserReminder = internalMutation({
     const hour = parseInt(hourStr!, 10);
     const minute = parseInt(minuteStr!, 10);
 
+    if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+      throw new Error(
+        `Invalid reminder time "${reminderTime}" — expected "HH:MM" with hour 0-23 and minute 0-59`,
+      );
+    }
+
     const cronName = `reminder-${userId}`;
 
     // Remove any existing cron for this user before re-registering

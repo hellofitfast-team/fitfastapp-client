@@ -90,6 +90,13 @@ export default function InitialAssessmentPage() {
       case 2: {
         if (!currentWeight || !height) return tErrors("weightHeightRequired");
         if (!age || !gender) return tErrors("ageGenderRequired");
+        // Range validation for anthropometric data
+        const w = parseFloat(String(currentWeight));
+        const h = parseFloat(String(height));
+        const a = parseFloat(String(age));
+        if (isNaN(w) || w < 30 || w > 300) return tErrors("weightOutOfRange");
+        if (isNaN(h) || h < 100 || h > 250) return tErrors("heightOutOfRange");
+        if (isNaN(a) || a < 13 || a > 120) return tErrors("ageOutOfRange");
         if (!experienceLevel) return tErrors("experienceLevelRequired");
         if (!equipment) return tErrors("equipmentRequired");
         if (equipment === "other" && !equipmentOther.trim()) return tErrors("equipmentSpecify");
@@ -142,15 +149,14 @@ export default function InitialAssessmentPage() {
     }
   };
 
-  // Swipe handlers with RTL support
+  // Swipe handlers with RTL support (use locale, not document.dir which may not be set yet)
+  const isRtl = locale === "ar";
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
-      const isRtl = document.dir === "rtl";
       if (isRtl) handleBack();
       else handleNext();
     },
     onSwipedRight: () => {
-      const isRtl = document.dir === "rtl";
       if (isRtl) handleNext();
       else handleBack();
     },
@@ -208,7 +214,7 @@ export default function InitialAssessmentPage() {
         currentWeight: parseFloat(currentWeight),
         height: parseFloat(height),
         age: parseInt(age),
-        gender,
+        gender: gender as "male" | "female",
         activityLevel: activityLevel
           ? (activityLevel as "sedentary" | "lightly_active" | "moderately_active" | "very_active")
           : undefined,

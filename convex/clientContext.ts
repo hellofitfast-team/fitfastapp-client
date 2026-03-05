@@ -126,6 +126,21 @@ export const buildClientContext = internalQuery({
 });
 
 // ---------------------------------------------------------------------------
+// Input sanitization for AI prompts
+// ---------------------------------------------------------------------------
+
+/** Truncate and sanitize user-provided text before injecting into AI prompts. */
+function sanitizeForPrompt(text: string, maxLen = 500): string {
+  let sanitized = text.slice(0, maxLen);
+  // Strip consecutive newlines (reduce prompt injection surface)
+  sanitized = sanitized.replace(/\n{3,}/g, "\n\n");
+  // Strip common prompt injection patterns
+  sanitized = sanitized.replace(/^(system|assistant|user)\s*:/gim, "");
+  sanitized = sanitized.replace(/ignore (?:all )?(?:previous |above )?instructions/gi, "");
+  return sanitized.trim();
+}
+
+// ---------------------------------------------------------------------------
 // Format context into a compact, token-efficient string for LLM prompts
 // ---------------------------------------------------------------------------
 
@@ -188,9 +203,10 @@ export function formatContextForPrompt(ctx: ClientContext): string {
     if (ci.sleepQuality != null) ciParts.push(`Sleep ${ci.sleepQuality}/10`);
     if (ci.dietaryAdherence != null) ciParts.push(`Diet adherence ${ci.dietaryAdherence}/10`);
     parts.push(`\nCURRENT CHECK-IN: ${ciParts.join(", ")}`);
-    if (ci.workoutPerformance) parts.push(`WORKOUT FEEDBACK: ${ci.workoutPerformance}`);
-    if (ci.newInjuries) parts.push(`NEW INJURIES: ${ci.newInjuries}`);
-    if (ci.notes) parts.push(`CLIENT NOTES: ${ci.notes}`);
+    if (ci.workoutPerformance)
+      parts.push(`WORKOUT FEEDBACK: ${sanitizeForPrompt(ci.workoutPerformance)}`);
+    if (ci.newInjuries) parts.push(`NEW INJURIES: ${sanitizeForPrompt(ci.newInjuries)}`);
+    if (ci.notes) parts.push(`CLIENT NOTES: ${sanitizeForPrompt(ci.notes)}`);
   }
 
   // ── Adherence data ──
@@ -208,7 +224,7 @@ export function formatContextForPrompt(ctx: ClientContext): string {
   // ── Recent reflections (compact) ──
   const reflections = ctx.recentReflections
     .filter((r) => r.reflection)
-    .map((r) => `${r.date}: ${r.reflection!.substring(0, 80)}`);
+    .map((r) => `${r.date}: ${sanitizeForPrompt(r.reflection!, 80)}`);
   if (reflections.length > 0) {
     parts.push(`\nRECENT REFLECTIONS:\n${reflections.join("\n")}`);
   }

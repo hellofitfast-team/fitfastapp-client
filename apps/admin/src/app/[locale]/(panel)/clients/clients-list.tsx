@@ -56,13 +56,7 @@ const STATUS_ICONS: Record<string, typeof CheckCircle2> = {
   expired: XCircle,
 };
 
-const tierLabels: Record<string, string> = {
-  monthly: "Monthly",
-  quarterly: "Quarterly",
-  "3_months": "Quarterly",
-  "6_months": "Semi-Annual",
-  "12_months": "Annual",
-};
+// tierLabels moved to admin.tierLabels in translation files
 
 function RejectModal({
   client,
@@ -88,16 +82,16 @@ function RejectModal({
         rejectionReason: reason.trim(),
       });
       toast({
-        title: "Client rejected",
-        description: `${client.fullName} has been rejected and removed.`,
+        title: t("clientDetail.rejected"),
+        description: t("rejectSuccess", { name: client.fullName ?? "" }),
         variant: "success",
       });
       onOpenChange(false);
     } catch (err) {
       console.error("Reject failed:", err); // Sentry captures this
       toast({
-        title: "Error",
-        description: err instanceof Error ? err.message : "Failed to reject client",
+        title: t("actionError"),
+        description: err instanceof Error ? err.message : t("clientDetail.rejectFailed"),
         variant: "destructive",
       });
       setIsSubmitting(false);
@@ -119,10 +113,10 @@ function RejectModal({
         }}
       >
         <DialogHeader>
-          <DialogTitle>Reject {client.fullName ?? "Client"}</DialogTitle>
-          <DialogDescription>
-            This will remove the client and send them a rejection email with your reason.
-          </DialogDescription>
+          <DialogTitle>
+            {t("rejectDialogTitle", { name: client.fullName ?? t("client") })}
+          </DialogTitle>
+          <DialogDescription>{t("rejectDialogDescription")}</DialogDescription>
         </DialogHeader>
 
         {/* Reason input */}
@@ -142,13 +136,15 @@ function RejectModal({
 
         <DialogFooter>
           <button
+            type="button"
             onClick={() => onOpenChange(false)}
             disabled={isSubmitting}
             className="rounded-lg border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-50 disabled:opacity-50"
           >
-            Cancel
+            {t("cancel")}
           </button>
           <button
+            type="button"
             onClick={handleSubmit}
             disabled={isSubmitting || !reason.trim()}
             className="flex items-center gap-1.5 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-50"
@@ -158,7 +154,7 @@ function RejectModal({
             ) : (
               <X className="h-4 w-4" />
             )}
-            Reject Client
+            {t("clientDetail.confirmReject")}
           </button>
         </DialogFooter>
       </DialogContent>
@@ -229,7 +225,9 @@ export function ClientsList({ clients }: { clients: Client[] }) {
                   </td>
                   <td className="px-4 py-4">
                     <span className="text-primary text-xs font-semibold">
-                      {client.planTier ? (tierLabels[client.planTier] ?? client.planTier) : "---"}
+                      {client.planTier
+                        ? t(`tierLabels.${client.planTier}`, { defaultMessage: client.planTier })
+                        : "---"}
                     </span>
                   </td>
                   <td className="px-4 py-4">
@@ -242,7 +240,9 @@ export function ClientsList({ clients }: { clients: Client[] }) {
                           }`}
                         >
                           <StatusIcon className="h-3 w-3" />
-                          {client.status?.replace("_", " ") ?? "unknown"}
+                          {client.status
+                            ? t(`statusLabels.${client.status}`, { defaultMessage: client.status })
+                            : "—"}
                         </span>
                       );
                     })()}
@@ -262,6 +262,7 @@ export function ClientsList({ clients }: { clients: Client[] }) {
                             {t("activate")}
                           </Link>
                           <button
+                            type="button"
                             onClick={() => setRejectTarget(client)}
                             className="flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700 transition-colors hover:bg-red-100"
                           >
@@ -272,6 +273,7 @@ export function ClientsList({ clients }: { clients: Client[] }) {
                       )}
                       <Link
                         href={`/clients/${client.userId}`}
+                        aria-label={t("viewClient")}
                         className="hover:border-primary/30 hover:text-primary flex h-11 w-11 items-center justify-center rounded-lg border border-stone-200 text-stone-400 transition-colors"
                       >
                         <ArrowRight className="h-4 w-4 rtl:rotate-180" />

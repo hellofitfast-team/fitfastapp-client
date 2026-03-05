@@ -50,8 +50,8 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title || "FitFast", {
       body: data.body,
-      icon: "/icon-192x192.png",
-      badge: "/icon-192x192.png",
+      icon: "/icons/icon-192x192.png",
+      badge: "/icons/icon-192x192.png",
       data: { url: data.url || "/" },
     }),
   );

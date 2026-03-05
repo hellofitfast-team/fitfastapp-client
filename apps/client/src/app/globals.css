@@ -5,6 +5,9 @@
 
 @import "tailwindcss";
 
+/* Scan shared UI package so Tailwind generates CSS for classes used in @fitfast/ui components */
+@source "../../../../packages/ui/src";
+
 /* FitFast Modern Clean Theme Configuration */
 @theme inline {
   /* Color Palette */

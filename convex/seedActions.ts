@@ -701,10 +701,21 @@ export const createLoadTestUsers = internalAction({
 // Food database seeding (previously seedFoodDatabase.ts)
 // ============================================================================
 
+type FoodCategory =
+  | "protein"
+  | "carb"
+  | "fat"
+  | "vegetable"
+  | "fruit"
+  | "dairy"
+  | "dessert"
+  | "recipe";
+type FoodSource = "usda" | "coach" | "verified_recipe";
+
 interface FoodEntry {
   name: string;
   nameAr?: string;
-  category: string;
+  category: FoodCategory;
   tags: string[];
   per100g: { calories: number; protein: number; carbs: number; fat: number; fiber?: number };
   isRecipe: boolean;
@@ -712,7 +723,7 @@ interface FoodEntry {
   perServing?: { calories: number; protein: number; carbs: number; fat: number };
   ingredients?: string[];
   instructions?: string[];
-  source: string;
+  source: FoodSource;
   isVerified: boolean;
 }
 

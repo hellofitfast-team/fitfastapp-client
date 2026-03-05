@@ -37,12 +37,20 @@ export const metadata: Metadata = {
     title: "FitFast - AI-Powered Fitness Coaching",
     description:
       "Personalized meal plans and workout routines powered by AI. Track your progress and achieve your fitness goals.",
+    images: [{ url: "/logo.svg", width: 512, height: 512, alt: "FitFast Logo" }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "FitFast - AI-Powered Fitness Coaching",
     description:
       "Personalized meal plans and workout routines powered by AI. Track your progress and achieve your fitness goals.",
+    images: ["/logo.svg"],
+  },
+  alternates: {
+    languages: {
+      en: "/en",
+      ar: "/ar",
+    },
   },
 };
 
@@ -52,12 +60,17 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const { headers } = await import("next/headers");
+  const h = await headers();
+  const locale = h.get("x-next-intl-locale") ?? "en";
+  const dir = locale === "ar" ? "rtl" : "ltr";
+
   return (
     <html
       suppressHydrationWarning
-      lang="en"
-      dir="ltr"
+      lang={locale}
+      dir={dir}
       className={`${inter.variable} ${spaceGrotesk.variable} ${alexandria.variable}`}
     >
       <body className="min-h-screen bg-[var(--color-background)] font-sans text-[var(--color-foreground)] antialiased">

@@ -7,7 +7,7 @@ import { useSwipeable } from "react-swipeable";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation, useAction, useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { useAuth } from "@/hooks/use-auth";
@@ -15,7 +15,7 @@ import { useCheckInLock } from "@/hooks/use-check-in-lock";
 import { useToast } from "@/hooks/use-toast";
 import { Weight, Dumbbell, UtensilsCrossed, Camera, ClipboardCheck, Loader2 } from "lucide-react";
 import * as Sentry from "@sentry/nextjs";
-import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_MB, MAX_CHECK_IN_PHOTOS } from "@/lib/constants";
+import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_MB } from "@/lib/constants";
 
 import { CheckInLocked } from "./_components/check-in-locked";
 import { StepProgress } from "./_components/step-progress";
@@ -26,39 +26,46 @@ import { PhotosStep } from "./_components/photos-step";
 import { ReviewStep } from "./_components/review-step";
 import { StepNavigation } from "./_components/step-navigation";
 
-// Schema and type exported for sub-components to import
-export const checkInSchema = z.object({
-  weight: z.coerce
-    .number()
-    .positive("Weight must be positive")
-    .min(20, "Weight seems too low")
-    .max(300, "Weight seems too high"),
-  chest: z.coerce.number().optional(),
-  waist: z.coerce.number().optional(),
-  hips: z.coerce.number().optional(),
-  arms: z.coerce.number().optional(),
-  thighs: z.coerce.number().optional(),
-  workoutPerformance: z
-    .string()
-    .min(10, "Please provide at least 10 characters about your workout performance"),
-  energyLevel: z.coerce
-    .number()
-    .min(1, "Energy level must be between 1-10")
-    .max(10, "Energy level must be between 1-10"),
-  sleepQuality: z.coerce
-    .number()
-    .min(1, "Sleep quality must be between 1-10")
-    .max(10, "Sleep quality must be between 1-10"),
-  dietaryAdherence: z.coerce
-    .number()
-    .min(1, "Dietary adherence must be between 1-10")
-    .max(10, "Dietary adherence must be between 1-10"),
-  dietNotes: z.string().optional(),
-  newInjuries: z.string().optional(),
-  notes: z.string().optional(),
-});
+// Schema factory for i18n validation messages
+function createCheckInSchema(t: (key: string) => string) {
+  return z.object({
+    weight: z.coerce
+      .number()
+      .positive(t("validation.weightPositive"))
+      .min(20, t("validation.weightTooLow"))
+      .max(300, t("validation.weightTooHigh")),
+    measurementMethod: z.enum(["manual", "inbody"]).default("manual"),
+    chest: z.coerce.number().optional(),
+    waist: z.coerce.number().optional(),
+    hips: z.coerce.number().optional(),
+    arms: z.coerce.number().optional(),
+    thighs: z.coerce.number().optional(),
+    workoutPerformance: z.string().min(10, t("validation.workoutPerformanceMin")),
+    energyLevel: z.coerce
+      .number()
+      .min(1, t("validation.ratingRange"))
+      .max(10, t("validation.ratingRange")),
+    sleepQuality: z.coerce
+      .number()
+      .min(1, t("validation.ratingRange"))
+      .max(10, t("validation.ratingRange")),
+    dietaryAdherence: z.coerce
+      .number()
+      .min(1, t("validation.ratingRange"))
+      .max(10, t("validation.ratingRange")),
+    dietNotes: z.string().optional(),
+    newInjuries: z.string().optional(),
+    notes: z.string().optional(),
+  });
+}
 
-export type CheckInFormData = z.infer<typeof checkInSchema>;
+export type CheckInFormData = z.infer<ReturnType<typeof createCheckInSchema>>;
+
+export interface ProgressPhotos {
+  front: File | null;
+  back: File | null;
+  side: File | null;
+}
 
 const STEP_ICONS = [Weight, Dumbbell, UtensilsCrossed, Camera, ClipboardCheck];
 
@@ -71,10 +78,10 @@ export default function CheckInPage() {
   const { profile } = useAuth();
   const { toast } = useToast();
 
-  const submitCheckIn = useMutation(api.checkIns.submitCheckIn);
+  const checkInSchema = createCheckInSchema((key) => t(key));
+
+  const startCheckInWorkflow = useMutation(api.checkIns.startCheckInWorkflow);
   const generateUploadUrl = useMutation(api.storage.generateUploadUrl);
-  const generateMealPlan = useAction(api.ai.generateMealPlan);
-  const generateWorkoutPlan = useAction(api.ai.generateWorkoutPlan);
 
   // Build steps with translations
   const STEPS = [
@@ -87,7 +94,12 @@ export default function CheckInPage() {
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [uploadedPhotos, setUploadedPhotos] = useState<File[]>([]);
+  const [progressPhotos, setProgressPhotos] = useState<ProgressPhotos>({
+    front: null,
+    back: null,
+    side: null,
+  });
+  const [inBodyFile, setInBodyFile] = useState<File | null>(null);
 
   // Use the extracted hook for lock status
   const {
@@ -101,7 +113,12 @@ export default function CheckInPage() {
   const methods = useForm<CheckInFormData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- zodResolver type inference gap with react-hook-form v7
     resolver: zodResolver(checkInSchema) as any,
-    defaultValues: { energyLevel: 5, sleepQuality: 5, dietaryAdherence: 5 },
+    defaultValues: {
+      energyLevel: 5,
+      sleepQuality: 5,
+      dietaryAdherence: 5,
+      measurementMethod: "manual" as const,
+    },
   });
 
   // Pre-fill weight from last check-in
@@ -113,52 +130,63 @@ export default function CheckInPage() {
     }
   }, [latestCheckIn, methods]);
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const validFiles = files.filter((file) => {
-      const isImage = file.type.startsWith("image/");
-      const isUnderSizeLimit = file.size <= MAX_UPLOAD_SIZE_BYTES;
-      if (!isImage || !isUnderSizeLimit) {
-        toast({
-          title: t("invalidFile"),
-          description: t("invalidFileDescription", { maxFileMB: MAX_UPLOAD_SIZE_MB }),
-          variant: "destructive",
-        });
-        return false;
-      }
-      return true;
-    });
-    setUploadedPhotos((prev) => [...prev, ...validFiles].slice(0, MAX_CHECK_IN_PHOTOS));
-  };
-
-  const removePhoto = (index: number) => {
-    setUploadedPhotos((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const uploadPhotosToStorage = async (): Promise<Id<"_storage">[]> => {
-    if (uploadedPhotos.length === 0) return [];
-    const uploadedIds: Id<"_storage">[] = [];
-
-    for (const photo of uploadedPhotos) {
-      const uploadUrl = await generateUploadUrl({});
-      const result = await fetch(uploadUrl, {
-        method: "POST",
-        headers: { "Content-Type": photo.type },
-        body: photo,
+  const validateFile = (file: File): boolean => {
+    const isImage = file.type.startsWith("image/");
+    const isUnderSizeLimit = file.size <= MAX_UPLOAD_SIZE_BYTES;
+    if (!isImage || !isUnderSizeLimit) {
+      toast({
+        title: t("invalidFile"),
+        description: t("invalidFileDescription", { maxFileMB: MAX_UPLOAD_SIZE_MB }),
+        variant: "destructive",
       });
-      if (!result.ok) throw new Error(`Upload failed: ${result.status}`);
-      const { storageId } = await result.json();
-      uploadedIds.push(storageId as Id<"_storage">);
+      return false;
     }
-    return uploadedIds;
+    return true;
+  };
+
+  const handleProgressPhoto = (position: keyof ProgressPhotos, file: File | null) => {
+    if (file && !validateFile(file)) return;
+    setProgressPhotos((prev) => ({ ...prev, [position]: file }));
+  };
+
+  const handleInBodyFile = (file: File | null) => {
+    if (file && !validateFile(file)) return;
+    setInBodyFile(file);
+  };
+
+  const uploadFileToStorage = async (
+    file: File,
+    purpose?: "progress_photo" | "ticket_screenshot",
+  ): Promise<Id<"_storage">> => {
+    const uploadUrl = await generateUploadUrl({ purpose });
+    const result = await fetch(uploadUrl, {
+      method: "POST",
+      headers: { "Content-Type": file.type },
+      body: file,
+    });
+    if (!result.ok) throw new Error(`Upload failed: ${result.status}`);
+    const json = await result.json();
+    if (!json.storageId) throw new Error("Upload succeeded but no storageId returned");
+    return json.storageId as Id<"_storage">;
   };
 
   const validateStep = async (step: number): Promise<boolean> => {
     let fields: (keyof CheckInFormData)[] = [];
     switch (step) {
-      case 1:
+      case 1: {
         fields = ["weight"];
-        break;
+        const isValid = await methods.trigger(fields);
+        // If InBody method is selected, require the InBody file
+        if (isValid && methods.getValues("measurementMethod") === "inbody" && !inBodyFile) {
+          toast({
+            title: t("invalidFile"),
+            description: t("inBodyRequired"),
+            variant: "destructive",
+          });
+          return false;
+        }
+        return isValid;
+      }
       case 2:
         fields = ["workoutPerformance", "energyLevel", "sleepQuality"];
         break;
@@ -237,45 +265,70 @@ export default function CheckInPage() {
 
     setIsSubmitting(true);
     try {
-      const progressPhotoIds = await uploadPhotosToStorage();
-      const measurements = {
-        chest: data.chest || null,
-        waist: data.waist || null,
-        hips: data.hips || null,
-        arms: data.arms || null,
-        thighs: data.thighs || null,
-      };
+      // Upload progress photos
+      const photoUploads: {
+        progressPhotoFront?: Id<"_storage">;
+        progressPhotoBack?: Id<"_storage">;
+        progressPhotoSide?: Id<"_storage">;
+      } = {};
+      if (progressPhotos.front) {
+        photoUploads.progressPhotoFront = await uploadFileToStorage(
+          progressPhotos.front,
+          "progress_photo",
+        );
+      }
+      if (progressPhotos.back) {
+        photoUploads.progressPhotoBack = await uploadFileToStorage(
+          progressPhotos.back,
+          "progress_photo",
+        );
+      }
+      if (progressPhotos.side) {
+        photoUploads.progressPhotoSide = await uploadFileToStorage(
+          progressPhotos.side,
+          "progress_photo",
+        );
+      }
 
-      const checkInId = await submitCheckIn({
+      // Upload InBody file if applicable
+      let inBodyStorageId: Id<"_storage"> | undefined;
+      if (data.measurementMethod === "inbody" && inBodyFile) {
+        inBodyStorageId = await uploadFileToStorage(inBodyFile);
+      }
+
+      const measurements =
+        data.measurementMethod === "manual"
+          ? {
+              chest: data.chest || undefined,
+              waist: data.waist || undefined,
+              hips: data.hips || undefined,
+              arms: data.arms || undefined,
+              thighs: data.thighs || undefined,
+            }
+          : undefined;
+
+      const language = (locale === "ar" ? "ar" : "en") as "en" | "ar";
+
+      await startCheckInWorkflow({
         weight: data.weight,
+        measurementMethod: data.measurementMethod,
         measurements,
+        inBodyStorageId,
         workoutPerformance: data.workoutPerformance,
         energyLevel: data.energyLevel,
         sleepQuality: data.sleepQuality,
         dietaryAdherence: data.dietaryAdherence,
         newInjuries: data.newInjuries || undefined,
-        progressPhotoIds: progressPhotoIds.length > 0 ? progressPhotoIds : undefined,
+        ...photoUploads,
         notes: [data.dietNotes, data.notes].filter(Boolean).join("\n\n") || undefined,
+        language,
+        planDuration: frequencyDays,
       });
 
-      // Generate new plans
-      const language = (locale === "ar" ? "ar" : "en") as "en" | "ar";
-      const [mealResult, workoutResult] = await Promise.allSettled([
-        generateMealPlan({ checkInId, language, planDuration: frequencyDays }),
-        generateWorkoutPlan({ checkInId, language, planDuration: frequencyDays }),
-      ]);
-
-      if (mealResult.status === "rejected" || workoutResult.status === "rejected") {
-        toast({
-          title: t("checkInSuccess"),
-          description: t("planGenerationWarning"),
-        });
-      } else {
-        toast({
-          title: t("checkInSuccess"),
-          description: t("newPlanGenerated"),
-        });
-      }
+      toast({
+        title: t("checkInSuccess"),
+        description: t("plansGenerateInBackground"),
+      });
 
       router.replace("/");
     } catch (error) {
@@ -300,7 +353,7 @@ export default function CheckInPage() {
           <div className="bg-card mx-4 rounded-2xl p-8 text-center shadow-xl">
             <Loader2 className="text-primary mx-auto mb-4 h-10 w-10 animate-spin" />
             <p className="text-lg font-bold">{t("submitting")}</p>
-            <p className="text-muted-foreground mt-2 text-sm">{t("newPlanGenerated")}</p>
+            <p className="text-muted-foreground mt-2 text-sm">{t("plansGenerateInBackground")}</p>
           </div>
         </div>
       )}
@@ -347,7 +400,9 @@ export default function CheckInPage() {
               <div {...swipeHandlers} className="touch-pan-y">
                 <div key={currentStep} className="animate-fade-in">
                   {/* Step 1: Weight & Measurements */}
-                  {currentStep === 1 && <WeightStep />}
+                  {currentStep === 1 && (
+                    <WeightStep inBodyFile={inBodyFile} onInBodyFileChange={handleInBodyFile} />
+                  )}
 
                   {/* Step 2: Fitness Metrics */}
                   {currentStep === 2 && <FitnessStep />}
@@ -358,14 +413,15 @@ export default function CheckInPage() {
                   {/* Step 4: Progress Photos */}
                   {currentStep === 4 && (
                     <PhotosStep
-                      uploadedPhotos={uploadedPhotos}
-                      onPhotoChange={handlePhotoChange}
-                      onRemovePhoto={removePhoto}
+                      progressPhotos={progressPhotos}
+                      onPhotoChange={handleProgressPhoto}
                     />
                   )}
 
                   {/* Step 5: Review & Submit */}
-                  {currentStep === 5 && <ReviewStep uploadedPhotosCount={uploadedPhotos.length} />}
+                  {currentStep === 5 && (
+                    <ReviewStep progressPhotos={progressPhotos} inBodyFile={inBodyFile} />
+                  )}
                 </div>
               </div>
 

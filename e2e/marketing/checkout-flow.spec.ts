@@ -62,6 +62,16 @@ test.describe("Marketing Checkout Flow", () => {
     });
     await expect(page.locator('input[name="email"]').first()).toBeVisible();
     await expect(page.locator('input[name="phone"]').first()).toBeVisible();
+
+    // Scroll drawer to reveal new payment fields
+    await page.evaluate(() => {
+      const scrollable = document.querySelector(".overflow-y-auto");
+      if (scrollable) scrollable.scrollTop = scrollable.scrollHeight;
+    });
+    await page.waitForTimeout(500);
+
+    await expect(page.locator('input[name="transferReferenceNumber"]').first()).toBeVisible();
+    await expect(page.locator('input[name="transferAmount"]').first()).toBeVisible();
   });
 
   test("form validation shows errors for empty submission", async ({ page }) => {
@@ -136,6 +146,19 @@ test.describe("Marketing Checkout Flow", () => {
       await nameInput.fill("E2E Test User");
       await emailInput.fill(testEmail);
       await phoneInput.fill("+201234567890");
+
+      // Scroll drawer to reveal payment fields
+      await page.evaluate(() => {
+        const scrollable = document.querySelector(".overflow-y-auto");
+        if (scrollable) scrollable.scrollTop = scrollable.scrollHeight;
+      });
+      await page.waitForTimeout(500);
+
+      // Fill transfer reference number and amount (required)
+      const refInput = page.locator('input[name="transferReferenceNumber"]').first();
+      await refInput.waitFor({ state: "visible", timeout: 5000 });
+      await refInput.fill(`REF-${timestamp}`);
+      await page.locator('input[name="transferAmount"]').first().fill("2500");
 
       // Upload screenshot
       const fakeImg = createFakeScreenshot();

@@ -4,7 +4,6 @@ import { internal } from "./_generated/api";
 import { getAuthUserId } from "./auth";
 import { pendingSignupsCount } from "./adminStats";
 import { rateLimiter } from "./rateLimiter";
-import { INVITE_EXPIRATION_DAYS } from "./constants";
 
 export const getPendingSignups = query({
   args: {},
@@ -37,7 +36,9 @@ export const getAllSignups = query({
       .unique();
     if (!profile?.isCoach) throw new Error("Not authorized");
 
-    return ctx.db.query("pendingSignups").order("desc").collect();
+    // Capped at 500 most recent signups to prevent unbounded queries
+    const signups = await ctx.db.query("pendingSignups").order("desc").take(500);
+    return signups;
   },
 });
 
@@ -113,8 +114,7 @@ export const createSignup = mutation({
     // Duplicate email guard
     const existingPending = await ctx.db
       .query("pendingSignups")
-      .withIndex("by_email", (q) => q.eq("email", args.email))
-      .filter((q) => q.eq(q.field("status"), "pending"))
+      .withIndex("by_email_status", (q) => q.eq("email", args.email).eq("status", "pending"))
       .first();
     if (existingPending) throw new Error("A signup with this email is already pending");
 
@@ -152,13 +152,10 @@ export const approveSignup = mutation({
     // Generate a secure invite token
     const inviteToken =
       crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
-    const inviteExpiresAt = Date.now() + INVITE_EXPIRATION_DAYS * 24 * 60 * 60 * 1000;
-
     await ctx.db.patch(signupId, {
       status: "approved",
       reviewedAt: Date.now(),
       inviteToken,
-      inviteExpiresAt,
     });
     // Decrement pending count — signup is no longer "pending"
     await pendingSignupsCount.deleteIfExists(ctx, { key: signupId, id: signupId });
@@ -239,8 +236,7 @@ export const createRenewalSignup = mutation({
     // Don't allow duplicate pending renewal
     const existingPending = await ctx.db
       .query("pendingSignups")
-      .withIndex("by_email", (q) => q.eq("email", email))
-      .filter((q) => q.eq(q.field("status"), "pending"))
+      .withIndex("by_email_status", (q) => q.eq("email", email).eq("status", "pending"))
       .first();
     if (existingPending) throw new Error("A renewal request is already pending");
 
@@ -282,8 +278,7 @@ export const getMyPendingRenewal = query({
 
     return ctx.db
       .query("pendingSignups")
-      .withIndex("by_email", (q) => q.eq("email", profile.email!))
-      .filter((q) => q.eq(q.field("status"), "pending"))
+      .withIndex("by_email_status", (q) => q.eq("email", profile.email!).eq("status", "pending"))
       .first();
   },
 });
@@ -301,7 +296,6 @@ export const validateInviteToken = query({
       .unique();
 
     if (!signup) return null;
-    if (signup.inviteExpiresAt && signup.inviteExpiresAt < Date.now()) return null;
 
     return {
       email: signup.email,
@@ -317,7 +311,6 @@ export const markInviteUsed = internalMutation({
   handler: async (ctx, { signupId }) => {
     await ctx.db.patch(signupId, {
       inviteToken: undefined,
-      inviteExpiresAt: undefined,
     });
   },
 });
@@ -329,7 +322,13 @@ export const markInviteUsed = internalMutation({
 export const patchOcrData = internalMutation({
   args: {
     signupId: v.id("pendingSignups"),
-    ocrExtractedData: v.any(),
+    ocrExtractedData: v.object({
+      amount: v.optional(v.string()),
+      sender_name: v.optional(v.string()),
+      reference_number: v.optional(v.string()),
+      date: v.optional(v.string()),
+      bank: v.optional(v.string()),
+    }),
   },
   handler: async (ctx, { signupId, ocrExtractedData }) => {
     await ctx.db.patch(signupId, { ocrExtractedData });

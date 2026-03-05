@@ -60,6 +60,7 @@
     "saveSuccess": "Settings Saved",
     "saveSuccessDescription": "Your configuration changes have been saved.",
     "saveError": "Save Failed",
+    "saveErrorRetry": "Error — try again",
     "saveErrorGeneric": "An unexpected error occurred while saving settings.",
     "confirmAction": "Are you sure?",
     "client": "Client",
@@ -115,10 +116,24 @@
     "close": "Close",
     "cancel": "Cancel",
     "addFaq": "Add FAQ",
+    "faqSaveFailed": "Failed to save FAQ. Please try again.",
+    "faqDeleteFailed": "Failed to delete FAQ. Please try again.",
     "questionPlaceholder": "Question...",
     "answerPlaceholder": "Answer...",
     "noPlansYet": "No plans yet. Add your first pricing plan.",
     "noPaymentMethods": "No payment methods yet. Add a method for clients to pay.",
+    "rejectDialogTitle": "Reject {name}",
+    "rejectDialogDescription": "This will remove the client and send them a rejection email with your reason.",
+    "rejectSuccess": "{name} has been rejected and removed.",
+    "statusLabels": {
+      "active": "Active",
+      "pending_approval": "Pending",
+      "inactive": "Inactive",
+      "expired": "Expired"
+    },
+    "imageUnavailable": "Image unavailable",
+    "paymentScreenshot": "Payment screenshot",
+    "viewClient": "View client",
     "clientNotFound": "Client not found.",
     "respondFailed": "Failed to send response. Please try again.",
     "closeFailed": "Failed to close ticket. Please try again.",
@@ -166,6 +181,8 @@
       "bank": "Bank",
       "noPaymentDetails": "No payment details submitted.",
       "noScreenshot": "No screenshot",
+      "id": "ID",
+      "clientRequested": "Client requested: {tier} — you can override below.",
       "paymentStatus": {
         "pending": "Pending",
         "approved": "Approved",
@@ -274,6 +291,7 @@
     "savePaymentMethodsSuccess": "Payment Methods Saved",
     "savePaymentMethodsSuccessDescription": "Your payment methods have been updated.",
     "savePaymentMethodsError": "Save Failed",
+    "noPlansEmpty": "No plans yet. Add your first pricing plan.",
     "confirmRemovePlan": "Remove this plan?",
     "confirmRemoveMethod": "Remove this payment method?",
     "planCard": "Plan",
@@ -288,7 +306,13 @@
     "socialLinksDesc": "Configure your social media links. Only platforms with a URL will be shown on the marketing site.",
     "saveSocialLinks": "Save Social Links",
     "pushNotifications": "Push Notifications",
-    "pushNotificationsDesc": "Enable or disable push notifications sent to all clients (plan-ready, reminders, manual sends)."
+    "pushNotificationsDesc": "Enable or disable push notifications sent to all clients (plan-ready, reminders, manual sends).",
+    "notificationToggleFailed": "Failed to update notification settings.",
+    "noPaymentMethodsEmpty": "No payment methods yet. Add a method for clients to pay.",
+    "accountNamePlaceholder": "e.g. Ahmed Hassan",
+    "accountNumberPlaceholder": "e.g. 01XXXXXXXXX",
+    "atLeastOneRequired": "at least one required",
+    "featuresSelected": "{count, plural, one {# feature selected} other {# features selected}}"
   },
   "adminNav": {
     "dashboard": "Dashboard",
@@ -338,7 +362,8 @@
       "sent": "Sent",
       "failed": "Failed",
       "partial": "Partial"
-    }
+    },
+    "failedSuffix": "failed"
   },
   "brand": {
     "name": "FITFAST",
@@ -543,7 +568,14 @@
     "perServing": "per serving",
     "per100g": "per 100g",
     "verified": "Verified",
-    "coach": "Coach"
+    "coach": "Coach",
+    "deleteFood": "Delete food",
+    "errors": {
+      "saveFailed": "Failed to save. Please try again.",
+      "uploadFailed": "Upload failed. Please try again.",
+      "deleteFailed": "Failed to delete. Please try again.",
+      "invalidMacros": "Please enter valid numeric values for all macros."
+    }
   },
   "tickets": {
     "title": "Support",

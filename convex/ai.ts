@@ -8,6 +8,94 @@ import { getAuthUserId } from "./auth";
 import { type ClientContext, formatContextForPrompt } from "./clientContext";
 import { calculateNutritionTargets, type NutritionTargets } from "./nutritionEngine";
 import { selectWorkoutSplit, type WorkoutSplit } from "./workoutSplitEngine";
+import {
+  MEAL_OUTPUT_TOKENS_EN,
+  MEAL_OUTPUT_TOKENS_AR,
+  WORKOUT_OUTPUT_TOKENS_EN,
+  WORKOUT_OUTPUT_TOKENS_AR,
+  PLAN_GENERATION_TIMEOUT_MS,
+  PLAN_GENERATION_MAX_RETRIES,
+} from "./constants";
+
+// ---------------------------------------------------------------------------
+// AI Model Configuration
+// ---------------------------------------------------------------------------
+
+/** Plan generation + translation model (text-only, GPT-5 class at budget pricing) */
+const PLAN_MODEL = "deepseek/deepseek-v3.2";
+
+// ---------------------------------------------------------------------------
+// Robust JSON extraction & repair
+// ---------------------------------------------------------------------------
+
+/**
+ * Attempts to extract and parse a JSON object from potentially messy LLM output.
+ * Handles: markdown fences, leading/trailing text, trailing commas, truncated JSON.
+ */
+function extractJSON(raw: string): Record<string, unknown> {
+  // 1. Strip markdown code fences
+  let text = raw.replace(/```(?:json)?\s*\n?/g, "").trim();
+
+  // 2. Extract the outermost { ... } if surrounded by extra text
+  const firstBrace = text.indexOf("{");
+  const lastBrace = text.lastIndexOf("}");
+  if (firstBrace !== -1 && lastBrace > firstBrace) {
+    text = text.slice(firstBrace, lastBrace + 1);
+  }
+
+  // 3. Try direct parse first
+  try {
+    return JSON.parse(text);
+  } catch {
+    // continue to repairs
+  }
+
+  // 4. Fix trailing commas before } or ] (common LLM mistake)
+  let repaired = text.replace(/,\s*([\]}])/g, "$1");
+
+  try {
+    return JSON.parse(repaired);
+  } catch {
+    // continue
+  }
+
+  // 5. Handle truncated JSON: try closing open brackets/braces
+  repaired = repaired.trimEnd();
+  // Count unmatched openers
+  let braces = 0,
+    brackets = 0;
+  let inString = false,
+    escaped = false;
+  for (const ch of repaired) {
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (ch === "\\") {
+      escaped = true;
+      continue;
+    }
+    if (ch === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
+    if (ch === "{") braces++;
+    else if (ch === "}") braces--;
+    else if (ch === "[") brackets++;
+    else if (ch === "]") brackets--;
+  }
+  // If we're inside a string, close it
+  if (inString) repaired += '"';
+  // Close unmatched brackets/braces
+  for (let i = 0; i < brackets; i++) repaired += "]";
+  for (let i = 0; i < braces; i++) repaired += "}";
+
+  // Remove any trailing commas that appeared before our closers
+  repaired = repaired.replace(/,\s*([\]}])/g, "$1");
+
+  return JSON.parse(repaired); // let this throw if still broken
+}
 
 // ---------------------------------------------------------------------------
 // Post-generation validation & auto-correction
@@ -128,8 +216,16 @@ function validateAndCorrectMealPlan(
     const calorieDiff =
       Math.abs(sumCalories - nutritionTargets.calories) / nutritionTargets.calories;
     if (calorieDiff > 0.1 && sumCalories > 0) {
-      // Scale portions proportionally to hit target
+      // Scale at daily level first: preserve protein ratio, scale fat, derive carbs from remainder
       const scaleFactor = nutritionTargets.calories / sumCalories;
+      const scaledProtein = Math.round(sumProtein * scaleFactor);
+      const scaledFat = Math.round(sumFat * scaleFactor);
+      // Derive carbs from calorie remainder to avoid cumulative rounding errors
+      const scaledCarbs = Math.round(
+        (nutritionTargets.calories - scaledProtein * 4 - scaledFat * 9) / 4,
+      );
+
+      // Distribute proportionally to meals
       for (const meal of dayData.meals) {
         if (!meal || typeof meal !== "object") continue;
         meal.calories = Math.round((Number(meal.calories) || 0) * scaleFactor);
@@ -139,9 +235,9 @@ function validateAndCorrectMealPlan(
       }
       dayData.dailyTotals = {
         calories: nutritionTargets.calories,
-        protein: Math.round(sumProtein * scaleFactor),
-        carbs: Math.round(sumCarbs * scaleFactor),
-        fat: Math.round(sumFat * scaleFactor),
+        protein: scaledProtein,
+        carbs: scaledCarbs,
+        fat: scaledFat,
       };
       warnings.push({
         type: "totals_corrected",
@@ -270,19 +366,26 @@ async function fetchClientContextWithRetry(
   userId: string,
   checkInId?: Id<"checkIns">,
 ): Promise<ClientContext> {
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY_MS = 1500;
+
   let clientCtx: ClientContext = await ctx.runQuery(internal.clientContext.buildClientContext, {
     userId,
     checkInId,
   });
 
-  if (!clientCtx.assessment) {
-    console.warn(`[AI] Assessment not found on first try for user ${userId}, retrying in 2s...`);
-    await new Promise((r) => setTimeout(r, 2000));
+  // Retry with backoff — assessment may not be visible in the action's read snapshot yet
+  for (let attempt = 1; attempt <= MAX_RETRIES && !clientCtx.assessment; attempt++) {
+    console.warn(
+      `[AI] Assessment not found for user ${userId} (attempt ${attempt}/${MAX_RETRIES}), retrying in ${RETRY_DELAY_MS}ms...`,
+    );
+    await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
     clientCtx = await ctx.runQuery(internal.clientContext.buildClientContext, {
       userId,
       checkInId,
     });
   }
+
   if (!clientCtx.assessment)
     throw new Error("Please complete your initial assessment before generating a plan.");
 
@@ -310,17 +413,39 @@ async function generateMealPlanHandler(
   const clientCtx = await fetchClientContextWithRetry(ctx, userId, checkInId);
 
   // Pre-calculate nutrition targets deterministically
+  const startTime = Date.now();
   const assessment = clientCtx.assessment!;
   const scheduleData = assessment.scheduleAvailability as { days?: string[] } | null;
-  const trainingDays = scheduleData?.days?.length ?? 4;
+  const trainingDays = Math.max(1, scheduleData?.days?.length ?? 4);
   console.log(
     `[AI] Generating meal plan for user ${userId} (${language}), training days: ${trainingDays}`,
   );
 
+  // Validate anthropometric data with safe ranges — use defaults if out of range
+  let weightKg = assessment.currentWeight ?? 75;
+  let heightCm = assessment.height ?? 170;
+  let age = assessment.age ?? 30;
+  if (weightKg < 30 || weightKg > 300) {
+    console.warn(
+      `[AI] Weight ${weightKg}kg out of range (30-300) for user ${userId}, using default 75kg`,
+    );
+    weightKg = 75;
+  }
+  if (heightCm < 100 || heightCm > 250) {
+    console.warn(
+      `[AI] Height ${heightCm}cm out of range (100-250) for user ${userId}, using default 170cm`,
+    );
+    heightCm = 170;
+  }
+  if (age < 13 || age > 120) {
+    console.warn(`[AI] Age ${age} out of range (13-120) for user ${userId}, using default 30`);
+    age = 30;
+  }
+
   const nutritionTargets: NutritionTargets = calculateNutritionTargets({
-    weightKg: assessment.currentWeight ?? 75,
-    heightCm: assessment.height ?? 170,
-    age: assessment.age ?? 30,
+    weightKg,
+    heightCm,
+    age,
     gender: assessment.gender === "female" ? "female" : "male",
     trainingDaysPerWeek: trainingDays,
     goal: assessment.goals?.split(",")[0]?.trim() ?? "general_fitness",
@@ -407,10 +532,7 @@ ${isArabic ? "ALL content MUST be in Arabic language. Focus on Egyptian/Middle E
 ${foodReference}
 IMPORTANT: Respond ONLY with valid JSON. No markdown, no code blocks, just raw JSON.`;
 
-  // Token budget: Gemini Flash-Lite runs ~290 tok/s, so even 16K takes ~55s (well within 4-min timeout).
-  // Each meal day with alternatives, ingredients, instructions ≈ 900-1200 tokens.
-  // Use generous caps — truncation is far worse than a slightly larger response.
-  const mealOutputTokens = isArabic ? 16000 : 12000;
+  const mealOutputTokens = isArabic ? MEAL_OUTPUT_TOKENS_AR : MEAL_OUTPUT_TOKENS_EN;
 
   const userPrompt = `Create a ${planDuration}-day meal plan ${isArabic ? "ENTIRELY IN ARABIC" : "in English"}:
 
@@ -451,13 +573,13 @@ Daily meal macros MUST sum to the targets above (±5% tolerance). Respond ONLY w
 
   // --- Attempt 1: full plan ---
   let result = await generateText({
-    model: openrouter("google/gemini-2.5-flash-lite"),
+    model: openrouter(PLAN_MODEL),
     system: systemPrompt,
     prompt: userPrompt,
     temperature: 0.4,
     maxOutputTokens: mealOutputTokens,
-    maxRetries: 2,
-    abortSignal: AbortSignal.timeout(4 * 60 * 1000),
+    maxRetries: PLAN_GENERATION_MAX_RETRIES,
+    abortSignal: AbortSignal.timeout(PLAN_GENERATION_TIMEOUT_MS),
   });
 
   // --- Truncation detection + retry with reduced scope ---
@@ -483,40 +605,45 @@ Return JSON: { "dailyTargets": {...}, "weeklyPlan": { "day1": { "dailyTotals": {
 Respond ONLY with valid JSON.`;
 
     result = await generateText({
-      model: openrouter("google/gemini-2.5-flash-lite"),
+      model: openrouter(PLAN_MODEL),
       system: systemPrompt,
       prompt: retryPrompt,
       temperature: 0.3,
-      maxOutputTokens: 16000,
+      maxOutputTokens: MEAL_OUTPUT_TOKENS_AR, // Use larger budget for retry
       maxRetries: 1,
-      abortSignal: AbortSignal.timeout(4 * 60 * 1000),
+      abortSignal: AbortSignal.timeout(PLAN_GENERATION_TIMEOUT_MS),
     });
   }
 
   let planData: Record<string, unknown>;
   try {
-    const cleaned = result.text.replace(/```json\n?|```\n?/g, "").trim();
-    planData = JSON.parse(cleaned);
+    planData = extractJSON(result.text);
   } catch (parseErr) {
     console.error(
-      `[AI] Meal plan JSON parse failed for user ${userId}. Text length: ${result.text.length}, finish reason: ${result.finishReason}`,
+      `[AI] Meal plan JSON parse failed for user ${userId}. Text length: ${result.text.length}, finish reason: ${result.finishReason}. First 500 chars: ${result.text.slice(0, 500)}`,
     );
+    if (result.finishReason === "length") {
+      throw new Error(
+        "Meal plan too long for AI model output limit. Try reducing plan duration or simplifying requirements.",
+      );
+    }
     throw new Error(
       `Meal plan generation failed: AI returned invalid JSON (finish reason: ${result.finishReason})`,
     );
   }
 
   // Post-generation validation & auto-correction
-  if (!planData.parseError) {
-    const validationWarnings = validateAndCorrectMealPlan(planData, nutritionTargets);
-    if (validationWarnings.length > 0) {
-      planData.validationWarnings = validationWarnings;
-      console.warn(
-        `[AI] Meal plan validation: ${validationWarnings.length} warnings for user ${userId}`,
-        validationWarnings,
-      );
-    }
+  const validationWarnings = validateAndCorrectMealPlan(planData, nutritionTargets);
+  if (validationWarnings.length > 0) {
+    planData.validationWarnings = validationWarnings;
+    console.warn(
+      `[AI] Meal plan validation: ${validationWarnings.length} warnings for user ${userId}`,
+      validationWarnings,
+    );
   }
+
+  const durationMs = Date.now() - startTime;
+  console.log(`[AI] Meal plan generated in ${durationMs}ms for user ${userId}`);
 
   const startDate = new Date().toISOString().split("T")[0]!;
   const endDate = new Date(Date.now() + planDuration * 24 * 60 * 60 * 1000)
@@ -551,10 +678,11 @@ async function generateWorkoutPlanHandler(
 ): Promise<Id<"workoutPlans">> {
   const clientCtx = await fetchClientContextWithRetry(ctx, userId, checkInId);
 
+  const startTime = Date.now();
   // Pre-select workout split deterministically
   const assessment = clientCtx.assessment!;
   const scheduleData = assessment.scheduleAvailability as { days?: string[] } | null;
-  const trainingDays = scheduleData?.days?.length ?? 4;
+  const trainingDays = Math.max(1, scheduleData?.days?.length ?? 4);
   const split: WorkoutSplit = selectWorkoutSplit(
     assessment.experienceLevel as "beginner" | "intermediate" | "advanced" | undefined,
     trainingDays,
@@ -655,9 +783,7 @@ GUIDELINES:
 ${isArabic ? "ALL content MUST be in Arabic language." : ""}${knowledgeSection}
 IMPORTANT: Respond ONLY with valid JSON. No markdown, no code blocks, just raw JSON.`;
 
-  // Token budget: each workout day with warmup/cooldown/exercises ≈ 400-600 tokens.
-  // Rest days ≈ 30 tokens. Gemini Flash-Lite at ~290 tok/s makes generous caps safe.
-  const workoutOutputTokens = isArabic ? 20000 : 16000;
+  const workoutOutputTokens = isArabic ? WORKOUT_OUTPUT_TOKENS_AR : WORKOUT_OUTPUT_TOKENS_EN;
 
   const userPrompt = `Create a ${planDuration}-day workout plan ${isArabic ? "ENTIRELY IN ARABIC" : "in English"}:
 
@@ -699,13 +825,13 @@ Rest days only need: restDay=true, workoutName. Respond ONLY with valid JSON.`;
 
   // --- Attempt 1: full plan ---
   let result = await generateText({
-    model: openrouter("google/gemini-2.5-flash-lite"),
+    model: openrouter(PLAN_MODEL),
     system: systemPrompt,
     prompt: userPrompt,
     temperature: 0.4,
     maxOutputTokens: workoutOutputTokens,
-    maxRetries: 2,
-    abortSignal: AbortSignal.timeout(4 * 60 * 1000),
+    maxRetries: PLAN_GENERATION_MAX_RETRIES,
+    abortSignal: AbortSignal.timeout(PLAN_GENERATION_TIMEOUT_MS),
   });
 
   // --- Truncation detection + retry with reduced scope ---
@@ -727,40 +853,45 @@ Return JSON: { "splitType": "...", "splitName": "...", "splitDescription": "..."
 Respond ONLY with valid JSON.`;
 
     result = await generateText({
-      model: openrouter("google/gemini-2.5-flash-lite"),
+      model: openrouter(PLAN_MODEL),
       system: systemPrompt,
       prompt: retryPrompt,
       temperature: 0.3,
-      maxOutputTokens: 16000,
+      maxOutputTokens: WORKOUT_OUTPUT_TOKENS_AR, // Use larger budget for retry
       maxRetries: 1,
-      abortSignal: AbortSignal.timeout(4 * 60 * 1000),
+      abortSignal: AbortSignal.timeout(PLAN_GENERATION_TIMEOUT_MS),
     });
   }
 
   let planData: Record<string, unknown>;
   try {
-    const cleaned = result.text.replace(/```json\n?|```\n?/g, "").trim();
-    planData = JSON.parse(cleaned);
+    planData = extractJSON(result.text);
   } catch {
     console.error(
-      `[AI] Workout plan JSON parse failed for user ${userId}. Text length: ${result.text.length}, finish reason: ${result.finishReason}`,
+      `[AI] Workout plan JSON parse failed for user ${userId}. Text length: ${result.text.length}, finish reason: ${result.finishReason}. First 500 chars: ${result.text.slice(0, 500)}`,
     );
+    if (result.finishReason === "length") {
+      throw new Error(
+        "Workout plan too long for AI model output limit. Try reducing plan duration.",
+      );
+    }
     throw new Error(
       `Workout plan generation failed: AI returned invalid JSON (finish reason: ${result.finishReason})`,
     );
   }
 
   // Post-generation validation
-  if (!planData.parseError) {
-    const validationWarnings = validateWorkoutPlan(planData);
-    if (validationWarnings.length > 0) {
-      planData.validationWarnings = validationWarnings;
-      console.warn(
-        `[AI] Workout plan validation: ${validationWarnings.length} warnings for user ${userId}`,
-        validationWarnings,
-      );
-    }
+  const workoutWarnings = validateWorkoutPlan(planData);
+  if (workoutWarnings.length > 0) {
+    planData.validationWarnings = workoutWarnings;
+    console.warn(
+      `[AI] Workout plan validation: ${workoutWarnings.length} warnings for user ${userId}`,
+      workoutWarnings,
+    );
   }
+
+  const durationMs = Date.now() - startTime;
+  console.log(`[AI] Workout plan generated in ${durationMs}ms for user ${userId}`);
 
   const startDate = new Date().toISOString().split("T")[0]!;
   const endDate = new Date(Date.now() + planDuration * 24 * 60 * 60 * 1000)
@@ -929,6 +1060,9 @@ export const translateToArabic = action({
 
     if (!text.trim()) return "";
 
+    // Truncate input to prevent abuse (translation is for short UI strings)
+    const truncatedText = text.slice(0, 500);
+
     const { createOpenRouter } = await import("@openrouter/ai-sdk-provider");
     const { generateText } = await import("ai");
 
@@ -939,7 +1073,7 @@ export const translateToArabic = action({
 
     try {
       const { text: translated } = await generateText({
-        model: openrouter("google/gemini-2.5-flash-lite"),
+        model: openrouter(PLAN_MODEL),
         maxOutputTokens: 100,
         temperature: 0.3,
         messages: [
@@ -952,7 +1086,7 @@ export const translateToArabic = action({
               "For example: 'Starter' → 'مبتدئ', 'Premium' → 'مميز', 'Pro' → 'احترافي', 'Ultimate' → 'شامل'. " +
               "Return ONLY the Arabic translation, nothing else.",
           },
-          { role: "user", content: text },
+          { role: "user", content: truncatedText },
         ],
       });
 

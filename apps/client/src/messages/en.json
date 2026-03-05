@@ -131,7 +131,8 @@
     "loginMessages": {
       "session_expired": "Your session has expired. Please log in again.",
       "account_pending": "Your account is pending approval.",
-      "password_changed": "Password changed successfully. Please log in."
+      "password_changed": "Password changed successfully. Please log in.",
+      "account_inactive": "Your account is inactive. Please contact support."
     }
   },
   "nav": {
@@ -305,12 +306,36 @@
     "none": "None",
     "photosUploaded": "{count} photos uploaded",
     "noPhotos": "No photos",
+    "manualMeasurements": "Body Measurements",
+    "recommended": "Recommended",
+    "inBodyUpload": "InBody Upload",
+    "uploadInBody": "Upload InBody Result",
+    "uploadInBodyDescription": "Take a photo or upload your InBody result sheet for automatic body composition extraction",
+    "inBodyRequired": "Please upload your InBody result sheet",
+    "removeFile": "Remove file",
+    "removePhoto": "Remove photo",
+    "inBodyResult": "InBody result",
+    "inBodyProcessing": "Processing InBody data...",
+    "inBodyExtracted": "InBody data extracted",
+    "aiExtracted": "AI-extracted",
+    "photoFront": "Front",
+    "photoBack": "Back",
+    "photoSide": "Side",
+    "tapToUpload": "Tap to upload",
+    "plansGenerateInBackground": "Your plans will be generated in the background. You'll be notified when ready.",
     "placeholders": {
       "performance": "Describe your workout performance, improvements, or challenges...",
       "dietNotes": "Any challenges with your meal plan? Foods you enjoyed or disliked?",
       "injuries": "Describe any new injuries, pain, or discomfort...",
       "notes": "Share any other thoughts, questions, or concerns...",
       "photoUpload": "Click to upload photos"
+    },
+    "validation": {
+      "weightPositive": "Weight must be positive",
+      "weightTooLow": "Weight seems too low",
+      "weightTooHigh": "Weight seems too high",
+      "workoutPerformanceMin": "Please provide at least 10 characters about your workout performance",
+      "ratingRange": "Must be between 1 and 10"
     }
   },
   "tracking": {
@@ -336,7 +361,9 @@
     "mealsCompleted": "meals completed",
     "addWorkoutNotes": "Add workout notes (optional)...",
     "takeTimeToRecover": "Take time to recover and prepare for your next workout",
-    "complete": "complete"
+    "complete": "complete",
+    "markComplete": "Mark as complete",
+    "markIncomplete": "Mark as incomplete"
   },
   "progress": {
     "title": "Your Progress",
@@ -372,6 +399,7 @@
     "checkInHistoryDescription": "All your recorded check-ins",
     "noCheckIns": "No check-ins recorded yet",
     "progressPhoto": "Progress Photo",
+    "close": "Close",
     "loading": "Loading..."
   },
   "tickets": {
@@ -418,7 +446,11 @@
       "today": "Today",
       "yesterday": "Yesterday"
     },
-    "lastMessage": "Last message"
+    "lastMessage": "Last message",
+    "uploadFailed": "Screenshot upload failed",
+    "uploadFailedDescription": "Could not upload the screenshot. Please try again.",
+    "subjectMinLength": "Subject must be at least 3 characters",
+    "subjectMaxLength": "Subject must be under 100 characters"
   },
   "faq": {
     "title": "Frequently Asked Questions",
@@ -477,6 +509,13 @@
     "darkMode": "Dark Mode",
     "account": "Account",
     "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "passwordChanged": "Password changed successfully",
+    "passwordMismatch": "Passwords don't match",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "wrongPassword": "Current password is incorrect",
     "planDetails": "Plan Details",
     "planTier": "Plan Tier",
     "planExpiry": "Plan Expiry",
@@ -490,6 +529,7 @@
     "darkModeDescription": "Toggle dark mode on or off",
     "email": "Email",
     "saveChanges": "Save Changes",
+    "saveSuccess": "Settings saved successfully",
     "signOut": "Sign Out",
     "status": "Status",
     "planStart": "Started",
@@ -506,7 +546,13 @@
       "inactive": "Inactive",
       "expired": "Expired"
     },
-    "noPlan": "No plan assigned"
+    "noPlan": "No plan assigned",
+    "namePlaceholder": "e.g. John Doe",
+    "phonePlaceholder": "e.g. 01xxxxxxxxx",
+    "closeDialog": "Close dialog",
+    "errors": {
+      "saveFailed": "Failed to save. Please try again."
+    }
   },
   "onboarding": {
     "welcome": {
@@ -760,6 +806,9 @@
     "goalRequired": "Please select at least one fitness goal",
     "weightHeightRequired": "Please enter your weight and height",
     "ageGenderRequired": "Please enter your age and select your gender",
+    "weightOutOfRange": "Weight must be between 30 and 300 kg",
+    "heightOutOfRange": "Height must be between 100 and 250 cm",
+    "ageOutOfRange": "Age must be between 13 and 120 years",
     "experienceLevelRequired": "Please select your experience level",
     "workoutDaysRequired": "Please select at least one workout day",
     "workoutDaysMin": "Please select at least {min} workout days for meaningful results",
@@ -846,6 +895,11 @@
     "tracking": {
       "title": "TRACKING ERROR",
       "description": "We couldn't load your tracking data. Please try again.",
+      "retry": "TRY AGAIN"
+    },
+    "dashboard": {
+      "title": "DASHBOARD ERROR",
+      "description": "We couldn't load the dashboard. Please try again.",
       "retry": "TRY AGAIN"
     },
     "adminSettings": {

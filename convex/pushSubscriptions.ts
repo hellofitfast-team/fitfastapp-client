@@ -38,15 +38,16 @@ export const getVapidPublicKey = query({
 export const getAllActiveSubscriptions = internalQuery({
   args: {},
   handler: async (ctx) => {
-    // Fetch subscriptions and profiles in parallel (2 queries instead of N+1)
+    // Fetch subscriptions and profiles in parallel using indexes
     const [subscriptions, profiles] = await Promise.all([
       ctx.db
         .query("pushSubscriptions")
-        .filter((q) => q.eq(q.field("isActive"), true))
+        .withIndex("by_isActive", (q) => q.eq("isActive", true))
         .collect(),
       ctx.db
         .query("profiles")
-        .filter((q) => q.and(q.eq(q.field("isCoach"), false), q.eq(q.field("status"), "active")))
+        .withIndex("by_isCoach", (q) => q.eq("isCoach", false))
+        .filter((q) => q.eq(q.field("status"), "active"))
         .collect(),
     ]);
 

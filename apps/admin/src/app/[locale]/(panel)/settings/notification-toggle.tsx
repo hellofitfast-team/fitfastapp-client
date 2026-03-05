@@ -26,9 +26,7 @@ export function NotificationToggle() {
     } catch {
       toast({
         title: tSettings("pushNotifications"),
-        description: checked
-          ? "Failed to enable notifications."
-          : "Failed to disable notifications.",
+        description: tSettings("notificationToggleFailed"),
         variant: "destructive",
       });
     }

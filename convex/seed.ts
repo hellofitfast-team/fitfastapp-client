@@ -1059,3 +1059,243 @@ export const populateExpiredUser = internalMutation({
     return `Populated expired user (${userId}) with assessment and expired profile.`;
   },
 });
+
+/**
+ * Simulate a client who has completed initial assessment, received their first
+ * plans, and is now ready for their first check-in.
+ *
+ * Strategy: insert assessment + minimal fake plans, then set check_in_frequency_days
+ * to 0 so the lock expires immediately (since _creationTime can't be backdated).
+ * After testing, reset frequency back to 14 via admin Settings or:
+ *   npx convex run seed:restoreCheckInFrequency
+ *
+ * Run: npx convex run seed:simulateReadyForCheckIn '{"email":"client@fitfast.app"}'
+ */
+export const simulateReadyForCheckIn = internalMutation({
+  args: { email: v.string() },
+  handler: async (ctx, { email }) => {
+    const authAccount = await ctx.db
+      .query("authAccounts")
+      .filter((q) =>
+        q.and(q.eq(q.field("provider"), "password"), q.eq(q.field("providerAccountId"), email)),
+      )
+      .first();
+    if (!authAccount) return `No user found with email ${email}`;
+
+    const userId = authAccount.userId;
+    const steps: string[] = [];
+
+    // 1. Ensure profile is active
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (profile && profile.status !== "active") {
+      await ctx.db.patch(profile._id, { status: "active" });
+      steps.push("profile → active");
+    }
+
+    // 2. Ensure assessment exists
+    let assessment = await ctx.db
+      .query("initialAssessments")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .first();
+    if (!assessment) {
+      await ctx.db.insert("initialAssessments", {
+        userId,
+        goals: "weight_loss",
+        currentWeight: 80,
+        height: 175,
+        age: 28,
+        gender: "male",
+        activityLevel: "moderately_active",
+        experienceLevel: "intermediate",
+        scheduleAvailability: {
+          days: ["mon", "wed", "fri"],
+          sessionDuration: 60,
+          preferredTime: "morning",
+        },
+      });
+      steps.push("created assessment");
+    } else {
+      steps.push("assessment exists");
+    }
+
+    // 3. Delete existing plans/checkIns (clean slate)
+    for (const table of ["checkIns", "mealPlans", "workoutPlans"] as const) {
+      const docs = await ctx.db
+        .query(table)
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .collect();
+      for (const doc of docs) await ctx.db.delete(doc._id);
+      if (docs.length > 0) steps.push(`deleted ${docs.length} ${table}`);
+    }
+
+    // 4. Insert minimal fake plans (so dashboard renders)
+    const today = new Date().toISOString().split("T")[0]!;
+    const endDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]!;
+
+    const fakeMealPlan = {
+      dailyTargets: { calories: 2200, protein: 165, carbs: 248, fat: 73 },
+      weeklyPlan: {
+        day1: {
+          dailyTotals: { calories: 2200, protein: 165, carbs: 248, fat: 73 },
+          meals: [
+            {
+              name: "Oatmeal with Eggs",
+              type: "breakfast",
+              calories: 550,
+              protein: 35,
+              carbs: 65,
+              fat: 15,
+              ingredients: ["80g oats", "3 eggs", "1 banana"],
+              instructions: ["Cook oats, fry eggs, serve together"],
+            },
+            {
+              name: "Grilled Chicken Rice Bowl",
+              type: "lunch",
+              calories: 650,
+              protein: 50,
+              carbs: 70,
+              fat: 18,
+              ingredients: ["200g chicken breast", "150g rice", "mixed vegetables"],
+              instructions: ["Grill chicken, cook rice, combine"],
+            },
+            {
+              name: "Greek Yogurt Snack",
+              type: "snack",
+              calories: 300,
+              protein: 25,
+              carbs: 35,
+              fat: 8,
+              ingredients: ["200g Greek yogurt", "30g honey", "handful nuts"],
+              instructions: ["Mix and serve"],
+            },
+            {
+              name: "Beef Stir Fry",
+              type: "dinner",
+              calories: 700,
+              protein: 55,
+              carbs: 78,
+              fat: 32,
+              ingredients: ["200g beef strips", "200g rice", "mixed veggies"],
+              instructions: ["Stir fry beef and veggies, serve over rice"],
+            },
+          ],
+        },
+      },
+      notes: "Seed data — fake plan for testing check-in flow",
+    };
+
+    await ctx.db.insert("mealPlans", {
+      userId,
+      planData: fakeMealPlan,
+      language: "en",
+      startDate: today,
+      endDate,
+    });
+    steps.push("created fake meal plan");
+
+    const fakeWorkoutPlan = {
+      splitType: "push_pull_legs",
+      splitName: "Push / Pull / Legs",
+      splitDescription: "3-day split targeting push, pull, and leg movements",
+      weeklyPlan: {
+        day1: {
+          workoutName: "Push Day",
+          duration: 45,
+          targetMuscles: ["chest", "shoulders", "triceps"],
+          restDay: false,
+          warmup: {
+            exercises: [
+              {
+                name: "Arm circles",
+                duration: 30,
+                instructions: ["Circle arms forward and backward"],
+              },
+            ],
+          },
+          exercises: [
+            {
+              name: "Bench Press",
+              sets: 3,
+              reps: "10",
+              restBetweenSets: "90s",
+              targetMuscles: ["chest"],
+              instructions: ["Lower bar to chest, press up"],
+            },
+            {
+              name: "Overhead Press",
+              sets: 3,
+              reps: "10",
+              restBetweenSets: "60s",
+              targetMuscles: ["shoulders"],
+              instructions: ["Press bar overhead, lower to chin"],
+            },
+          ],
+          cooldown: {
+            exercises: [
+              {
+                name: "Chest stretch",
+                duration: 30,
+                instructions: ["Hold arm against wall, turn away"],
+              },
+            ],
+          },
+        },
+        day2: { restDay: true, workoutName: "Rest Day" },
+      },
+      progressionNotes: "Seed data for testing",
+      safetyTips: ["Maintain proper form"],
+    };
+
+    await ctx.db.insert("workoutPlans", {
+      userId,
+      planData: fakeWorkoutPlan,
+      language: "en",
+      startDate: today,
+      endDate,
+    });
+    steps.push("created fake workout plan");
+
+    // 5. Set check_in_frequency_days to 0 so lock expires immediately
+    const freqConfig = await ctx.db
+      .query("systemConfig")
+      .withIndex("by_key", (q) => q.eq("key", "check_in_frequency_days"))
+      .unique();
+    if (freqConfig) {
+      await ctx.db.patch(freqConfig._id, { value: 0 });
+      steps.push("set check_in_frequency_days → 0 (was " + freqConfig.value + ")");
+    } else {
+      await ctx.db.insert("systemConfig", {
+        key: "check_in_frequency_days",
+        value: 0,
+        updatedAt: Date.now(),
+      });
+      steps.push("inserted check_in_frequency_days = 0");
+    }
+
+    return `Ready for check-in (${email}): ${steps.join(", ")}`;
+  },
+});
+
+/**
+ * Restore check_in_frequency_days back to 14 after testing.
+ *
+ * Run: npx convex run seed:restoreCheckInFrequency
+ */
+export const restoreCheckInFrequency = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const config = await ctx.db
+      .query("systemConfig")
+      .withIndex("by_key", (q) => q.eq("key", "check_in_frequency_days"))
+      .unique();
+    if (config) {
+      const prev = config.value;
+      await ctx.db.patch(config._id, { value: 14 });
+      return `Restored check_in_frequency_days: ${prev} → 14`;
+    }
+    return "No config found";
+  },
+});

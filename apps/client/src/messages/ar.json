@@ -126,7 +126,8 @@
     "loginMessages": {
       "session_expired": "انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.",
       "account_pending": "حسابك قيد المراجعة.",
-      "password_changed": "تم تغيير كلمة المرور بنجاح. يرجى تسجيل الدخول."
+      "password_changed": "تم تغيير كلمة المرور بنجاح. يرجى تسجيل الدخول.",
+      "account_inactive": "حسابك غير نشط. يرجى التواصل مع الدعم."
     }
   },
   "nav": {
@@ -300,12 +301,36 @@
     "none": "لا يوجد",
     "photosUploaded": "{count} صور تم رفعها",
     "noPhotos": "لا توجد صور",
+    "manualMeasurements": "قياسات الجسم",
+    "recommended": "موصى به",
+    "inBodyUpload": "رفع InBody",
+    "uploadInBody": "رفع نتيجة InBody",
+    "uploadInBodyDescription": "التقط صورة أو ارفع ورقة نتائج InBody لاستخراج تركيب الجسم تلقائياً",
+    "inBodyRequired": "يرجى رفع ورقة نتائج InBody",
+    "removeFile": "إزالة الملف",
+    "removePhoto": "إزالة الصورة",
+    "inBodyResult": "نتيجة InBody",
+    "inBodyProcessing": "جاري معالجة بيانات InBody...",
+    "inBodyExtracted": "تم استخراج بيانات InBody",
+    "aiExtracted": "مستخرج بالذكاء الاصطناعي",
+    "photoFront": "أمامي",
+    "photoBack": "خلفي",
+    "photoSide": "جانبي",
+    "tapToUpload": "اضغط للرفع",
+    "plansGenerateInBackground": "سيتم إنشاء خططك في الخلفية. ستُبلَّغ عند الجاهزية.",
     "placeholders": {
       "performance": "صف أداء تمارينك، التحسينات، أو التحديات...",
       "dietNotes": "أي تحديات في خطة وجباتك؟ أطعمة أعجبتك أو لم تعجبك؟",
       "injuries": "صف أي إصابات جديدة، ألم، أو انزعاج...",
       "notes": "شارك أي أفكار، أسئلة، أو مخاوف أخرى...",
       "photoUpload": "اضغط لرفع الصور"
+    },
+    "validation": {
+      "weightPositive": "يجب أن يكون الوزن موجبًا",
+      "weightTooLow": "الوزن يبدو منخفضًا جدًا",
+      "weightTooHigh": "الوزن يبدو مرتفعًا جدًا",
+      "workoutPerformanceMin": "يرجى كتابة 10 أحرف على الأقل عن أدائك في التمارين",
+      "ratingRange": "يجب أن يكون بين 1 و 10"
     }
   },
   "tracking": {
@@ -331,7 +356,9 @@
     "mealsCompleted": "وجبات مكتملة",
     "addWorkoutNotes": "أضف ملاحظات التمرين (اختياري)...",
     "takeTimeToRecover": "خذ وقتك للتعافي والاستعداد لتمرينك القادم",
-    "complete": "مكتمل"
+    "complete": "مكتمل",
+    "markComplete": "تحديد كمكتمل",
+    "markIncomplete": "تحديد كغير مكتمل"
   },
   "progress": {
     "title": "تقدمك",
@@ -367,6 +394,7 @@
     "checkInHistoryDescription": "جميع متابعاتك المسجلة",
     "noCheckIns": "لا توجد متابعات مسجلة بعد",
     "progressPhoto": "صورة التقدم",
+    "close": "إغلاق",
     "loading": "جاري التحميل..."
   },
   "tickets": {
@@ -413,7 +441,11 @@
       "today": "اليوم",
       "yesterday": "أمس"
     },
-    "lastMessage": "آخر رسالة"
+    "lastMessage": "آخر رسالة",
+    "uploadFailed": "فشل رفع الصورة",
+    "uploadFailedDescription": "تعذر رفع لقطة الشاشة. يرجى المحاولة مرة أخرى.",
+    "subjectMinLength": "يجب أن يكون الموضوع 3 أحرف على الأقل",
+    "subjectMaxLength": "يجب أن يكون الموضوع أقل من 100 حرف"
   },
   "faq": {
     "title": "الأسئلة الشائعة",
@@ -472,6 +504,13 @@
     "darkMode": "الوضع الداكن",
     "account": "الحساب",
     "changePassword": "تغيير كلمة المرور",
+    "currentPassword": "كلمة المرور الحالية",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+    "passwordChanged": "تم تغيير كلمة المرور بنجاح",
+    "passwordMismatch": "كلمات المرور غير متطابقة",
+    "passwordTooShort": "كلمة المرور يجب أن تكون 8 أحرف على الأقل",
+    "wrongPassword": "كلمة المرور الحالية غير صحيحة",
     "planDetails": "تفاصيل الخطة",
     "planTier": "مستوى الخطة",
     "planExpiry": "انتهاء الخطة",
@@ -485,6 +524,7 @@
     "darkModeDescription": "تبديل الوضع الداكن",
     "email": "البريد الإلكتروني",
     "saveChanges": "حفظ التغييرات",
+    "saveSuccess": "تم حفظ الإعدادات بنجاح",
     "signOut": "تسجيل الخروج",
     "status": "الحالة",
     "planStart": "تاريخ البدء",
@@ -501,7 +541,13 @@
       "inactive": "غير نشط",
       "expired": "منتهي"
     },
-    "noPlan": "لا توجد خطة حالية"
+    "noPlan": "لا توجد خطة حالية",
+    "namePlaceholder": "مثال: أحمد محمد",
+    "phonePlaceholder": "مثال: 01xxxxxxxxx",
+    "closeDialog": "إغلاق النافذة",
+    "errors": {
+      "saveFailed": "فشل الحفظ. يرجى المحاولة مرة أخرى."
+    }
   },
   "onboarding": {
     "welcome": {
@@ -755,6 +801,9 @@
     "goalRequired": "يرجى اختيار هدف واحد على الأقل",
     "weightHeightRequired": "يرجى إدخال وزنك وطولك",
     "ageGenderRequired": "يرجى إدخال عمرك واختيار جنسك",
+    "weightOutOfRange": "يجب أن يكون الوزن بين 30 و 300 كجم",
+    "heightOutOfRange": "يجب أن يكون الطول بين 100 و 250 سم",
+    "ageOutOfRange": "يجب أن يكون العمر بين 13 و 120 سنة",
     "experienceLevelRequired": "يرجى اختيار مستوى الخبرة",
     "workoutDaysRequired": "يرجى اختيار يوم تمرين واحد على الأقل",
     "workoutDaysMin": "يرجى اختيار {min} أيام تمرين على الأقل لنتائج فعلية",
@@ -841,6 +890,11 @@
     "tracking": {
       "title": "خطأ في التتبع",
       "description": "لم نتمكن من تحميل بيانات التتبع. يرجى المحاولة مرة أخرى.",
+      "retry": "حاول مرة أخرى"
+    },
+    "dashboard": {
+      "title": "خطأ في لوحة التحكم",
+      "description": "لم نتمكن من تحميل لوحة التحكم. يرجى المحاولة مرة أخرى.",
       "retry": "حاول مرة أخرى"
     },
     "adminSettings": {

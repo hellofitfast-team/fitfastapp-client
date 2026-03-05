@@ -61,8 +61,10 @@ export function AdminHeader({ onMenuClick, coachName }: AdminHeaderProps) {
 
           {/* Sign Out */}
           <button
+            type="button"
             className="flex h-11 items-center gap-2 rounded-lg border border-stone-200 px-3 text-sm font-medium text-stone-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
             onClick={handleSignOut}
+            aria-label={t("signOut")}
           >
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline">{t("signOut")}</span>

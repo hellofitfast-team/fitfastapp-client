@@ -2,10 +2,10 @@
 
 import { type ReactNode, useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { User, Bell, Shield, CreditCard, LogOut, AlertTriangle } from "lucide-react";
+import { User, Bell, Shield, CreditCard, LogOut, AlertTriangle, X, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
-import { useMutation } from "convex/react";
+import { useMutation, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Skeleton } from "@fitfast/ui/skeleton";
 import { useForm } from "react-hook-form";
@@ -85,9 +85,13 @@ export default function SettingsPage() {
     },
   });
 
+  const changePasswordAction = useAction(api.passwordChange.changePassword);
   const [reminderTime, setReminderTime] = useState("08:00");
   const [reminderInitialized, setReminderInitialized] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ current: "", new: "", confirm: "" });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   // Initialize reminder time from profile once (setState during render, guarded by flag)
   if (profile?.notificationReminderTime && !reminderInitialized) {
@@ -113,8 +117,9 @@ export default function SettingsPage() {
         phone: data.phone || undefined,
         language: data.language,
       });
+      toast({ title: t("saveSuccess") });
     } catch (err) {
-      console.error("Failed to update profile:", err); // Sentry captures this
+      console.error("Failed to update profile:", err);
       toast({ title: t("errors.saveFailed"), variant: "destructive" });
     }
     setIsSaving(false);
@@ -131,7 +136,7 @@ export default function SettingsPage() {
 
   const calculatePlanDetails = () => {
     if (!profile?.planStartDate || !profile?.planEndDate) {
-      return { daysRemaining: 0, progressPercentage: 0, formattedEndDate: "N/A" };
+      return { daysRemaining: 0, progressPercentage: 0, formattedEndDate: "—" };
     }
     const today = new Date();
     const endDate = new Date(profile.planEndDate);
@@ -151,6 +156,35 @@ export default function SettingsPage() {
   };
 
   const { daysRemaining, progressPercentage, formattedEndDate } = calculatePlanDetails();
+
+  const handleChangePassword = async () => {
+    if (passwordForm.new.length < 8) {
+      toast({ title: t("passwordTooShort"), variant: "destructive" });
+      return;
+    }
+    if (passwordForm.new !== passwordForm.confirm) {
+      toast({ title: t("passwordMismatch"), variant: "destructive" });
+      return;
+    }
+    setIsChangingPassword(true);
+    try {
+      await changePasswordAction({
+        currentPassword: passwordForm.current,
+        newPassword: passwordForm.new,
+      });
+      toast({ title: t("passwordChanged") });
+      setShowPasswordDialog(false);
+      setPasswordForm({ current: "", new: "", confirm: "" });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : t("errors.saveFailed");
+      toast({
+        title: message.includes("incorrect") ? t("wrongPassword") : message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 px-4 py-6 lg:px-6">
@@ -180,7 +214,7 @@ export default function SettingsPage() {
             <label className="mb-1.5 block text-sm font-medium">{t("fullName")}</label>
             <input
               type="text"
-              placeholder="John Doe"
+              placeholder={t("namePlaceholder")}
               {...register("fullName")}
               className={cn(
                 "bg-card placeholder:text-muted-foreground focus:ring-ring h-11 w-full rounded-lg border px-3.5 text-sm transition-colors focus:ring-2 focus:outline-none",
@@ -198,7 +232,7 @@ export default function SettingsPage() {
             <label className="mb-1.5 block text-sm font-medium">{t("phone")}</label>
             <input
               type="tel"
-              placeholder="01xxxxxxxxx"
+              placeholder={t("phonePlaceholder")}
               {...register("phone")}
               className={cn(
                 "bg-card placeholder:text-muted-foreground focus:ring-ring h-11 w-full rounded-lg border px-3.5 text-sm transition-colors focus:ring-2 focus:outline-none",
@@ -270,6 +304,7 @@ export default function SettingsPage() {
                   <Skeleton className="h-7 w-12 rounded-full" />
                 ) : (
                   <button
+                    type="button"
                     onClick={() => toggleSubscription()}
                     disabled={!isSupported || (permission === "denied" && !isSubscribed)}
                     className={cn(
@@ -310,10 +345,15 @@ export default function SettingsPage() {
         animationDelay="100ms"
       >
         <div className="space-y-3 p-4">
-          <button className="focus-visible:ring-ring border-border w-full rounded-lg border py-2.5 text-sm font-medium transition-colors hover:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none">
+          <button
+            type="button"
+            onClick={() => setShowPasswordDialog(true)}
+            className="focus-visible:ring-ring border-border w-full rounded-lg border py-2.5 text-sm font-medium transition-colors hover:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          >
             {t("changePassword")}
           </button>
           <button
+            type="button"
             onClick={() => signOut()}
             className="border-error-500/30 bg-error-500/5 text-error-500 hover:bg-error-500/10 focus-visible:ring-error-500/50 flex w-full items-center justify-center gap-2 rounded-lg border py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
@@ -385,6 +425,80 @@ export default function SettingsPage() {
           )}
         </div>
       </SettingsCard>
+
+      {/* Change Password Dialog */}
+      {showPasswordDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="bg-card w-full max-w-sm rounded-2xl shadow-xl">
+            <div className="border-border flex items-center justify-between border-b p-4">
+              <h3 className="text-sm font-semibold">{t("changePassword")}</h3>
+              <button
+                type="button"
+                onClick={() => setShowPasswordDialog(false)}
+                aria-label={t("closeDialog")}
+                className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-neutral-100"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-3 p-4">
+              <div>
+                <label htmlFor="current-password" className="mb-1.5 block text-sm font-medium">
+                  {t("currentPassword")}
+                </label>
+                <input
+                  id="current-password"
+                  type="password"
+                  autoComplete="current-password"
+                  value={passwordForm.current}
+                  onChange={(e) => setPasswordForm((p) => ({ ...p, current: e.target.value }))}
+                  className="border-input bg-card focus:ring-ring h-11 w-full rounded-lg border px-3.5 text-sm transition-colors focus:ring-2 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label htmlFor="new-password" className="mb-1.5 block text-sm font-medium">
+                  {t("newPassword")}
+                </label>
+                <input
+                  id="new-password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={passwordForm.new}
+                  onChange={(e) => setPasswordForm((p) => ({ ...p, new: e.target.value }))}
+                  className="border-input bg-card focus:ring-ring h-11 w-full rounded-lg border px-3.5 text-sm transition-colors focus:ring-2 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label htmlFor="confirm-password" className="mb-1.5 block text-sm font-medium">
+                  {t("confirmNewPassword")}
+                </label>
+                <input
+                  id="confirm-password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={passwordForm.confirm}
+                  onChange={(e) => setPasswordForm((p) => ({ ...p, confirm: e.target.value }))}
+                  className="border-input bg-card focus:ring-ring h-11 w-full rounded-lg border px-3.5 text-sm transition-colors focus:ring-2 focus:outline-none"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleChangePassword}
+                disabled={
+                  isChangingPassword ||
+                  !passwordForm.current ||
+                  !passwordForm.new ||
+                  !passwordForm.confirm
+                }
+                className="bg-primary hover:bg-primary/90 flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold text-white transition-all disabled:opacity-50"
+              >
+                {isChangingPassword && <Loader2 className="h-4 w-4 animate-spin" />}
+                {t("changePassword")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -49,10 +49,11 @@ export const getAllClients = query({
       .unique();
     if (!profile?.isCoach) throw new Error("Not authorized");
 
+    // Capped at 1500 to prevent unbounded live subscriptions at scale
     return ctx.db
       .query("profiles")
       .withIndex("by_isCoach", (q) => q.eq("isCoach", false))
-      .collect();
+      .take(1500);
   },
 });
 
@@ -216,7 +217,7 @@ export const onNewUserCreated = internalMutation({
       const endDate = new Date();
       endDate.setMonth(endDate.getMonth() + planMonths);
 
-      await ctx.db.insert("profiles", {
+      const profileId = await ctx.db.insert("profiles", {
         userId,
         email: signup.email,
         fullName: signup.fullName,
@@ -229,11 +230,13 @@ export const onNewUserCreated = internalMutation({
         updatedAt: Date.now(),
       });
 
+      // Maintain active clients aggregate counter
+      await activeClientsCount.insert(ctx, { key: profileId, id: profileId });
+
       // Mark invite token as used
       if (signup.inviteToken) {
         await ctx.db.patch(signup._id, {
           inviteToken: undefined,
-          inviteExpiresAt: undefined,
         });
       }
     } else {

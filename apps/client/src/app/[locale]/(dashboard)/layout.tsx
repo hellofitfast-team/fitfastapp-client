@@ -39,11 +39,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       redirect(`/${locale}/expired`);
       break;
     case "inactive":
-      redirect(
-        `/${locale}/login?message=${encodeURIComponent(
-          "Your account is inactive. Please contact support.",
-        )}`,
-      );
+      redirect(`/${locale}/login?message=account_inactive`);
       break;
     case "active":
       if (!hasAssessment) {

@@ -19,7 +19,12 @@ function escapeHtml(str: string): string {
 async function sendEmail(to: string, subject: string, html: string): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM_EMAIL ?? "FitFast <noreply@fitfast.app>";
-  if (!apiKey) throw new Error("RESEND_API_KEY not configured");
+  if (!apiKey) {
+    console.warn(
+      "[Email] RESEND_API_KEY not configured — skipping email send. Plans are still saved.",
+    );
+    return;
+  }
 
   const { Resend } = await import("resend");
   const resend = new Resend(apiKey);
@@ -86,7 +91,9 @@ function getTicketReplyEmail(
   const safeSubject = escapeHtml(ticketSubject);
   const safeMessage = escapeHtml(coachMessage);
   return {
-    subject: isAr ? `رد المدرب: ${ticketSubject}` : `Coach replied: ${ticketSubject}`,
+    subject: isAr
+      ? `رد المدرب: ${escapeHtml(ticketSubject)}`
+      : `Coach replied: ${escapeHtml(ticketSubject)}`,
     html: `
       <div dir="${isAr ? "rtl" : "ltr"}" style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
         <h1 style="color:#10B981">${isAr ? `${safeName}، رد مدربك` : `${safeName}, your coach replied`}</h1>
@@ -181,7 +188,7 @@ function getInvitationEmail(fullName: string, inviteToken: string, language: "en
           </a>
         </div>
         <p style="color:#6b7280;font-size:13px">${
-          isAr ? "هذا الرابط صالح لمدة 7 أيام." : "This link is valid for 7 days."
+          isAr ? "هذا الرابط مخصص لك فقط." : "This link is unique to you."
         }</p>
         <p style="color:#6b7280;font-size:12px;margin-top:32px">— FitFast</p>
       </div>`,

@@ -92,6 +92,7 @@ export function TicketsList() {
           >
             {/* Header row */}
             <button
+              type="button"
               onClick={() => toggleTicket(ticket._id)}
               className="flex w-full items-center gap-4 p-4 text-start"
             >
@@ -155,6 +156,7 @@ export function TicketsList() {
                     />
                     <div className="flex gap-2">
                       <button
+                        type="button"
                         onClick={() => handleRespond(ticket._id)}
                         disabled={respondingId === ticket._id || !response.trim()}
                         className="bg-primary hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium text-white transition-colors disabled:opacity-50"
@@ -164,6 +166,7 @@ export function TicketsList() {
                       </button>
                       {(ticket.status as string) !== "closed" && (
                         <button
+                          type="button"
                           onClick={() => handleClose(ticket._id)}
                           className="flex items-center gap-2 rounded-lg border border-stone-200 px-4 py-2 text-xs font-medium text-stone-600 transition-colors hover:bg-stone-50"
                         >

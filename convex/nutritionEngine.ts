@@ -139,10 +139,22 @@ export function calculateNutritionTargets(input: NutritionInput): NutritionTarge
   // Macros (ISSN guidelines)
   const proteinPerKg = getProteinPerKg(goal);
   const protein = Math.round(weightKg * proteinPerKg);
-  const fat = Math.round(weightKg * NUTRITION.fatPerKg);
+  let fat = Math.round(weightKg * NUTRITION.fatPerKg);
+
+  // Guard: if protein + fat exceed calorie budget, scale fat down (preserve protein for muscle)
+  let remainingCalories = calories - protein * 4 - fat * 9;
+  if (remainingCalories < 0) {
+    // Minimum fat: 0.5g/kg for hormonal health
+    const minFatG = Math.round(weightKg * 0.5);
+    const maxFatCalories = calories - protein * 4 - NUTRITION.minCarbsG * 4;
+    fat = Math.max(minFatG, Math.round(maxFatCalories / 9));
+    remainingCalories = calories - protein * 4 - fat * 9;
+    console.warn(
+      `[NutritionEngine] Fat scaled down to ${fat}g — protein+fat exceeded calorie target of ${calories}`,
+    );
+  }
 
   // Carbs fill remaining calories: (calories - protein*4 - fat*9) / 4
-  const remainingCalories = calories - protein * 4 - fat * 9;
   const carbs = Math.max(NUTRITION.minCarbsG, Math.round(remainingCalories / 4));
 
   return { bmr, tdee, calories, protein, carbs, fat, proteinPerKg, minCalories };

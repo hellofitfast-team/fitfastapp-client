@@ -28,7 +28,7 @@ export function RatingSelector({
   return (
     <div>
       {label && (
-        <div className="mb-2.5 flex items-center justify-between">
+        <div className="mb-5 flex items-center justify-between">
           <label className="text-sm font-medium">{label}</label>
           <span
             className="rounded-full px-2 py-0.5 text-sm font-bold"

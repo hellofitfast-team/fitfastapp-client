@@ -116,7 +116,7 @@ export default function NotificationsPage() {
 
         {/* Broadcast card */}
         <div
-          className={`rounded-xl border border-stone-200 bg-white p-6${isNotifEnabled === false ? "pointer-events-none opacity-50" : ""}`}
+          className={`rounded-xl border border-stone-200 bg-white p-6 ${isNotifEnabled === false ? "pointer-events-none opacity-50" : ""}`}
           aria-disabled={isNotifEnabled === false}
         >
           <div className="mb-4 flex items-center gap-2">
@@ -170,6 +170,7 @@ export default function NotificationsPage() {
             </div>
             <div className="flex justify-end">
               <button
+                type="button"
                 onClick={() => setShowConfirm(true)}
                 disabled={isNotifEnabled === false || isSending || !title.trim() || !body.trim()}
                 className="bg-primary hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-50"
@@ -191,6 +192,7 @@ export default function NotificationsPage() {
               <p className="mb-3 text-xs text-stone-500">{t("confirmBroadcastDesc")}</p>
               <div className="flex gap-2">
                 <button
+                  type="button"
                   ref={confirmBtnRef}
                   onClick={handleBroadcast}
                   className="bg-primary hover:bg-primary/90 rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition-colors"
@@ -198,6 +200,7 @@ export default function NotificationsPage() {
                   {t("confirmSend")}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setShowConfirm(false)}
                   className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-600 transition-colors hover:bg-stone-50"
                 >
@@ -258,7 +261,10 @@ export default function NotificationsPage() {
                       <span className="text-xs text-stone-500">
                         {t("recipients")}: {log.recipientCount}
                         {log.failedCount ? (
-                          <span className="text-red-500"> (+{log.failedCount} failed)</span>
+                          <span className="text-red-500">
+                            {" "}
+                            (+{log.failedCount} {t("failedSuffix")})
+                          </span>
                         ) : null}
                       </span>
                       <span
@@ -324,7 +330,10 @@ export default function NotificationsPage() {
                         <td className="py-2.5 pe-4 text-xs">
                           {log.recipientCount}
                           {log.failedCount ? (
-                            <span className="text-red-500"> (+{log.failedCount} failed)</span>
+                            <span className="text-red-500">
+                              {" "}
+                              (+{log.failedCount} {t("failedSuffix")})
+                            </span>
                           ) : null}
                         </td>
                         <td className="py-2.5">
@@ -353,6 +362,7 @@ export default function NotificationsPage() {
               </p>
               <div className="flex gap-1">
                 <button
+                  type="button"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
                   className="rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-stone-600 transition-colors hover:bg-stone-50 disabled:opacity-40"
@@ -360,6 +370,7 @@ export default function NotificationsPage() {
                   {tAdmin("previous")}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
                   className="rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-stone-600 transition-colors hover:bg-stone-50 disabled:opacity-40"

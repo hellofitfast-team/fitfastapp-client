@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Save, Check } from "lucide-react";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -15,12 +16,18 @@ interface SaveButtonProps {
 
 export function SaveButton({
   onSave,
-  label = "Save",
-  savingLabel = "Saving...",
-  savedLabel = "Saved!",
-  errorLabel = "Error — try again",
+  label,
+  savingLabel,
+  savedLabel,
+  errorLabel,
 }: SaveButtonProps) {
+  const t = useTranslations("admin");
   const [state, setState] = useState<SaveState>("idle");
+
+  const resolvedLabel = label ?? t("save");
+  const resolvedSavingLabel = savingLabel ?? t("saving");
+  const resolvedSavedLabel = savedLabel ?? t("saved");
+  const resolvedErrorLabel = errorLabel ?? t("saveErrorRetry");
 
   const handleClick = async () => {
     if (state === "saving" || state === "saved") return;
@@ -40,6 +47,7 @@ export function SaveButton({
 
   return (
     <button
+      type="button"
       onClick={handleClick}
       disabled={state === "saving"}
       className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium shadow-md transition-all duration-300 disabled:opacity-70 ${
@@ -51,7 +59,13 @@ export function SaveButton({
       }`}
     >
       {isSuccess ? <Check className="h-4 w-4" /> : <Save className="h-4 w-4" />}
-      {state === "saving" ? savingLabel : isSuccess ? savedLabel : isError ? errorLabel : label}
+      {state === "saving"
+        ? resolvedSavingLabel
+        : isSuccess
+          ? resolvedSavedLabel
+          : isError
+            ? resolvedErrorLabel
+            : resolvedLabel}
     </button>
   );
 }

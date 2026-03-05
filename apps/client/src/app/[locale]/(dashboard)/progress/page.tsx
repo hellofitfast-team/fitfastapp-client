@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import type { Id } from "@/convex/_generated/dataModel";
 import dynamic from "next/dynamic";
 import { Activity, Camera, Calendar } from "lucide-react";
 import { StatsOverview } from "./_components/stats-overview";
@@ -97,16 +98,38 @@ export default function ProgressPage() {
     ? ((weightChange / firstCheckIn.weight) * 100).toFixed(1)
     : "0";
 
+  // Collect all photo storage IDs from check-ins (individual fields + legacy array)
+  const photoStorageIds = useMemo(() => {
+    const ids: Id<"_storage">[] = [];
+    for (const ci of filteredCheckIns) {
+      if (ci.progressPhotoFront) ids.push(ci.progressPhotoFront);
+      if (ci.progressPhotoBack) ids.push(ci.progressPhotoBack);
+      if (ci.progressPhotoSide) ids.push(ci.progressPhotoSide);
+      if (ci.progressPhotoIds) ids.push(...ci.progressPhotoIds);
+    }
+    return ids;
+  }, [filteredCheckIns]);
+
+  // Resolve storage IDs to URLs in a single batch query
+  const photoUrlMap = useQuery(
+    api.storage.getFileUrlsBatch,
+    photoStorageIds.length > 0 ? { storageIds: photoStorageIds } : "skip",
+  );
+
   const allPhotos = useMemo(() => {
-    return filteredCheckIns
-      .filter((checkIn) => checkIn.progressPhotoIds && checkIn.progressPhotoIds.length > 0)
-      .flatMap((checkIn) =>
-        (checkIn.progressPhotoIds || []).map((storageId) => ({
-          url: storageId, // Will need to resolve via getFileUrl
-          date: formatDate(new Date(checkIn._creationTime).toISOString(), locale),
-        })),
-      );
-  }, [filteredCheckIns, locale]);
+    if (!photoUrlMap) return [];
+    return filteredCheckIns.flatMap((checkIn) => {
+      const ids: Id<"_storage">[] = [];
+      if (checkIn.progressPhotoFront) ids.push(checkIn.progressPhotoFront);
+      if (checkIn.progressPhotoBack) ids.push(checkIn.progressPhotoBack);
+      if (checkIn.progressPhotoSide) ids.push(checkIn.progressPhotoSide);
+      if (checkIn.progressPhotoIds) ids.push(...checkIn.progressPhotoIds);
+      const dateStr = formatDate(new Date(checkIn._creationTime).toISOString(), locale);
+      return ids
+        .filter((id) => photoUrlMap[id])
+        .map((id) => ({ url: photoUrlMap[id]!, date: dateStr }));
+    });
+  }, [filteredCheckIns, photoUrlMap, locale]);
 
   if (checkInsLoading) {
     return <ProgressSkeleton />;

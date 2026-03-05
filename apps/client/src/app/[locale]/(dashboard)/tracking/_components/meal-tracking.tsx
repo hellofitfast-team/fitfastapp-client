@@ -93,8 +93,10 @@ export function MealTracking({
                 >
                   <div className="flex items-start gap-3">
                     <button
+                      type="button"
                       onClick={() => onMealToggle(index, isCompleted)}
                       disabled={isTogglingMeal === index}
+                      aria-label={isCompleted ? t("markIncomplete") : t("markComplete")}
                       className={cn(
                         "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border-2 transition-colors",
                         isCompleted

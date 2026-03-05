@@ -6,12 +6,14 @@ import { useConvexAuth, useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { createLogger } from "@fitfast/config/logger";
+import { useToast } from "@/hooks/use-toast";
 
 const log = createLogger("admin-faqs");
 import { HelpCircle, Plus, Trash2, Save, X, Pencil } from "lucide-react";
 
 export function FaqManager() {
   const t = useTranslations("admin");
+  const tCommon = useTranslations("common");
   const { isAuthenticated } = useConvexAuth();
   const enFaqs = useQuery(api.faqs.getFAQs, isAuthenticated ? { language: "en" } : "skip");
   const arFaqs = useQuery(api.faqs.getFAQs, isAuthenticated ? { language: "ar" } : "skip");
@@ -19,6 +21,7 @@ export function FaqManager() {
   const updateFAQ = useMutation(api.faqs.updateFAQ);
   const deleteFAQ = useMutation(api.faqs.deleteFAQ);
 
+  const { toast } = useToast();
   const allFaqs = [...(enFaqs ?? []), ...(arFaqs ?? [])];
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -45,6 +48,7 @@ export function FaqManager() {
       setShowNew(false);
     } catch (err) {
       log.error({ err, language: newLang }, "Failed to create FAQ");
+      toast({ title: t("faqSaveFailed"), variant: "destructive" });
     }
     setIsSaving(false);
   };
@@ -62,6 +66,7 @@ export function FaqManager() {
       setEditingId(null);
     } catch (err) {
       log.error({ err, faqId }, "Failed to update FAQ");
+      toast({ title: t("faqSaveFailed"), variant: "destructive" });
     }
     setIsSaving(false);
   };
@@ -72,6 +77,7 @@ export function FaqManager() {
       await deleteFAQ({ faqId });
     } catch (err) {
       log.error({ err, faqId }, "Failed to delete FAQ");
+      toast({ title: t("faqDeleteFailed"), variant: "destructive" });
     }
   };
 
@@ -79,6 +85,7 @@ export function FaqManager() {
     <div className="space-y-4">
       {/* Add new FAQ button */}
       <button
+        type="button"
         onClick={() => setShowNew(!showNew)}
         className="bg-primary hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors"
       >
@@ -91,6 +98,7 @@ export function FaqManager() {
         <div className="space-y-3 rounded-xl border border-stone-200 bg-white p-5">
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={() => setNewLang("en")}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                 newLang === "en"
@@ -101,6 +109,7 @@ export function FaqManager() {
               EN
             </button>
             <button
+              type="button"
               onClick={() => setNewLang("ar")}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                 newLang === "ar"
@@ -126,6 +135,7 @@ export function FaqManager() {
             className="focus:ring-primary/20 focus:border-primary w-full resize-none rounded-xl border border-stone-200 bg-stone-50 p-3 text-sm text-stone-900 transition-all placeholder:text-stone-400 focus:ring-2 focus:outline-none"
           />
           <button
+            type="button"
             onClick={handleCreate}
             disabled={isSaving || !newQuestion.trim() || !newAnswer.trim()}
             className="bg-primary hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium text-white transition-colors disabled:opacity-50"
@@ -165,6 +175,7 @@ export function FaqManager() {
                   />
                   <div className="flex gap-2">
                     <button
+                      type="button"
                       onClick={() => handleSave(faq._id)}
                       disabled={isSaving}
                       className="bg-primary hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium text-white transition-colors disabled:opacity-50"
@@ -173,6 +184,7 @@ export function FaqManager() {
                       {t("save")}
                     </button>
                     <button
+                      type="button"
                       onClick={() => setEditingId(null)}
                       className="flex items-center gap-2 rounded-lg border border-stone-200 px-4 py-2 text-xs font-medium text-stone-600 transition-colors hover:bg-stone-50"
                     >
@@ -191,13 +203,17 @@ export function FaqManager() {
                   </div>
                   <div className="flex shrink-0 gap-1">
                     <button
+                      type="button"
                       onClick={() => handleEdit(faq)}
+                      aria-label={tCommon("edit")}
                       className="hover:border-primary/30 hover:text-primary flex h-11 w-11 items-center justify-center rounded-lg border border-stone-200 text-stone-400 transition-colors"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleDelete(faq._id)}
+                      aria-label={tCommon("delete")}
                       className="flex h-11 w-11 items-center justify-center rounded-lg border border-stone-200 text-stone-400 transition-colors hover:border-red-300 hover:text-red-600"
                     >
                       <Trash2 className="h-3.5 w-3.5" />

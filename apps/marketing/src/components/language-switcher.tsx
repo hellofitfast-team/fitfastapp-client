@@ -21,7 +21,9 @@ export function LanguageSwitcher() {
   return (
     <div className="flex items-center gap-1 rounded-full bg-white/10 p-0.5">
       <button
+        type="button"
         onClick={() => switchLocale("en")}
+        aria-label="Switch to English"
         className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
           locale === "en"
             ? "bg-white text-[var(--color-primary)]"
@@ -31,7 +33,9 @@ export function LanguageSwitcher() {
         EN
       </button>
       <button
+        type="button"
         onClick={() => switchLocale("ar")}
+        aria-label="التبديل إلى العربية"
         className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
           locale === "ar"
             ? "bg-white text-[var(--color-primary)]"

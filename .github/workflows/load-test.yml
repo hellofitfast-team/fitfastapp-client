@@ -1,0 +1,66 @@
+name: Load Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      convex_url:
+        description: "Convex deployment URL to test against"
+        required: true
+        type: string
+
+concurrency:
+  group: load-test
+  cancel-in-progress: true
+
+jobs:
+  load-test:
+    name: k6 Load Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D68
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Run dashboard reads scenario
+        env:
+          E2E_CONVEX_URL: ${{ inputs.convex_url }}
+        run: k6 run --summary-export=e2e/reports/k6-dashboard.json e2e/load/scenarios/dashboard-reads.js
+
+      - name: Run check-in submit scenario
+        env:
+          E2E_CONVEX_URL: ${{ inputs.convex_url }}
+        run: k6 run --summary-export=e2e/reports/k6-checkin.json e2e/load/scenarios/checkin-submit.js
+
+      - name: Run AI correctness scenario
+        env:
+          E2E_CONVEX_URL: ${{ inputs.convex_url }}
+        run: k6 run --summary-export=e2e/reports/k6-ai.json e2e/load/scenarios/ai-correctness.js
+
+      - name: Run ramp-up scenario
+        env:
+          E2E_CONVEX_URL: ${{ inputs.convex_url }}
+        run: k6 run --summary-export=e2e/reports/k6-rampup.json e2e/load/scenarios/ramp-up.js
+
+      - name: Merge k6 results
+        run: |
+          mkdir -p e2e/reports
+          jq -s '.[0] * .[1] * .[2] * .[3]' \
+            e2e/reports/k6-dashboard.json \
+            e2e/reports/k6-checkin.json \
+            e2e/reports/k6-ai.json \
+            e2e/reports/k6-rampup.json \
+            > e2e/reports/k6-summary.json || true
+
+      - name: Upload k6 results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: k6-results
+          path: e2e/reports/k6-*.json
+          retention-days: 30

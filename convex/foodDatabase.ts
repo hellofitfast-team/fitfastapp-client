@@ -8,7 +8,18 @@ import { getAuthUserId } from "./auth";
 
 export const listFoods = query({
   args: {
-    category: v.optional(v.string()),
+    category: v.optional(
+      v.union(
+        v.literal("protein"),
+        v.literal("carb"),
+        v.literal("fat"),
+        v.literal("vegetable"),
+        v.literal("fruit"),
+        v.literal("dairy"),
+        v.literal("dessert"),
+        v.literal("recipe"),
+      ),
+    ),
     isRecipe: v.optional(v.boolean()),
     search: v.optional(v.string()),
   },
@@ -101,7 +112,16 @@ export const addFood = mutation({
   args: {
     name: v.string(),
     nameAr: v.optional(v.string()),
-    category: v.string(),
+    category: v.union(
+      v.literal("protein"),
+      v.literal("carb"),
+      v.literal("fat"),
+      v.literal("vegetable"),
+      v.literal("fruit"),
+      v.literal("dairy"),
+      v.literal("dessert"),
+      v.literal("recipe"),
+    ),
     tags: v.array(v.string()),
     per100g: v.object({
       calories: v.number(),
@@ -168,7 +188,16 @@ export const insertFood = internalMutation({
   args: {
     name: v.string(),
     nameAr: v.optional(v.string()),
-    category: v.string(),
+    category: v.union(
+      v.literal("protein"),
+      v.literal("carb"),
+      v.literal("fat"),
+      v.literal("vegetable"),
+      v.literal("fruit"),
+      v.literal("dairy"),
+      v.literal("dessert"),
+      v.literal("recipe"),
+    ),
     tags: v.array(v.string()),
     per100g: v.object({
       calories: v.number(),
@@ -189,7 +218,7 @@ export const insertFood = internalMutation({
     ),
     ingredients: v.optional(v.array(v.string())),
     instructions: v.optional(v.array(v.string())),
-    source: v.string(),
+    source: v.union(v.literal("usda"), v.literal("coach"), v.literal("verified_recipe")),
     isVerified: v.boolean(),
   },
   handler: async (ctx, args) => {

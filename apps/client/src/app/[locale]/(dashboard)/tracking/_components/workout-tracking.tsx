@@ -86,8 +86,12 @@ export function WorkoutTracking({
           ) : (
             <div className="flex items-start gap-3">
               <button
+                type="button"
                 onClick={() => onWorkoutToggle(0, getWorkoutCompletion(0)?.completed || false)}
                 disabled={isTogglingWorkout === 0}
+                aria-label={
+                  getWorkoutCompletion(0)?.completed ? t("markIncomplete") : t("markComplete")
+                }
                 className={cn(
                   "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border-2 transition-colors",
                   getWorkoutCompletion(0)?.completed

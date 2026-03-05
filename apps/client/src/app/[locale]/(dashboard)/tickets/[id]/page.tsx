@@ -275,8 +275,10 @@ export default function TicketDetailPage() {
             }}
           />
           <button
+            type="button"
             onClick={handleSendReply}
             disabled={isSending || !reply.trim()}
+            aria-label={t("sendReply")}
             className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all active:scale-[0.97] disabled:opacity-50"
           >
             {isSending ? (

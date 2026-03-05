@@ -102,9 +102,7 @@ export function PaymentMethodsManager() {
     <div className="space-y-4">
       {methods.length === 0 && (
         <div className="rounded-xl border border-dashed border-stone-200 p-8 text-center">
-          <p className="text-sm text-stone-400">
-            No payment methods yet. Add a method for clients to pay.
-          </p>
+          <p className="text-sm text-stone-400">{t("noPaymentMethodsEmpty")}</p>
         </div>
       )}
 
@@ -157,7 +155,7 @@ export function PaymentMethodsManager() {
                   type="text"
                   value={method.accountName}
                   onChange={(e) => handleChange(index, "accountName", e.target.value)}
-                  placeholder="Ahmed Hassan"
+                  placeholder={t("accountNamePlaceholder")}
                   className="focus:ring-primary/20 focus:border-primary h-10 w-full rounded-lg border border-stone-200 bg-stone-50 px-3 text-sm text-stone-900 transition-all placeholder:text-stone-400 focus:ring-2 focus:outline-none"
                 />
               </div>
@@ -169,7 +167,7 @@ export function PaymentMethodsManager() {
                   type="text"
                   value={method.accountNumber}
                   onChange={(e) => handleChange(index, "accountNumber", e.target.value)}
-                  placeholder="01XXXXXXXXX"
+                  placeholder={t("accountNumberPlaceholder")}
                   className="focus:ring-primary/20 focus:border-primary h-10 w-full rounded-lg border border-stone-200 bg-stone-50 px-3 text-sm text-stone-900 transition-all placeholder:text-stone-400 focus:ring-2 focus:outline-none"
                 />
               </div>

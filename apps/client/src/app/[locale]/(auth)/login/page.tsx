@@ -17,7 +17,12 @@ type LoginFormData = {
   password: string;
 };
 
-const ALLOWED_MESSAGES = new Set(["session_expired", "account_pending", "password_changed"]);
+const ALLOWED_MESSAGES = new Set([
+  "session_expired",
+  "account_pending",
+  "password_changed",
+  "account_inactive",
+]);
 
 export default function LoginPage() {
   const t = useTranslations("auth");

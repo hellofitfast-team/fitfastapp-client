@@ -36,6 +36,8 @@ import type * as notificationLog from "../notificationLog.js";
 import type * as notifications from "../notifications.js";
 import type * as nutritionEngine from "../nutritionEngine.js";
 import type * as ocrExtraction from "../ocrExtraction.js";
+import type * as passwordChange from "../passwordChange.js";
+import type * as passwordChangeHelpers from "../passwordChangeHelpers.js";
 import type * as pendingSignups from "../pendingSignups.js";
 import type * as profiles from "../profiles.js";
 import type * as pushSubscriptions from "../pushSubscriptions.js";
@@ -89,6 +91,8 @@ declare const fullApi: ApiFromModules<{
   notifications: typeof notifications;
   nutritionEngine: typeof nutritionEngine;
   ocrExtraction: typeof ocrExtraction;
+  passwordChange: typeof passwordChange;
+  passwordChangeHelpers: typeof passwordChangeHelpers;
   pendingSignups: typeof pendingSignups;
   profiles: typeof profiles;
   pushSubscriptions: typeof pushSubscriptions;

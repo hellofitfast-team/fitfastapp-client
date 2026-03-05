@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { ImageIcon, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@fitfast/ui/dialog";
+import { useTranslations } from "next-intl";
 
 interface PaymentScreenshotProps {
   storageId: Id<"_storage">;
@@ -14,6 +15,7 @@ interface PaymentScreenshotProps {
 }
 
 export function PaymentScreenshot({ storageId, variant = "compact" }: PaymentScreenshotProps) {
+  const t = useTranslations("admin");
   const url = useQuery(api.storage.getFileUrl, { storageId });
   const [open, setOpen] = useState(false);
 
@@ -34,12 +36,12 @@ export function PaymentScreenshot({ storageId, variant = "compact" }: PaymentScr
         <div className="flex w-64 shrink-0 items-center justify-center rounded-lg border border-dashed border-stone-200 p-8">
           <div className="text-center">
             <ImageIcon className="mx-auto mb-2 h-8 w-8 text-stone-300" />
-            <p className="text-xs text-stone-400">Image unavailable</p>
+            <p className="text-xs text-stone-400">{t("imageUnavailable")}</p>
           </div>
         </div>
       );
     }
-    return <p className="text-xs text-stone-400">Unable to load image</p>;
+    return <p className="text-xs text-stone-400">{t("imageUnavailable")}</p>;
   }
 
   return (
@@ -53,7 +55,7 @@ export function PaymentScreenshot({ storageId, variant = "compact" }: PaymentScr
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={url}
-            alt="Payment screenshot"
+            alt={t("paymentScreenshot")}
             className="h-48 w-full bg-stone-50 object-contain"
           />
         </button>
@@ -61,17 +63,17 @@ export function PaymentScreenshot({ storageId, variant = "compact" }: PaymentScr
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={url}
-          alt="Payment screenshot"
-          className="h-40 w-full cursor-pointer rounded-lg border border-stone-200 object-cover transition-opacity hover:opacity-90"
+          alt={t("paymentScreenshot")}
+          className="mx-auto max-h-40 max-w-full cursor-pointer rounded-lg border border-stone-200 object-contain transition-opacity hover:opacity-90"
           onClick={() => setOpen(true)}
         />
       )}
       <DialogContent className="max-w-fit border-none bg-transparent p-0 shadow-none">
-        <DialogTitle className="sr-only">Payment screenshot</DialogTitle>
+        <DialogTitle className="sr-only">{t("paymentScreenshot")}</DialogTitle>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={url}
-          alt="Payment screenshot full size"
+          alt={t("paymentScreenshot")}
           className="max-h-[85vh] max-w-[90vw] rounded-lg object-contain shadow-2xl"
         />
       </DialogContent>

@@ -16,7 +16,7 @@ const openrouter = createOpenRouter({
 });
 
 export const DEEPSEEK_MODEL = AI_MODEL;
-export const QWEN_VISION_MODEL = "qwen/qwen2.5-vl-72b-instruct";
+export const QWEN_VISION_MODEL = "qwen/qwen3-vl-8b-instruct";
 
 export function getModel(modelId: string = DEEPSEEK_MODEL) {
   return openrouter(modelId);

@@ -41,7 +41,7 @@ export const submitAssessment = mutation({
     currentWeight: v.optional(v.number()),
     height: v.optional(v.number()),
     age: v.optional(v.number()),
-    gender: v.optional(v.string()),
+    gender: v.optional(v.union(v.literal("male"), v.literal("female"))),
     measurements: v.optional(
       v.object({
         chest: v.optional(v.number()),

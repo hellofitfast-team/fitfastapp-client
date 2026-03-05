@@ -359,10 +359,13 @@ export default function ClientDetailPage() {
           <h1 className="text-2xl font-bold tracking-tight text-stone-900">
             {profile.fullName ?? t("client")}
           </h1>
-          <p className="mt-0.5 text-xs text-stone-400">ID: {userId.slice(0, 8)}...</p>
+          <p className="mt-0.5 text-xs text-stone-400">
+            {t("clientDetail.id")}: {userId.slice(0, 8)}...
+          </p>
         </div>
         {profile.status === "active" && (
           <button
+            type="button"
             onClick={() => setShowNotifDialog(true)}
             className="hover:border-primary/30 hover:text-primary flex items-center gap-2 rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-500 transition-colors"
           >
@@ -443,6 +446,7 @@ export default function ClientDetailPage() {
 
           <DialogFooter>
             <button
+              type="button"
               onClick={() => {
                 setShowNotifDialog(false);
                 setNotifTitle("");
@@ -454,6 +458,7 @@ export default function ClientDetailPage() {
               {tNotif("cancelSend")}
             </button>
             <button
+              type="button"
               onClick={handleSendNotification}
               disabled={isSendingNotif || !notifTitle.trim() || !notifBody.trim()}
               className="bg-primary hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-50"
@@ -623,8 +628,9 @@ export default function ClientDetailPage() {
             {t("clientDetail.activateDesc")}
             {latestSignup?.planTier && (
               <span className="mt-1 block text-xs text-stone-400">
-                Client requested: {t(`tierLabels.${latestSignup.planTier}`)} — you can override
-                below.
+                {t("clientDetail.clientRequested", {
+                  tier: t(`tierLabels.${latestSignup.planTier}`),
+                })}
               </span>
             )}
           </p>
@@ -658,6 +664,7 @@ export default function ClientDetailPage() {
 
             {/* Activate button */}
             <button
+              type="button"
               onClick={handleActivate}
               disabled={isActing}
               className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-50"
@@ -673,6 +680,7 @@ export default function ClientDetailPage() {
             {/* Reject toggle */}
             {!isRejecting && (
               <button
+                type="button"
                 onClick={() => setIsRejecting(true)}
                 disabled={isActing}
                 className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-100 disabled:opacity-50"
@@ -700,6 +708,7 @@ export default function ClientDetailPage() {
                 />
                 <div className="flex shrink-0 flex-col gap-2">
                   <button
+                    type="button"
                     onClick={handleReject}
                     disabled={isActing || !rejectionReason.trim()}
                     className="flex items-center gap-1.5 rounded-lg border border-red-300 bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-50"
@@ -712,6 +721,7 @@ export default function ClientDetailPage() {
                     {t("clientDetail.confirmReject")}
                   </button>
                   <button
+                    type="button"
                     onClick={() => {
                       setIsRejecting(false);
                       setRejectionReason("");
@@ -732,6 +742,7 @@ export default function ClientDetailPage() {
       {(profile.status === "active" || profile.status === "expired") && (
         <div className="flex justify-end">
           <button
+            type="button"
             onClick={handleDeactivate}
             disabled={isActing}
             className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 disabled:opacity-50"

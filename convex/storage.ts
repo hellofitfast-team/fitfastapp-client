@@ -11,7 +11,14 @@ import { v } from "convex/values";
 
 export const generateUploadUrl = mutation({
   args: {
-    purpose: v.optional(v.string()),
+    purpose: v.optional(
+      v.union(
+        v.literal("progress_photo"),
+        v.literal("ticket_screenshot"),
+        v.literal("payment_proof"),
+        v.literal("knowledge_pdf"),
+      ),
+    ),
   },
   handler: async (ctx, { purpose }) => {
     const userId = await getAuthUserId(ctx);
@@ -28,7 +35,12 @@ export const generateUploadUrl = mutation({
 export const trackUploadedFile = mutation({
   args: {
     storageId: v.id("_storage"),
-    purpose: v.string(),
+    purpose: v.union(
+      v.literal("progress_photo"),
+      v.literal("ticket_screenshot"),
+      v.literal("payment_proof"),
+      v.literal("knowledge_pdf"),
+    ),
   },
   handler: async (ctx, { storageId, purpose }) => {
     const userId = await getAuthUserId(ctx);
@@ -67,6 +79,20 @@ export const getFileUrl = query({
   },
 });
 
+export const getFileUrlsBatch = query({
+  args: { storageIds: v.array(v.id("_storage")) },
+  handler: async (ctx, { storageIds }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return {};
+
+    const urls: Record<string, string | null> = {};
+    for (const id of storageIds) {
+      urls[id] = await ctx.storage.getUrl(id);
+    }
+    return urls;
+  },
+});
+
 /**
  * Cleanup orphaned storage files — files uploaded but never referenced.
  * Runs daily via static cron. Checks for fileMetadata entries older than
@@ -90,43 +116,59 @@ const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 
 /**
  * Find fileMetadata entries older than 24h that aren't referenced anywhere.
+ * Uses by_uploadedAt index to only load old entries (avoids full scan).
+ * Builds a Set of all referenced storageIds to check membership in O(1).
  */
 export const findOrphanedFiles = internalQuery({
   args: {},
   handler: async (ctx): Promise<string[]> => {
     const cutoff = Date.now() - TWENTY_FOUR_HOURS;
-    const allMeta = await ctx.db.query("fileMetadata").collect();
-    const oldMeta = allMeta.filter((m) => m.uploadedAt < cutoff);
 
-    const orphanIds: string[] = [];
+    // Only load metadata older than 24h using the index (ascending order,
+    // take while uploadedAt < cutoff)
+    const oldMeta = await ctx.db
+      .query("fileMetadata")
+      .withIndex("by_uploadedAt")
+      .filter((q) => q.lt(q.field("uploadedAt"), cutoff))
+      .collect();
 
-    // Pre-fetch all check-ins once (avoids N+1 queries)
+    if (oldMeta.length === 0) return [];
+
+    // Build a Set of all referenced storageIds from the tables that reference _storage
+    const referencedIds = new Set<string>();
+
+    // Check-ins: front/back/side photos + legacy progressPhotoIds
     const allCheckIns = await ctx.db.query("checkIns").collect();
-
-    for (const meta of oldMeta) {
-      const usedInPhotos = allCheckIns.some((ci) => ci.progressPhotoIds?.includes(meta.storageId));
-
-      const usedInTicket = await ctx.db
-        .query("tickets")
-        .filter((q) => q.eq(q.field("screenshotId"), meta.storageId))
-        .first();
-
-      const usedInSignup = await ctx.db
-        .query("pendingSignups")
-        .filter((q) => q.eq(q.field("paymentScreenshotId"), meta.storageId))
-        .first();
-
-      const usedInKnowledge = await ctx.db
-        .query("coachKnowledge")
-        .filter((q) => q.eq(q.field("storageId"), meta.storageId))
-        .first();
-
-      if (!usedInPhotos && !usedInTicket && !usedInSignup && !usedInKnowledge) {
-        orphanIds.push(meta._id);
+    for (const ci of allCheckIns) {
+      if (ci.progressPhotoFront) referencedIds.add(ci.progressPhotoFront);
+      if (ci.progressPhotoBack) referencedIds.add(ci.progressPhotoBack);
+      if (ci.progressPhotoSide) referencedIds.add(ci.progressPhotoSide);
+      if (ci.inBodyStorageId) referencedIds.add(ci.inBodyStorageId);
+      if (ci.progressPhotoIds) {
+        for (const id of ci.progressPhotoIds) referencedIds.add(id);
       }
     }
 
-    return orphanIds;
+    // Tickets
+    const allTickets = await ctx.db.query("tickets").collect();
+    for (const t of allTickets) {
+      if (t.screenshotId) referencedIds.add(t.screenshotId);
+    }
+
+    // Pending signups
+    const allSignups = await ctx.db.query("pendingSignups").collect();
+    for (const s of allSignups) {
+      if (s.paymentScreenshotId) referencedIds.add(s.paymentScreenshotId);
+    }
+
+    // Coach knowledge
+    const allKnowledge = await ctx.db.query("coachKnowledge").collect();
+    for (const k of allKnowledge) {
+      if (k.storageId) referencedIds.add(k.storageId);
+    }
+
+    // Filter: old metadata whose storageId is not referenced anywhere
+    return oldMeta.filter((meta) => !referencedIds.has(meta.storageId)).map((meta) => meta._id);
   },
 });
 

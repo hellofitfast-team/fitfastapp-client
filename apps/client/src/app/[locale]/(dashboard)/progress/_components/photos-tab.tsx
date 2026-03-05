@@ -74,7 +74,9 @@ export function PhotosTab({ photos }: PhotosTabProps) {
             <div className="border-border flex items-center justify-between border-b p-3">
               <span className="text-sm font-semibold">{t("progressPhoto")}</span>
               <button
+                type="button"
                 onClick={() => setSelectedPhoto(null)}
+                aria-label={t("close")}
                 className="flex h-11 w-11 items-center justify-center rounded-lg transition-colors hover:bg-neutral-100"
               >
                 <X className="h-5 w-5" />

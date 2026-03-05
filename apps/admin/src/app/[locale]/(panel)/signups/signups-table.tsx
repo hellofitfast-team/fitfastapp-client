@@ -212,6 +212,7 @@ export function SignupsTable() {
 
                         {/* Payment toggle */}
                         <button
+                          type="button"
                           onClick={() => setExpandedId(isExpanded ? null : signup._id)}
                           className={`flex min-h-11 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-colors ${
                             isExpanded
@@ -231,6 +232,7 @@ export function SignupsTable() {
                         {signup.status === "pending" && !isRejecting && (
                           <>
                             <button
+                              type="button"
                               onClick={() => handleApprove(signup._id)}
                               disabled={actionId === signup._id}
                               className="flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 transition-colors hover:bg-emerald-100 disabled:opacity-50"
@@ -239,6 +241,7 @@ export function SignupsTable() {
                               {t("approve")}
                             </button>
                             <button
+                              type="button"
                               onClick={() => handleRejectClick(signup._id)}
                               disabled={actionId === signup._id}
                               className="flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 disabled:opacity-50"
@@ -269,6 +272,7 @@ export function SignupsTable() {
                         />
                         <div className="flex shrink-0 flex-col gap-2">
                           <button
+                            type="button"
                             onClick={() => handleRejectSubmit(signup._id)}
                             disabled={actionId === signup._id || !rejectionReason.trim()}
                             className="flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 disabled:opacity-50"
@@ -277,6 +281,7 @@ export function SignupsTable() {
                             {t("confirmReject")}
                           </button>
                           <button
+                            type="button"
                             onClick={handleRejectCancel}
                             disabled={actionId === signup._id}
                             className="flex items-center gap-1 rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-600 transition-colors hover:bg-stone-50 disabled:opacity-50"

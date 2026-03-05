@@ -2,6 +2,58 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import { authTables } from "@convex-dev/auth/server";
 
+/** Reusable language validator */
+const languageValidator = v.union(v.literal("en"), v.literal("ar"));
+
+/** Reusable plan tier validator (includes legacy values for backward compat) */
+const planTierValidator = v.union(
+  v.literal("monthly"),
+  v.literal("quarterly"),
+  // Legacy values — kept for backward compat with existing data
+  v.literal("3_months"),
+  v.literal("6_months"),
+  v.literal("12_months"),
+);
+
+/** Reusable food category validator */
+const foodCategoryValidator = v.union(
+  v.literal("protein"),
+  v.literal("carb"),
+  v.literal("fat"),
+  v.literal("vegetable"),
+  v.literal("fruit"),
+  v.literal("dairy"),
+  v.literal("dessert"),
+  v.literal("recipe"),
+);
+
+/** Reusable food source validator */
+const foodSourceValidator = v.union(
+  v.literal("usda"),
+  v.literal("coach"),
+  v.literal("verified_recipe"),
+);
+
+/** Reusable file purpose validator */
+const filePurposeValidator = v.union(
+  v.literal("progress_photo"),
+  v.literal("ticket_screenshot"),
+  v.literal("payment_proof"),
+  v.literal("knowledge_pdf"),
+);
+
+/** Reusable gender validator */
+const genderValidator = v.union(v.literal("male"), v.literal("female"));
+
+/** Reusable OCR extracted data validator for payment screenshots */
+const ocrExtractedDataValidator = v.object({
+  amount: v.optional(v.string()),
+  sender_name: v.optional(v.string()),
+  reference_number: v.optional(v.string()),
+  date: v.optional(v.string()),
+  bank: v.optional(v.string()),
+});
+
 export default defineSchema({
   ...authTables,
 
@@ -10,17 +62,8 @@ export default defineSchema({
     fullName: v.optional(v.string()),
     email: v.optional(v.string()),
     phone: v.optional(v.string()),
-    language: v.union(v.literal("en"), v.literal("ar")),
-    planTier: v.optional(
-      v.union(
-        v.literal("monthly"),
-        v.literal("quarterly"),
-        // Legacy values — kept for backward compat with existing data
-        v.literal("3_months"),
-        v.literal("6_months"),
-        v.literal("12_months"),
-      ),
-    ),
+    language: languageValidator,
+    planTier: v.optional(planTierValidator),
     status: v.union(
       v.literal("pending_approval"),
       v.literal("active"),
@@ -73,7 +116,7 @@ export default defineSchema({
     medicalConditions: v.optional(v.array(v.string())),
     injuries: v.optional(v.array(v.string())),
     age: v.optional(v.number()),
-    gender: v.optional(v.string()),
+    gender: v.optional(genderValidator),
     exerciseHistory: v.optional(v.string()),
     activityLevel: v.optional(
       v.union(
@@ -98,13 +141,26 @@ export default defineSchema({
     userId: v.string(),
     submittedAt: v.optional(v.number()),
     weight: v.optional(v.number()),
+    measurementMethod: v.optional(v.union(v.literal("manual"), v.literal("inbody"))),
     measurements: v.optional(
       v.object({
-        chest: v.optional(v.union(v.number(), v.null())),
-        waist: v.optional(v.union(v.number(), v.null())),
-        hips: v.optional(v.union(v.number(), v.null())),
-        arms: v.optional(v.union(v.number(), v.null())),
-        thighs: v.optional(v.union(v.number(), v.null())),
+        chest: v.optional(v.number()),
+        waist: v.optional(v.number()),
+        hips: v.optional(v.number()),
+        arms: v.optional(v.number()),
+        thighs: v.optional(v.number()),
+      }),
+    ),
+    inBodyStorageId: v.optional(v.id("_storage")),
+    inBodyData: v.optional(
+      v.object({
+        bodyFatPercentage: v.optional(v.number()),
+        leanBodyMass: v.optional(v.number()),
+        skeletalMuscleMass: v.optional(v.number()),
+        bmi: v.optional(v.number()),
+        visceralFatLevel: v.optional(v.number()),
+        basalMetabolicRate: v.optional(v.number()),
+        totalBodyWater: v.optional(v.number()),
       }),
     ),
     workoutPerformance: v.optional(v.string()),
@@ -113,6 +169,9 @@ export default defineSchema({
     dietaryAdherence: v.optional(v.number()),
     newInjuries: v.optional(v.string()),
     progressPhotoIds: v.optional(v.array(v.id("_storage"))),
+    progressPhotoFront: v.optional(v.id("_storage")),
+    progressPhotoBack: v.optional(v.id("_storage")),
+    progressPhotoSide: v.optional(v.id("_storage")),
     notes: v.optional(v.string()),
   }).index("by_userId", ["userId"]),
 
@@ -122,7 +181,7 @@ export default defineSchema({
     planData: v.any(),
     aiGeneratedContent: v.optional(v.string()),
     streamId: v.optional(v.string()),
-    language: v.string(),
+    language: languageValidator,
     startDate: v.string(),
     endDate: v.string(),
   })
@@ -135,7 +194,7 @@ export default defineSchema({
     planData: v.any(),
     aiGeneratedContent: v.optional(v.string()),
     streamId: v.optional(v.string()),
-    language: v.string(),
+    language: languageValidator,
     startDate: v.string(),
     endDate: v.string(),
   })
@@ -204,12 +263,14 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_userId", ["userId"])
-    .index("by_status", ["status"]),
+    .index("by_userId_status", ["userId", "status"])
+    .index("by_status", ["status"])
+    .index("by_updatedAt", ["updatedAt"]),
 
   faqs: defineTable({
     question: v.string(),
     answer: v.string(),
-    language: v.union(v.literal("en"), v.literal("ar")),
+    language: languageValidator,
     displayOrder: v.number(),
     updatedAt: v.number(),
   }).index("by_language_order", ["language", "displayOrder"]),
@@ -219,28 +280,19 @@ export default defineSchema({
     fullName: v.string(),
     phone: v.optional(v.string()),
     planId: v.optional(v.string()),
-    planTier: v.optional(
-      v.union(
-        v.literal("monthly"),
-        v.literal("quarterly"),
-        // Legacy values
-        v.literal("3_months"),
-        v.literal("6_months"),
-        v.literal("12_months"),
-      ),
-    ),
+    planTier: v.optional(planTierValidator),
     transferReferenceNumber: v.optional(v.string()),
     transferAmount: v.optional(v.string()),
     paymentScreenshotId: v.optional(v.id("_storage")),
-    ocrExtractedData: v.optional(v.any()),
+    ocrExtractedData: v.optional(ocrExtractedDataValidator),
     status: v.union(v.literal("pending"), v.literal("approved"), v.literal("rejected")),
     reviewedAt: v.optional(v.number()),
     rejectionReason: v.optional(v.string()),
     inviteToken: v.optional(v.string()),
-    inviteExpiresAt: v.optional(v.number()),
   })
     .index("by_status", ["status"])
     .index("by_email", ["email"])
+    .index("by_email_status", ["email", "status"])
     .index("by_inviteToken", ["inviteToken"]),
 
   systemConfig: defineTable({
@@ -259,21 +311,23 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_userId", ["userId"])
-    .index("by_endpoint", ["endpoint"]),
+    .index("by_endpoint", ["endpoint"])
+    .index("by_isActive", ["isActive"]),
 
   fileMetadata: defineTable({
     storageId: v.id("_storage"),
     uploadedBy: v.string(),
     uploadedAt: v.number(),
-    purpose: v.string(), // "progress_photo" | "ticket_screenshot" | "payment_proof" | "knowledge_pdf"
+    purpose: filePurposeValidator,
   })
     .index("by_storageId", ["storageId"])
-    .index("by_uploadedBy", ["uploadedBy"]),
+    .index("by_uploadedBy", ["uploadedBy"])
+    .index("by_uploadedAt", ["uploadedAt"]),
 
   foodDatabase: defineTable({
     name: v.string(),
     nameAr: v.optional(v.string()),
-    category: v.string(), // "protein" | "carb" | "fat" | "vegetable" | "fruit" | "dairy" | "dessert" | "recipe"
+    category: foodCategoryValidator,
     tags: v.array(v.string()),
     per100g: v.object({
       calories: v.number(),
@@ -294,7 +348,7 @@ export default defineSchema({
     ),
     ingredients: v.optional(v.array(v.string())),
     instructions: v.optional(v.array(v.string())),
-    source: v.string(), // "usda" | "coach" | "verified_recipe"
+    source: foodSourceValidator,
     isVerified: v.boolean(),
     createdAt: v.number(),
     updatedAt: v.number(),

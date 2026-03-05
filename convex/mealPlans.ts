@@ -10,14 +10,24 @@ export const getCurrentPlan = query({
 
     const today = new Date().toISOString().split("T")[0];
 
-    // Find plan where today is between startDate and endDate
-    const plans = await ctx.db
+    // Use compound index to find plans where startDate <= today
+    // Ordered desc by startDate so the first match with endDate >= today is the current plan
+    // Only need recent candidates — capped to avoid loading all historical plans
+    const candidatePlans = await ctx.db
+      .query("mealPlans")
+      .withIndex("by_userId_dates", (q) => q.eq("userId", userId).lte("startDate", today))
+      .order("desc")
+      .take(5);
+
+    const activePlan = candidatePlans.find((p) => p.endDate >= today);
+    if (activePlan) return activePlan;
+
+    // Fallback: most recent plan (regardless of date range)
+    return await ctx.db
       .query("mealPlans")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .order("desc")
-      .collect();
-
-    return plans.find((p) => p.startDate <= today && p.endDate >= today) ?? plans[0] ?? null;
+      .first();
   },
 });
 
@@ -63,7 +73,7 @@ export const savePlanInternal = internalMutation({
     planData: v.any(),
     aiGeneratedContent: v.optional(v.string()),
     streamId: v.optional(v.string()),
-    language: v.string(),
+    language: v.union(v.literal("en"), v.literal("ar")),
     startDate: v.string(),
     endDate: v.string(),
   },

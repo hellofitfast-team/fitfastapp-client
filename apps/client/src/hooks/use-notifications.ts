@@ -15,6 +15,7 @@ export function useNotifications() {
   const [permission, setPermission] = useState<NotificationPermission>("default");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const { profile } = useAuth();
   const saveSubscription = useMutation(api.pushSubscriptions.saveSubscription);
@@ -60,6 +61,7 @@ export function useNotifications() {
   const subscribe = useCallback(async () => {
     if (!isSupported || !vapidPublicKey || !profile?._id) return;
     setLoading(true);
+    setError(null);
 
     try {
       // Request notification permission
@@ -92,6 +94,8 @@ export function useNotifications() {
 
       setIsSubscribed(true);
     } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to enable notifications";
+      setError(message);
       Sentry.captureException(err instanceof Error ? err : new Error("Push subscribe failed"), {
         tags: { feature: "push-notifications", operation: "subscribe" },
       });
@@ -103,6 +107,7 @@ export function useNotifications() {
   const unsubscribe = useCallback(async () => {
     if (!isSupported) return;
     setLoading(true);
+    setError(null);
 
     try {
       const registration = await navigator.serviceWorker.ready;
@@ -116,6 +121,8 @@ export function useNotifications() {
 
       setIsSubscribed(false);
     } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to disable notifications";
+      setError(message);
       Sentry.captureException(err instanceof Error ? err : new Error("Push unsubscribe failed"), {
         tags: { feature: "push-notifications", operation: "unsubscribe" },
       });
@@ -139,6 +146,7 @@ export function useNotifications() {
     requestPermission: subscribe,
     toggleSubscription,
     loading,
+    error,
   };
 }
 

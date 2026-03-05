@@ -7,17 +7,29 @@ import { DEFAULT_CHECK_IN_FREQUENCY_DAYS } from "./constants";
 import { rateLimiter } from "./rateLimiter";
 import { workflow } from "./workflowManager";
 
+/** Shared InBody data validator — reused across check-in mutations and workflow */
+export const inBodyDataValidator = v.object({
+  bodyFatPercentage: v.optional(v.number()),
+  leanBodyMass: v.optional(v.number()),
+  skeletalMuscleMass: v.optional(v.number()),
+  bmi: v.optional(v.number()),
+  visceralFatLevel: v.optional(v.number()),
+  basalMetabolicRate: v.optional(v.number()),
+  totalBodyWater: v.optional(v.number()),
+});
+
 export const getMyCheckIns = query({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return [];
 
+    // Capped at 100 most recent check-ins (bi-weekly = ~52 per year)
     return ctx.db
       .query("checkIns")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .order("desc")
-      .collect();
+      .take(100);
   },
 });
 
@@ -103,21 +115,27 @@ export const getLockStatus = query({
 export const submitCheckIn = mutation({
   args: {
     weight: v.optional(v.number()),
+    measurementMethod: v.optional(v.union(v.literal("manual"), v.literal("inbody"))),
     measurements: v.optional(
       v.object({
-        chest: v.optional(v.union(v.number(), v.null())),
-        waist: v.optional(v.union(v.number(), v.null())),
-        hips: v.optional(v.union(v.number(), v.null())),
-        arms: v.optional(v.union(v.number(), v.null())),
-        thighs: v.optional(v.union(v.number(), v.null())),
+        chest: v.optional(v.number()),
+        waist: v.optional(v.number()),
+        hips: v.optional(v.number()),
+        arms: v.optional(v.number()),
+        thighs: v.optional(v.number()),
       }),
     ),
+    inBodyStorageId: v.optional(v.id("_storage")),
+    inBodyData: v.optional(inBodyDataValidator),
     workoutPerformance: v.optional(v.string()),
     energyLevel: v.optional(v.number()),
     sleepQuality: v.optional(v.number()),
     dietaryAdherence: v.optional(v.number()),
     newInjuries: v.optional(v.string()),
     progressPhotoIds: v.optional(v.array(v.id("_storage"))),
+    progressPhotoFront: v.optional(v.id("_storage")),
+    progressPhotoBack: v.optional(v.id("_storage")),
+    progressPhotoSide: v.optional(v.id("_storage")),
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -144,21 +162,27 @@ export const startCheckInWorkflow = mutation({
     language: v.union(v.literal("en"), v.literal("ar")),
     planDuration: v.optional(v.number()),
     weight: v.optional(v.number()),
+    measurementMethod: v.optional(v.union(v.literal("manual"), v.literal("inbody"))),
     measurements: v.optional(
       v.object({
-        chest: v.optional(v.union(v.number(), v.null())),
-        waist: v.optional(v.union(v.number(), v.null())),
-        hips: v.optional(v.union(v.number(), v.null())),
-        arms: v.optional(v.union(v.number(), v.null())),
-        thighs: v.optional(v.union(v.number(), v.null())),
+        chest: v.optional(v.number()),
+        waist: v.optional(v.number()),
+        hips: v.optional(v.number()),
+        arms: v.optional(v.number()),
+        thighs: v.optional(v.number()),
       }),
     ),
+    inBodyStorageId: v.optional(v.id("_storage")),
+    inBodyData: v.optional(inBodyDataValidator),
     workoutPerformance: v.optional(v.string()),
     energyLevel: v.optional(v.number()),
     sleepQuality: v.optional(v.number()),
     dietaryAdherence: v.optional(v.number()),
     newInjuries: v.optional(v.string()),
     progressPhotoIds: v.optional(v.array(v.id("_storage"))),
+    progressPhotoFront: v.optional(v.id("_storage")),
+    progressPhotoBack: v.optional(v.id("_storage")),
+    progressPhotoSide: v.optional(v.id("_storage")),
     notes: v.optional(v.string()),
   },
   returns: v.string(), // WorkflowId
@@ -194,11 +218,25 @@ export const startCheckInWorkflow = mutation({
     // Use configured frequency as default plan duration if not explicitly provided
     const resolvedPlanDuration = planDuration ?? frequencyDays;
 
-    return workflow.start(ctx, internal.checkInWorkflow.checkInAndGeneratePlans, {
+    const workflowId = await workflow.start(ctx, internal.checkInWorkflow.checkInAndGeneratePlans, {
       userId,
       language,
       planDuration: resolvedPlanDuration,
       ...checkInFields,
     });
+
+    return workflowId;
+  },
+});
+
+/** OCR status query — used by review step to reactively show InBody OCR results */
+export const getCheckInOcrStatus = query({
+  args: { checkInId: v.id("checkIns") },
+  handler: async (ctx, { checkInId }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const checkIn = await ctx.db.get(checkInId);
+    if (!checkIn || checkIn.userId !== userId) return null;
+    return { inBodyData: checkIn.inBodyData ?? null };
   },
 });

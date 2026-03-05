@@ -11,9 +11,6 @@ export const DEFAULT_CHECK_IN_FREQUENCY_DAYS = 14;
 // ── Data Retention ─────────────────────────────────────────────────────────
 export const DATA_RETENTION_DAYS = 90;
 
-// ── Invitations ────────────────────────────────────────────────────────────
-export const INVITE_EXPIRATION_DAYS = 7;
-
 // ── AI Workpool ────────────────────────────────────────────────────────────
 export const MAX_AI_CONCURRENCY = 5;
 
@@ -26,8 +23,8 @@ export const FAQ_CACHE_TTL_MS = 3_600_000; // 1 hour
 export const PRICING_CACHE_TTL_MS = 1_800_000; // 30 min
 
 // ── Notifications (ActionRetrier) ──────────────────────────────────────────
-export const NOTIFICATION_MAX_RETRIES = 3;
-export const NOTIFICATION_INITIAL_BACKOFF_MS = 1000;
+export const NOTIFICATION_MAX_RETRIES = 5;
+export const NOTIFICATION_INITIAL_BACKOFF_MS = 2000;
 export const NOTIFICATION_BACKOFF_BASE = 2;
 
 // ── Upload Limits ──────────────────────────────────────────────────────────
@@ -65,3 +62,11 @@ export const NUTRITION = {
   /** Cap on blended activity multiplier */
   maxActivityMultiplier: 1.9,
 } as const;
+
+// ── AI Generation ─────────────────────────────────────────────────────────
+export const MEAL_OUTPUT_TOKENS_EN = 12000;
+export const MEAL_OUTPUT_TOKENS_AR = 16000;
+export const WORKOUT_OUTPUT_TOKENS_EN = 16000;
+export const WORKOUT_OUTPUT_TOKENS_AR = 20000;
+export const PLAN_GENERATION_TIMEOUT_MS = 240_000; // 4 minutes
+export const PLAN_GENERATION_MAX_RETRIES = 2;
