@@ -189,10 +189,11 @@ export const checkInAndGeneratePlans = workflow.define({
           `Meal plan generation timed out after ${MAX_POLL_ATTEMPTS} poll attempts (last state: ${mealStatus?.state})`,
         );
       }
-      await step.sleep(5000);
-      mealStatus = await step.runQuery(internal.workpoolManager.getWorkStatus, {
-        workId: mealWorkId,
-      });
+      mealStatus = await step.runQuery(
+        internal.workpoolManager.getWorkStatus,
+        { workId: mealWorkId },
+        { runAfter: 5000 },
+      );
     }
 
     let workoutStatus = await step.runQuery(internal.workpoolManager.getWorkStatus, {
@@ -209,10 +210,11 @@ export const checkInAndGeneratePlans = workflow.define({
           `Workout plan generation timed out after ${MAX_POLL_ATTEMPTS} poll attempts (last state: ${workoutStatus?.state})`,
         );
       }
-      await step.sleep(5000);
-      workoutStatus = await step.runQuery(internal.workpoolManager.getWorkStatus, {
-        workId: workoutWorkId,
-      });
+      workoutStatus = await step.runQuery(
+        internal.workpoolManager.getWorkStatus,
+        { workId: workoutWorkId },
+        { runAfter: 5000 },
+      );
     }
 
     // Extract plan IDs from workpool results
