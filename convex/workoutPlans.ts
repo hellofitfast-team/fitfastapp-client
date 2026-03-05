@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { query, internalMutation, internalQuery } from "./_generated/server";
+import { query, action, internalMutation, internalQuery } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { getAuthUserId } from "./auth";
 
 export const getCurrentPlan = query({
@@ -102,5 +103,61 @@ export const updatePlanData = internalMutation({
   },
   handler: async (ctx, { planId, planData, aiGeneratedContent }) => {
     await ctx.db.patch(planId, { planData, aiGeneratedContent });
+  },
+});
+
+export const saveTranslation = internalMutation({
+  args: {
+    planId: v.id("workoutPlans"),
+    translatedPlanData: v.any(),
+    translatedLanguage: v.union(v.literal("en"), v.literal("ar")),
+  },
+  handler: async (ctx, { planId, translatedPlanData, translatedLanguage }) => {
+    await ctx.db.patch(planId, { translatedPlanData, translatedLanguage });
+  },
+});
+
+export const requestTranslation = action({
+  args: {
+    targetLanguage: v.union(v.literal("en"), v.literal("ar")),
+  },
+  handler: async (ctx, { targetLanguage }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const plan = await ctx.runQuery(internal.workoutPlans.getCurrentPlanInternal, { userId });
+    if (!plan) throw new Error("No workout plan found");
+
+    if (plan.language === targetLanguage) return;
+    if (plan.translatedLanguage === targetLanguage && plan.translatedPlanData) return;
+
+    await ctx.scheduler.runAfter(0, internal.ai.translatePlanContent, {
+      planId: plan._id,
+      planType: "workout",
+      planData: plan.planData,
+      sourceLanguage: plan.language,
+      targetLanguage,
+    });
+  },
+});
+
+export const getCurrentPlanInternal = internalQuery({
+  args: { userId: v.string() },
+  handler: async (ctx, { userId }) => {
+    const today = new Date().toISOString().split("T")[0];
+    const candidatePlans = await ctx.db
+      .query("workoutPlans")
+      .withIndex("by_userId_dates", (q) => q.eq("userId", userId).lte("startDate", today))
+      .order("desc")
+      .take(5);
+
+    const activePlan = candidatePlans.find((p) => p.endDate >= today);
+    if (activePlan) return activePlan;
+
+    return await ctx.db
+      .query("workoutPlans")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .order("desc")
+      .first();
   },
 });

@@ -132,6 +132,26 @@ export default function MealPlanPage() {
   const isRTL = locale === "ar";
   const { profile } = useAuth();
 
+  // Translation: detect locale mismatch and auto-translate
+  const requestTranslation = useAction(api.mealPlans.requestTranslation);
+  const translationRequested = useRef(false);
+  const planLanguage = mealPlan?.language;
+  const needsTranslation = !!mealPlan && !!planLanguage && planLanguage !== locale;
+  const hasTranslation =
+    needsTranslation && mealPlan?.translatedLanguage === locale && !!mealPlan?.translatedPlanData;
+
+  useEffect(() => {
+    if (needsTranslation && !hasTranslation && !translationRequested.current) {
+      translationRequested.current = true;
+      requestTranslation({ targetLanguage: locale as "en" | "ar" }).catch(console.error);
+    }
+  }, [needsTranslation, hasTranslation, locale, requestTranslation]);
+
+  // Reset translation ref when plan changes
+  useEffect(() => {
+    translationRequested.current = false;
+  }, [mealPlan?._id]);
+
   // Generate meal plan action + plan duration config
   const generateMealPlan = useAction(api.ai.generateMealPlan);
   const frequencyConfig = useQuery(api.systemConfig.getConfig, { key: "check_in_frequency_days" });
@@ -318,7 +338,9 @@ export default function MealPlanPage() {
     );
   }
 
-  const planData = mealPlan.planData as unknown as GeneratedMealPlan;
+  const planData = (needsTranslation && hasTranslation
+    ? mealPlan.translatedPlanData
+    : mealPlan.planData) as unknown as GeneratedMealPlan;
 
   // Guard: if weeklyPlan is missing, show empty state instead of crashing
   if (!planData?.weeklyPlan) {
@@ -370,6 +392,17 @@ export default function MealPlanPage() {
           {formatDateShort(mealPlan.endDate, locale)}
         </p>
       </div>
+
+      {/* Translating banner */}
+      {needsTranslation && !hasTranslation && (
+        <div className="border-primary/30 bg-primary/5 flex items-center gap-3 rounded-xl border p-4">
+          <Loader2 className="text-primary h-5 w-5 shrink-0 animate-spin" />
+          <div>
+            <p className="text-primary text-sm font-semibold">{t("translating")}</p>
+            <p className="text-muted-foreground text-xs">{t("translatingDescription")}</p>
+          </div>
+        </div>
+      )}
 
       {/* Day Selector (1-10) */}
       <DaySelector

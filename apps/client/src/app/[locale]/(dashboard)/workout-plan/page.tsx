@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { cn } from "@fitfast/ui/cn";
-import { useQuery } from "convex/react";
+import { useQuery, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { usePlanStream } from "@/hooks/use-plan-stream";
 import { EmptyState } from "@fitfast/ui/empty-state";
@@ -206,6 +206,28 @@ export default function WorkoutPlanPage() {
   const daySelectorRef = useRef<HTMLDivElement>(null);
   const isRTL = locale === "ar";
 
+  // Translation: detect locale mismatch and auto-translate
+  const requestTranslation = useAction(api.workoutPlans.requestTranslation);
+  const translationRequested = useRef(false);
+  const planLanguage = workoutPlan?.language;
+  const needsTranslation = !!workoutPlan && !!planLanguage && planLanguage !== locale;
+  const hasTranslation =
+    needsTranslation &&
+    workoutPlan?.translatedLanguage === locale &&
+    !!workoutPlan?.translatedPlanData;
+
+  useEffect(() => {
+    if (needsTranslation && !hasTranslation && !translationRequested.current) {
+      translationRequested.current = true;
+      requestTranslation({ targetLanguage: locale as "en" | "ar" }).catch(console.error);
+    }
+  }, [needsTranslation, hasTranslation, locale, requestTranslation]);
+
+  // Reset translation ref when plan changes
+  useEffect(() => {
+    translationRequested.current = false;
+  }, [workoutPlan?._id]);
+
   // Scroll day selector to show day 1 on the correct edge for RTL
   useEffect(() => {
     const el = daySelectorRef.current;
@@ -343,7 +365,9 @@ export default function WorkoutPlanPage() {
     );
   }
 
-  const planData = workoutPlan.planData as unknown as GeneratedWorkoutPlan & {
+  const planData = (needsTranslation && hasTranslation
+    ? workoutPlan.translatedPlanData
+    : workoutPlan.planData) as unknown as GeneratedWorkoutPlan & {
     splitType?: string;
     splitName?: string;
     splitDescription?: string;
@@ -373,6 +397,17 @@ export default function WorkoutPlanPage() {
           {planData.splitDescription && (
             <p className="text-muted-foreground mt-1 text-xs">{planData.splitDescription}</p>
           )}
+        </div>
+      )}
+
+      {/* Translating banner */}
+      {needsTranslation && !hasTranslation && (
+        <div className="border-primary/30 bg-primary/5 flex items-center gap-3 rounded-xl border p-4">
+          <Loader2 className="text-primary h-5 w-5 shrink-0 animate-spin" />
+          <div>
+            <p className="text-primary text-sm font-semibold">{t("translating")}</p>
+            <p className="text-muted-foreground text-xs">{t("translatingDescription")}</p>
+          </div>
         </div>
       )}
 

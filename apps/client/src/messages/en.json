@@ -215,7 +215,9 @@
     "kcal": "KCAL",
     "aiGenerating": "AI is crafting your meal plan...",
     "calorieExplanation": "AI aims for around {calories} kcal/day ({protein}g protein) based on your profile and {trainingDays} training days/week. Actual meals may vary slightly.",
-    "dayLabel": "Day {n}"
+    "dayLabel": "Day {n}",
+    "translating": "Translating your meal plan...",
+    "translatingDescription": "Your plan will update automatically in a few seconds."
   },
   "workouts": {
     "title": "Workout Plan",
@@ -248,7 +250,9 @@
     "progressionNotes": "Progression Notes",
     "safetyTips": "Safety Tips",
     "aiGenerating": "AI is crafting your workout plan...",
-    "trainingSplit": "Training Split"
+    "trainingSplit": "Training Split",
+    "translating": "Translating your workout plan...",
+    "translatingDescription": "Your plan will update automatically in a few seconds."
   },
   "checkIn": {
     "title": "Check-in",

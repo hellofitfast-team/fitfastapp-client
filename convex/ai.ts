@@ -1063,6 +1063,74 @@ export const generateWorkoutPlan = action({
 });
 
 // ---------------------------------------------------------------------------
+// Plan content translation (lazy, on-demand when locale mismatches plan language)
+// ---------------------------------------------------------------------------
+
+const LANGUAGE_NAMES: Record<string, string> = { en: "English", ar: "Arabic" };
+
+export const translatePlanContent = internalAction({
+  args: {
+    planId: v.string(),
+    planType: v.union(v.literal("meal"), v.literal("workout")),
+    planData: v.any(),
+    sourceLanguage: v.union(v.literal("en"), v.literal("ar")),
+    targetLanguage: v.union(v.literal("en"), v.literal("ar")),
+  },
+  handler: async (ctx, args) => {
+    const { createOpenRouter } = await import("@openrouter/ai-sdk-provider");
+    const { generateText } = await import("ai");
+
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey) throw new Error("OPENROUTER_API_KEY not set");
+
+    const openrouter = createOpenRouter({ apiKey });
+    const sourceName = LANGUAGE_NAMES[args.sourceLanguage];
+    const targetName = LANGUAGE_NAMES[args.targetLanguage];
+
+    const maxTokens =
+      args.planType === "meal"
+        ? args.targetLanguage === "ar"
+          ? MEAL_OUTPUT_TOKENS_AR
+          : MEAL_OUTPUT_TOKENS_EN
+        : args.targetLanguage === "ar"
+          ? WORKOUT_OUTPUT_TOKENS_AR
+          : WORKOUT_OUTPUT_TOKENS_EN;
+
+    const { text: raw } = await generateText({
+      model: openrouter(PLAN_MODEL),
+      maxOutputTokens: maxTokens,
+      temperature: 0.3,
+      abortSignal: AbortSignal.timeout(PLAN_GENERATION_TIMEOUT_MS),
+      messages: [
+        {
+          role: "system",
+          content:
+            `You are a professional fitness content translator. Translate all human-readable text values in the JSON below from ${sourceName} to ${targetName}. ` +
+            `Keep ALL JSON keys, numbers, booleans, and structure EXACTLY the same. ` +
+            `Only translate values that are: meal/exercise names, ingredients, instructions, notes, alternatives, workout names, muscle names, safety tips, progression notes. ` +
+            `Do NOT translate JSON keys like "name", "type", "calories", "day1", etc. Do NOT change any numeric values. ` +
+            `Return ONLY valid JSON with the exact same structure.`,
+        },
+        { role: "user", content: JSON.stringify(args.planData) },
+      ],
+    });
+
+    const translatedData = extractJSON(raw);
+
+    const saveMutation =
+      args.planType === "meal"
+        ? internal.mealPlans.saveTranslation
+        : internal.workoutPlans.saveTranslation;
+
+    await ctx.runMutation(saveMutation, {
+      planId: args.planId as any,
+      translatedPlanData: translatedData,
+      translatedLanguage: args.targetLanguage,
+    });
+  },
+});
+
+// ---------------------------------------------------------------------------
 // Contextual translation EN → AR (used by admin plan name field)
 // ---------------------------------------------------------------------------
 

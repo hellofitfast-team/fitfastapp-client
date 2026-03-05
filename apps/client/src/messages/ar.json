@@ -210,7 +210,9 @@
     "kcal": "سعرة",
     "aiGenerating": "الذكاء الاصطناعي يُعد خطة وجباتك...",
     "calorieExplanation": "الذكاء الاصطناعي بيستهدف حوالي {calories} سعرة/يوم ({protein} جرام بروتين) بناءً على بياناتك و{trainingDays} أيام تمرين/أسبوع. الوجبات الفعلية ممكن تختلف بسيط.",
-    "dayLabel": "يوم {n}"
+    "dayLabel": "يوم {n}",
+    "translating": "جاري ترجمة خطة الوجبات...",
+    "translatingDescription": "ستُحدَّث الخطة تلقائيًا خلال ثوانٍ."
   },
   "workouts": {
     "title": "خطة التمارين",
@@ -243,7 +245,9 @@
     "progressionNotes": "ملاحظات التقدم",
     "safetyTips": "نصائح السلامة",
     "aiGenerating": "الذكاء الاصطناعي يُعد خطة تمارينك...",
-    "trainingSplit": "نظام التقسيم"
+    "trainingSplit": "نظام التقسيم",
+    "translating": "جاري ترجمة خطة التمارين...",
+    "translatingDescription": "ستُحدَّث الخطة تلقائيًا خلال ثوانٍ."
   },
   "checkIn": {
     "title": "المتابعة",

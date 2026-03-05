@@ -184,6 +184,8 @@ export default defineSchema({
     language: languageValidator,
     startDate: v.string(),
     endDate: v.string(),
+    translatedPlanData: v.optional(v.any()),
+    translatedLanguage: v.optional(languageValidator),
   })
     .index("by_userId", ["userId"])
     .index("by_userId_dates", ["userId", "startDate", "endDate"]),
@@ -197,6 +199,8 @@ export default defineSchema({
     language: languageValidator,
     startDate: v.string(),
     endDate: v.string(),
+    translatedPlanData: v.optional(v.any()),
+    translatedLanguage: v.optional(languageValidator),
   })
     .index("by_userId", ["userId"])
     .index("by_userId_dates", ["userId", "startDate", "endDate"]),
