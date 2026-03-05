@@ -307,6 +307,8 @@
     "uploadInBody": "رفع نتيجة InBody",
     "uploadInBodyDescription": "التقط صورة أو ارفع ورقة نتائج InBody لاستخراج تركيب الجسم تلقائياً",
     "inBodyRequired": "يرجى رفع ورقة نتائج InBody",
+    "measurementsRequired": "القياسات مطلوبة",
+    "measurementsRequiredDescription": "يرجى إدخال قياس واحد على الأقل (الصدر، الخصر، الأرداف، الذراعين، أو الفخذين) أو التبديل إلى رفع InBody",
     "removeFile": "إزالة الملف",
     "removePhoto": "إزالة الصورة",
     "inBodyResult": "نتيجة InBody",

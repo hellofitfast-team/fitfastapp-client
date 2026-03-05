@@ -312,6 +312,8 @@
     "uploadInBody": "Upload InBody Result",
     "uploadInBodyDescription": "Take a photo or upload your InBody result sheet for automatic body composition extraction",
     "inBodyRequired": "Please upload your InBody result sheet",
+    "measurementsRequired": "Measurements required",
+    "measurementsRequiredDescription": "Please enter at least one body measurement (chest, waist, hips, arms, or thighs) or switch to InBody upload",
     "removeFile": "Remove file",
     "removePhoto": "Remove photo",
     "inBodyResult": "InBody result",

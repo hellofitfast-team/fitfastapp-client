@@ -176,16 +176,36 @@ export default function CheckInPage() {
       case 1: {
         fields = ["weight"];
         const isValid = await methods.trigger(fields);
-        // If InBody method is selected, require the InBody file
-        if (isValid && methods.getValues("measurementMethod") === "inbody" && !inBodyFile) {
-          toast({
-            title: t("invalidFile"),
-            description: t("inBodyRequired"),
-            variant: "destructive",
-          });
-          return false;
+        if (!isValid) return false;
+
+        const method = methods.getValues("measurementMethod");
+
+        if (method === "inbody") {
+          if (!inBodyFile) {
+            toast({
+              title: t("invalidFile"),
+              description: t("inBodyRequired"),
+              variant: "destructive",
+            });
+            return false;
+          }
+        } else {
+          // Manual method: require at least one non-zero body measurement
+          const { chest, waist, hips, arms, thighs } = methods.getValues();
+          const hasAnyMeasurement = [chest, waist, hips, arms, thighs].some(
+            (v) => v !== undefined && v > 0,
+          );
+          if (!hasAnyMeasurement) {
+            toast({
+              title: t("measurementsRequired"),
+              description: t("measurementsRequiredDescription"),
+              variant: "destructive",
+            });
+            return false;
+          }
         }
-        return isValid;
+
+        return true;
       }
       case 2:
         fields = ["workoutPerformance", "energyLevel", "sleepQuality"];
