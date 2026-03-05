@@ -17,6 +17,7 @@ export const MAX_AI_CONCURRENCY = 5;
 // ── RAG Chunking ───────────────────────────────────────────────────────────
 export const RAG_CHUNK_SIZE_WORDS = 500;
 export const RAG_CHUNK_OVERLAP_WORDS = 50;
+export const RAG_SEARCH_TIMEOUT_MS = 30_000; // 30s safety net — normal response is 1-5s
 
 // ── Caching (ActionCache TTLs) ─────────────────────────────────────────────
 export const FAQ_CACHE_TTL_MS = 3_600_000; // 1 hour

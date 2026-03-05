@@ -67,12 +67,21 @@ export const getDashboardData = query({
     const currentMealPlan = mealPlans[0] ?? null;
     const currentWorkoutPlan = workoutPlans[0] ?? null;
 
-    // Calculate check-in lock status
+    // Calculate check-in lock status (3-tier fallback: check-in → plan → assessment)
     let checkInLock = { isLocked: false, nextCheckInDate: null as string | null };
-    if (latestCheckIn) {
-      const frequencyDays = await getCheckInFrequencyDays(ctx);
-      const lastDate = new Date(latestCheckIn._creationTime);
-      const nextDate = new Date(lastDate);
+    const frequencyDays = await getCheckInFrequencyDays(ctx);
+    let anchorTime: number | null = latestCheckIn?._creationTime ?? null;
+    if (!anchorTime) {
+      const planTimes = [currentMealPlan?._creationTime, currentWorkoutPlan?._creationTime].filter(
+        (t): t is number => t != null,
+      );
+      anchorTime = planTimes.length > 0 ? Math.min(...planTimes) : null;
+    }
+    if (!anchorTime) {
+      anchorTime = assessment?._creationTime ?? null;
+    }
+    if (anchorTime) {
+      const nextDate = new Date(anchorTime);
       nextDate.setDate(nextDate.getDate() + frequencyDays);
       checkInLock = {
         isLocked: Date.now() < nextDate.getTime(),

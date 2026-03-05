@@ -39,7 +39,9 @@
     },
     "mealPlanGenerating": {
       "title": "Generating Your Meal Plan...",
-      "description": "Our AI is creating your personalized meal plan. This usually takes a few minutes. This page will update automatically."
+      "description": "Our AI is creating your personalized meal plan. This usually takes a few minutes. This page will update automatically.",
+      "timeoutTitle": "Generation Taking Longer Than Expected",
+      "timeoutDescription": "Your meal plan is still being generated. If it doesn't appear soon, please submit a check-in to trigger a new generation."
     },
     "noWorkoutPlan": {
       "title": "No Workout Plan Yet",

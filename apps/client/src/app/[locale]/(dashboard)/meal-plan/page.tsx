@@ -141,6 +141,18 @@ export default function MealPlanPage() {
       : Number(frequencyConfig?.value) || 10;
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
+  const [generationTimedOut, setGenerationTimedOut] = useState(false);
+
+  // Show timeout message if generating state persists for 5 minutes
+  const isPlansGenerating = !mealPlan && !!assessment && !error;
+  useEffect(() => {
+    if (!isPlansGenerating && !isGenerating) {
+      setGenerationTimedOut(false);
+      return;
+    }
+    const timer = setTimeout(() => setGenerationTimedOut(true), 5 * 60 * 1000);
+    return () => clearTimeout(timer);
+  }, [isPlansGenerating, isGenerating]);
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -240,7 +252,6 @@ export default function MealPlanPage() {
 
   if (error || !mealPlan) {
     // Check if plans are being generated (assessment exists but no plan yet)
-    const isPlansGenerating = !mealPlan && !!assessment;
     return (
       <div className="mx-auto max-w-3xl space-y-6 px-4 py-6 lg:px-6">
         <div>
@@ -249,11 +260,23 @@ export default function MealPlanPage() {
         </div>
         {isPlansGenerating || isGenerating ? (
           <div className="border-border bg-card space-y-4 rounded-xl border p-8 text-center">
-            <Loader2 className="text-primary mx-auto h-10 w-10 animate-spin" />
-            <h2 className="text-lg font-bold">{tEmpty("mealPlanGenerating.title")}</h2>
-            <p className="text-muted-foreground mx-auto max-w-md text-sm">
-              {tEmpty("mealPlanGenerating.description")}
-            </p>
+            {generationTimedOut ? (
+              <>
+                <Info className="text-warning mx-auto h-10 w-10" />
+                <h2 className="text-lg font-bold">{tEmpty("mealPlanGenerating.timeoutTitle")}</h2>
+                <p className="text-muted-foreground mx-auto max-w-md text-sm">
+                  {tEmpty("mealPlanGenerating.timeoutDescription")}
+                </p>
+              </>
+            ) : (
+              <>
+                <Loader2 className="text-primary mx-auto h-10 w-10 animate-spin" />
+                <h2 className="text-lg font-bold">{tEmpty("mealPlanGenerating.title")}</h2>
+                <p className="text-muted-foreground mx-auto max-w-md text-sm">
+                  {tEmpty("mealPlanGenerating.description")}
+                </p>
+              </>
+            )}
           </div>
         ) : (
           <>

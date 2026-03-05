@@ -15,6 +15,7 @@ import {
   WORKOUT_OUTPUT_TOKENS_AR,
   PLAN_GENERATION_TIMEOUT_MS,
   PLAN_GENERATION_MAX_RETRIES,
+  RAG_SEARCH_TIMEOUT_MS,
 } from "./constants";
 
 // ---------------------------------------------------------------------------
@@ -337,17 +338,22 @@ async function getCoachKnowledgeContext(
   const tags = planType === "meal" ? ["nutrition", "general"] : ["workout", "recovery", "general"];
 
   try {
-    const chunks: string[] = await ctx.runAction(internal.knowledgeBaseActions.searchKnowledge, {
-      query: clientContext,
-      limit: 5,
-      tags,
-    });
+    const chunks: string[] = await Promise.race([
+      ctx.runAction(internal.knowledgeBaseActions.searchKnowledge, {
+        query: clientContext,
+        limit: 5,
+        tags,
+      }),
+      new Promise<string[]>((_, reject) =>
+        setTimeout(() => reject(new Error("RAG search timeout")), RAG_SEARCH_TIMEOUT_MS),
+      ),
+    ]);
 
     if (chunks.length === 0) return "";
 
     return `\nCOACH'S TRAINING PHILOSOPHY & GUIDELINES:\n${chunks.join("\n\n")}`;
   } catch {
-    // Knowledge base may be empty or not initialized yet
+    // Knowledge base timeout, empty, or not initialized — continue without RAG context
     return "";
   }
 }

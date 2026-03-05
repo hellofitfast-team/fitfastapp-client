@@ -90,6 +90,15 @@ export const getLockStatus = query({
       anchorTime = planTimes.length > 0 ? Math.min(...planTimes) : null;
     }
 
+    if (!anchorTime) {
+      // No plans yet — use assessment creation time (plans may still be generating async)
+      const assessment = await ctx.db
+        .query("initialAssessments")
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .first();
+      anchorTime = assessment?._creationTime ?? null;
+    }
+
     if (!anchorTime) return { isLocked: false, nextCheckInDate: null, frequencyDays };
 
     const anchorDate = new Date(anchorTime);
