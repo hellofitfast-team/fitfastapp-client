@@ -6,7 +6,6 @@ import { DesktopTopNav } from "./desktop-top-nav";
 import { BottomNav } from "./bottom-nav";
 import { MoreMenu } from "./more-menu";
 import { ExpiryBanner } from "./expiry-banner";
-import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -47,9 +46,6 @@ export function DashboardShell({ children, userName, daysUntilExpiry }: Dashboar
 
       {/* Mobile bottom navigation */}
       <BottomNav onMoreClick={() => setMoreMenuOpen(true)} />
-
-      {/* PWA install pill — floats above bottom nav */}
-      <InstallPrompt />
 
       {/* More menu bottom sheet */}
       <MoreMenu open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />

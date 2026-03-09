@@ -7,6 +7,15 @@ const ServiceWorkerRegistration = dynamic(
   { ssr: false },
 );
 
+const InstallPrompt = dynamic(() => import("./InstallPrompt").then((m) => m.InstallPrompt), {
+  ssr: false,
+});
+
 export function PWAProviders() {
-  return <ServiceWorkerRegistration />;
+  return (
+    <>
+      <ServiceWorkerRegistration />
+      <InstallPrompt />
+    </>
+  );
 }

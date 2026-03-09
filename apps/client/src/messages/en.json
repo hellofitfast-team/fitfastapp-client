@@ -797,12 +797,17 @@
   },
   "pwa": {
     "installTitle": "Install FitFast",
-    "installDescription": "Add FitFast to your home screen for the best experience",
+    "installDescription": "Add FitFast to your home screen",
     "installButton": "Install",
     "dismissButton": "Not Now",
     "iosInstructions": "Tap the share button, then \"Add to Home Screen\"",
     "iosTitle": "Install FitFast",
-    "iosDescription": "Get the full app experience on your iPhone"
+    "iosDescription": "Get the full app experience by adding FitFast to your home screen. It only takes a few seconds.",
+    "iosStep1": "Tap the Share button",
+    "iosStep1Hint": "At the bottom of Safari",
+    "iosStep2": "Tap \"Add to Home Screen\"",
+    "iosStep2Hint": "Scroll down in the share menu",
+    "iosStep3": "Tap \"Add\" to confirm"
   },
   "errors": {
     "networkError": "Network error. Please check your connection.",

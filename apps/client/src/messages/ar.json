@@ -791,13 +791,18 @@
     "copyright": "جميع الحقوق محفوظة"
   },
   "pwa": {
-    "installTitle": "تثبيت فيت فاست",
-    "installDescription": "أضف فيت فاست إلى شاشتك الرئيسية لأفضل تجربة",
+    "installTitle": "تثبيت FitFast",
+    "installDescription": "أضف FitFast إلى شاشتك الرئيسية",
     "installButton": "تثبيت",
     "dismissButton": "ليس الآن",
     "iosInstructions": "اضغط على زر المشاركة، ثم \"إضافة إلى الشاشة الرئيسية\"",
-    "iosTitle": "تثبيت فيت فاست",
-    "iosDescription": "احصل على تجربة التطبيق الكاملة على آيفونك"
+    "iosTitle": "تثبيت FitFast",
+    "iosDescription": "احصل على تجربة التطبيق الكاملة بإضافة FitFast إلى شاشتك الرئيسية. لن يستغرق الأمر سوى ثوانٍ قليلة.",
+    "iosStep1": "اضغط على زر المشاركة",
+    "iosStep1Hint": "في أسفل متصفح سفاري",
+    "iosStep2": "اضغط على \"إضافة إلى الشاشة الرئيسية\"",
+    "iosStep2Hint": "مرّر للأسفل في قائمة المشاركة",
+    "iosStep3": "اضغط \"إضافة\" للتأكيد"
   },
   "errors": {
     "networkError": "خطأ في الشبكة. يرجى التحقق من اتصالك.",
