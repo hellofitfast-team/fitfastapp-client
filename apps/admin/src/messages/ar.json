@@ -101,8 +101,6 @@
     "authorizedAccess": "لوحة المدرب · وصول مصرح فقط",
     "checkInFrequency": "تكرار المتابعة",
     "daysBetweenCheckIns": "أيام بين المتابعات",
-    "mealPlanDuration": "مدة خطة الوجبات",
-    "daysMealPlan": "أيام لكل خطة وجبات",
     "workoutPlanDuration": "مدة خطة التمارين",
     "daysWorkoutPlan": "أيام لكل خطة تمارين",
     "configurePlans": "إعداد حتى {maxPlans} خطط أسعار تظهر على صفحة التسويق.",
@@ -663,6 +661,10 @@
     "exerciseSaved": "تم حفظ التمرين بنجاح",
     "exerciseDeleted": "تم حذف التمرين بنجاح",
     "exerciseCount": "{count} تمرين",
-    "saveFailed": "فشل الحفظ. يرجى المحاولة مرة أخرى."
+    "saveFailed": "فشل الحفظ. يرجى المحاولة مرة أخرى.",
+    "gifUrl": "رابط الصورة المتحركة",
+    "gifUrlPlaceholder": "https://example.com/exercise.gif",
+    "gifPreview": "معاينة",
+    "removeGif": "إزالة"
   }
 }

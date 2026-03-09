@@ -5,30 +5,29 @@ import { toLocalDigits } from "@/lib/utils";
 import { useCurrentWorkoutPlan } from "@/hooks/use-workout-plans";
 import {
   Dumbbell,
-  Clock,
-  RefreshCw,
-  Zap,
-  Target,
+  Moon,
   Loader2,
   AlertTriangle,
   Sparkles,
   ChevronDown,
   ArrowLeftRight,
 } from "lucide-react";
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { cn } from "@fitfast/ui/cn";
 import { useQuery, useAction, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { usePlanStream } from "@/hooks/use-plan-stream";
 import { MuscleMap } from "@/components/workout/MuscleMap";
 import { EmptyState } from "@fitfast/ui/empty-state";
-import { WidgetCard } from "@fitfast/ui/widget-card";
-import { DaySelector } from "../meal-plan/_components/day-selector";
+import { DayNavigator } from "../meal-plan/_components/day-navigator";
+import { ExerciseGif } from "./_components/exercise-gif";
+import { useExerciseMedia } from "@/hooks/use-exercise-media";
 import type { GeneratedWorkoutPlan } from "@/lib/ai/workout-plan-generator";
 
 /** Normalized exercise used in the main workout section */
 interface NormalizedExercise {
   name: string;
+  exerciseDbId?: string;
   sets: number;
   reps: string;
   rest: string;
@@ -41,6 +40,7 @@ interface NormalizedExercise {
 /** Warmup/cooldown exercise */
 interface WarmupCooldownExercise {
   name: string;
+  exerciseDbId?: string;
   duration: number;
   instructions: string[];
 }
@@ -75,6 +75,7 @@ interface RawWorkoutDay {
 interface RawExercise {
   name?: string;
   exercise?: string;
+  exerciseDbId?: string;
   sets?: number;
   reps?: string;
   rest?: string | number;
@@ -119,7 +120,6 @@ function resolveDayPlan(
 function normalizeWorkoutDay(raw: RawWorkoutDay | null): NormalizedWorkoutDay | null {
   if (!raw) return null;
 
-  // Handle exercise list: old format uses "workout" array, new uses "exercises"
   const rawExercises: RawExercise[] = Array.isArray(raw.exercises)
     ? raw.exercises
     : Array.isArray(raw.workout)
@@ -128,6 +128,7 @@ function normalizeWorkoutDay(raw: RawWorkoutDay | null): NormalizedWorkoutDay | 
 
   const exercises: NormalizedExercise[] = rawExercises.map((ex) => ({
     name: ex.name || ex.exercise || "",
+    exerciseDbId: ex.exerciseDbId,
     sets: ex.sets || 0,
     reps: ex.reps || "",
     rest: String(ex.rest || ex.restBetweenSets || "-"),
@@ -141,14 +142,12 @@ function normalizeWorkoutDay(raw: RawWorkoutDay | null): NormalizedWorkoutDay | 
     notes: ex.notes || "",
   }));
 
-  // Normalize warmup: old format has warmUp.cardio + warmUp.dynamicStretching
   let warmupExercises: WarmupCooldownExercise[] = [];
   const warmup = raw.warmup || raw.warmUp;
   if (warmup) {
     if (Array.isArray(warmup.exercises) && warmup.exercises.length > 0) {
       warmupExercises = warmup.exercises;
     } else {
-      // Old format: convert cardio + dynamicStretching to exercise list
       if (warmup.cardio) {
         warmupExercises.push({
           name: warmup.cardio,
@@ -164,7 +163,6 @@ function normalizeWorkoutDay(raw: RawWorkoutDay | null): NormalizedWorkoutDay | 
     }
   }
 
-  // Normalize cooldown: old format has coolDown.staticStretching
   let cooldownExercises: WarmupCooldownExercise[] = [];
   const cooldown = raw.cooldown || raw.coolDown;
   if (cooldown) {
@@ -194,6 +192,12 @@ function normalizeWorkoutDay(raw: RawWorkoutDay | null): NormalizedWorkoutDay | 
   };
 }
 
+/** Compute total duration of warmup/cooldown exercises in minutes */
+function sectionDurationMinutes(exercises: WarmupCooldownExercise[]): number {
+  const totalSec = exercises.reduce((sum, ex) => sum + (ex.duration || 0), 0);
+  return Math.max(1, Math.round(totalSec / 60));
+}
+
 export default function WorkoutPlanPage() {
   const t = useTranslations("workouts");
   const tCommon = useTranslations("common");
@@ -207,8 +211,6 @@ export default function WorkoutPlanPage() {
   const [now] = useState(() => Date.now());
   const [selectedDay, setSelectedDay] = useState(0);
   const [expandedExercise, setExpandedExercise] = useState<number | null>(0);
-  const daySelectorRef = useRef<HTMLDivElement>(null);
-  const isRTL = locale === "ar";
 
   // Translation: detect locale mismatch and auto-translate
   const requestTranslation = useAction(api.workoutPlans.requestTranslation);
@@ -231,26 +233,6 @@ export default function WorkoutPlanPage() {
   useEffect(() => {
     translationRequested.current = false;
   }, [workoutPlan?._id]);
-
-  // Scroll day selector to show day 1 on the correct edge for RTL
-  useEffect(() => {
-    const el = daySelectorRef.current;
-    if (!el) return;
-    if (isRTL) {
-      // In RTL, scroll to the end so day 1 appears on the right edge
-      el.scrollLeft = el.scrollWidth - el.clientWidth;
-    }
-  }, [isRTL]);
-
-  // Scroll selected day into view
-  useEffect(() => {
-    const el = daySelectorRef.current;
-    if (!el) return;
-    const activeBtn = el.querySelector("[data-active='true']");
-    if (activeBtn) {
-      activeBtn.scrollIntoView({ inline: "nearest", block: "nearest", behavior: "smooth" });
-    }
-  }, [selectedDay]);
 
   // Streaming support
   const streamId = workoutPlan?.streamId;
@@ -279,7 +261,7 @@ export default function WorkoutPlanPage() {
       )
     : 0;
 
-  // Auto-select today (setState during render, guarded by selectedDay === 0)
+  // Auto-select today (setState during render, guarded by dayInitialized)
   const [dayInitialized, setDayInitialized] = useState(false);
   if (workoutPlan?.startDate && !dayInitialized) {
     setSelectedDay(todayDayIndex);
@@ -294,21 +276,6 @@ export default function WorkoutPlanPage() {
             86400000,
         )
       : 10;
-
-  // Detect rest days for DaySelector
-  // eslint-disable-next-line react-hooks/preserve-manual-memoization -- compiler infers subset; all 3 deps are needed
-  const restDays = useMemo(() => {
-    if (!workoutPlan?.planData) return [];
-    const planData = workoutPlan.planData as unknown as GeneratedWorkoutPlan;
-    const days: number[] = [];
-    for (let i = 0; i < totalDays; i++) {
-      const raw = resolveDayPlan(planData.weeklyPlan, i, workoutPlan.startDate);
-      if (raw?.restDay) {
-        days.push(i);
-      }
-    }
-    return days;
-  }, [workoutPlan?.planData, totalDays, workoutPlan?.startDate]);
 
   if (isLoading) {
     return (
@@ -379,30 +346,65 @@ export default function WorkoutPlanPage() {
   const rawDayPlan = resolveDayPlan(planData.weeklyPlan, selectedDay, workoutPlan.startDate);
   const dayPlan = normalizeWorkoutDay(rawDayPlan);
 
+  // Fetch exercise GIF media for current day's exercises
+  const exerciseMedia = useExerciseMedia(dayPlan?.exercises ?? []);
+
+  // Find next workout for rest day preview
+  const findNextWorkout = () => {
+    for (let i = selectedDay + 1; i < totalDays; i++) {
+      const raw = resolveDayPlan(planData.weeklyPlan, i, workoutPlan.startDate);
+      const normalized = normalizeWorkoutDay(raw);
+      if (normalized && !normalized.restDay) {
+        return normalized;
+      }
+    }
+    return null;
+  };
+
+  // Find previous workout for rest day recovery context
+  const findPrevWorkout = () => {
+    for (let i = selectedDay - 1; i >= 0; i--) {
+      const raw = resolveDayPlan(planData.weeklyPlan, i, workoutPlan.startDate);
+      const normalized = normalizeWorkoutDay(raw);
+      if (normalized && !normalized.restDay) {
+        return normalized;
+      }
+    }
+    return null;
+  };
+
+  const isToday = selectedDay === todayDayIndex;
+
   return (
     <div className="mx-auto max-w-3xl space-y-5 px-4 py-6 lg:px-6">
-      {/* Header */}
+      {/* Header — title + split badge + date range */}
       <div>
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold">{isToday ? t("todaysWorkout") : t("title")}</h1>
+          {planData.splitName && (
+            <span className="bg-fitness/10 text-fitness rounded-full px-2.5 py-0.5 text-xs font-semibold">
+              {planData.splitName}
+            </span>
+          )}
+        </div>
         <p className="text-muted-foreground mt-0.5 text-sm">
           {new Date(workoutPlan.startDate).toLocaleDateString(locale === "ar" ? "ar-EG" : "en")} -{" "}
           {new Date(workoutPlan.endDate).toLocaleDateString(locale === "ar" ? "ar-EG" : "en")}
         </p>
       </div>
 
-      {/* Training Split Overview Card */}
-      {planData.splitName && (
-        <div className="border-fitness/20 from-fitness/5 to-fitness/10 rounded-xl border bg-gradient-to-r p-4">
-          <div className="mb-1.5 flex items-center gap-2">
-            <Target className="text-fitness h-4 w-4" />
-            <span className="text-fitness text-sm font-bold">{t("trainingSplit")}</span>
-          </div>
-          <h3 className="text-lg font-bold">{planData.splitName}</h3>
-          {planData.splitDescription && (
-            <p className="text-muted-foreground mt-1 text-xs">{planData.splitDescription}</p>
-          )}
-        </div>
-      )}
+      {/* DayNavigator — compact prev/next */}
+      <DayNavigator
+        totalDays={totalDays}
+        selectedDay={selectedDay}
+        onSelectDay={(day) => {
+          setSelectedDay(day);
+          setExpandedExercise(0);
+        }}
+        planStartDate={workoutPlan.startDate}
+        todayDayIndex={todayDayIndex}
+        featureColor="fitness"
+      />
 
       {/* Translating banner */}
       {needsTranslation && !hasTranslation && (
@@ -415,111 +417,96 @@ export default function WorkoutPlanPage() {
         </div>
       )}
 
-      {/* Day Selector (1-10) (WORK-01) */}
-      <DaySelector
-        totalDays={totalDays}
-        selectedDay={selectedDay}
-        onSelectDay={(day) => {
-          setSelectedDay(day);
-          setExpandedExercise(0);
-        }}
-        planStartDate={workoutPlan.startDate}
-        restDays={restDays}
-        featureColor="fitness"
-      />
-
       {/* Today's Workout */}
       {dayPlan && (
         <>
           {dayPlan.restDay ? (
-            <div className="border-border bg-card shadow-card animate-slide-up rounded-xl border p-10 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
-                <Zap className="text-muted-foreground h-8 w-8" />
-              </div>
-              <h3 className="text-lg font-semibold">{t("restDay")}</h3>
-              <p className="text-muted-foreground mx-auto mt-2 max-w-sm text-sm">
-                {t("restDescription")}
-              </p>
-            </div>
+            <RestDayView t={t} prevWorkout={findPrevWorkout()} nextWorkout={findNextWorkout()} />
           ) : (
             <>
-              {/* Daily Workout Summary Card (WORK-05) */}
-              <WidgetCard featureColor="fitness" title={dayPlan.workoutName || t("todaysWorkout")}>
-                <div className="flex items-center">
-                  <div className="flex-1 text-center">
-                    <p className="text-lg font-bold">
-                      {Array.isArray(dayPlan.targetMuscles)
-                        ? dayPlan.targetMuscles.join(", ")
-                        : "-"}
-                    </p>
-                    <p className="text-muted-foreground text-[10px]">{t("targetMuscles")}</p>
-                  </div>
-                  <div className="bg-border h-8 w-px" />
-                  <div className="flex-1 text-center">
-                    <p className="text-lg font-bold">
-                      {toLocalDigits(dayPlan.exercises?.length || 0, locale)}
-                    </p>
-                    <p className="text-muted-foreground text-[10px]">{t("exercises")}</p>
-                  </div>
-                  <div className="bg-border h-8 w-px" />
-                  <div className="flex-1 text-center">
-                    <p className="text-lg font-bold">
-                      {dayPlan.duration ? toLocalDigits(dayPlan.duration, locale) : "-"}
-                    </p>
-                    <p className="text-muted-foreground text-[10px]">{t("duration")}</p>
+              {/* Condensed Summary Card — muscle map + stats in one card */}
+              <div className="border-border bg-card shadow-card animate-slide-up rounded-xl border p-4">
+                <div className="flex items-center gap-4">
+                  {/* Muscle map (compact) */}
+                  {dayPlan.targetMuscles && dayPlan.targetMuscles.length > 0 && (
+                    <div className="hidden shrink-0 sm:block">
+                      <MuscleMap
+                        targetMuscles={dayPlan.targetMuscles}
+                        className="flex justify-center [&_svg]:h-16 [&_svg]:w-16"
+                      />
+                    </div>
+                  )}
+                  {/* Stats grid */}
+                  <div className="flex flex-1 items-center">
+                    <div className="flex-1 text-center">
+                      <p className="text-sm font-bold sm:text-base">
+                        {Array.isArray(dayPlan.targetMuscles)
+                          ? dayPlan.targetMuscles.join(", ")
+                          : "-"}
+                      </p>
+                      <p className="text-muted-foreground text-[10px]">{t("targetMuscles")}</p>
+                    </div>
+                    <div className="bg-border h-8 w-px" />
+                    <div className="flex-1 text-center">
+                      <p className="text-sm font-bold sm:text-base">
+                        {toLocalDigits(dayPlan.exercises?.length || 0, locale)}
+                      </p>
+                      <p className="text-muted-foreground text-[10px]">{t("exercises")}</p>
+                    </div>
+                    <div className="bg-border h-8 w-px" />
+                    <div className="flex-1 text-center">
+                      <p className="text-sm font-bold sm:text-base">
+                        {dayPlan.duration ? toLocalDigits(dayPlan.duration, locale) : "-"}
+                      </p>
+                      <p className="text-muted-foreground text-[10px]">{t("duration")}</p>
+                    </div>
                   </div>
                 </div>
-              </WidgetCard>
-
-              {/* Day target muscles visualization */}
-              {dayPlan.targetMuscles && dayPlan.targetMuscles.length > 0 && (
-                <div className="border-border bg-card shadow-card animate-slide-up rounded-xl border p-4">
-                  <p className="text-muted-foreground mb-2 text-center text-xs font-medium">
-                    {t("targetMuscles")}
-                  </p>
-                  <MuscleMap
-                    targetMuscles={dayPlan.targetMuscles}
-                    className="flex justify-center"
-                  />
-                </div>
-              )}
-
-              {/* Warmup */}
-              {dayPlan.warmup &&
-                Array.isArray(dayPlan.warmup.exercises) &&
-                dayPlan.warmup.exercises.length > 0 && (
-                  <div className="border-border bg-card shadow-card animate-slide-up overflow-hidden rounded-xl border">
-                    <div className="border-border bg-fitness/8 flex items-center gap-2 border-b p-4">
-                      <span className="bg-fitness/12 text-fitness flex h-6 w-6 items-center justify-center rounded-md text-xs font-bold">
-                        W
-                      </span>
-                      <h3 className="text-sm font-semibold">{t("warmup")}</h3>
-                    </div>
-                    <div className="divide-border divide-y">
-                      {dayPlan.warmup.exercises.map((exercise, index) => (
-                        <div key={index} className="p-4">
-                          <div className="mb-1.5 flex items-center justify-between">
-                            <span className="text-sm font-medium">{exercise.name}</span>
-                            <span className="text-muted-foreground rounded-md bg-neutral-100 px-2 py-0.5 text-xs">
-                              {toLocalDigits(exercise.duration, locale)}
-                              {tUnits("sec")}
-                            </span>
-                          </div>
-                          <ul className="text-muted-foreground space-y-0.5 text-xs">
-                            {(Array.isArray(exercise.instructions)
-                              ? exercise.instructions
-                              : []
-                            ).map((instruction: string, i: number) => (
-                              <li key={i}>&#8226; {instruction}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
+                {/* Mobile-only muscle map below stats */}
+                {dayPlan.targetMuscles && dayPlan.targetMuscles.length > 0 && (
+                  <div className="mt-3 sm:hidden">
+                    <MuscleMap
+                      targetMuscles={dayPlan.targetMuscles}
+                      className="flex justify-center"
+                    />
                   </div>
                 )}
+              </div>
 
-              {/* Exercise Mini-Cards (WORK-02, WORK-03, WORK-04) */}
+              {/* Warmup (collapsed by default) */}
+              {dayPlan.warmup.exercises.length > 0 && (
+                <CollapsibleSection
+                  title={t("warmup")}
+                  durationMins={sectionDurationMinutes(dayPlan.warmup.exercises)}
+                  tUnits={tUnits}
+                  locale={locale}
+                  colorClass="bg-amber-50 border-amber-200"
+                  badgeClass="bg-amber-100 text-amber-700"
+                >
+                  <div className="divide-border divide-y">
+                    {dayPlan.warmup.exercises.map((exercise, index) => (
+                      <div key={index} className="p-4">
+                        <div className="mb-1.5 flex items-center justify-between">
+                          <span className="text-sm font-medium">{exercise.name}</span>
+                          <span className="text-muted-foreground rounded-md bg-neutral-100 px-2 py-0.5 text-xs">
+                            {toLocalDigits(exercise.duration, locale)}
+                            {tUnits("sec")}
+                          </span>
+                        </div>
+                        <ul className="text-muted-foreground space-y-0.5 text-xs">
+                          {(Array.isArray(exercise.instructions) ? exercise.instructions : []).map(
+                            (instruction: string, i: number) => (
+                              <li key={i}>&#8226; {instruction}</li>
+                            ),
+                          )}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </CollapsibleSection>
+              )}
+
+              {/* Exercise Mini-Cards */}
               <div className="space-y-3">
                 {(dayPlan.exercises ?? []).map((exercise, index) => {
                   const isExpanded = expandedExercise === index;
@@ -553,14 +540,20 @@ export default function WorkoutPlanPage() {
                             <p className="text-muted-foreground mt-0.5 text-xs">
                               {toLocalDigits(exercise.sets, locale)}x
                               {toLocalDigits(exercise.reps, locale)} {t("reps")}
+                              {exercise.rest && exercise.rest !== "-" && (
+                                <span className="text-muted-foreground/70">
+                                  {" "}
+                                  · {toLocalDigits(exercise.rest, locale)} {t("rest")}
+                                </span>
+                              )}
                             </p>
                           </div>
                         </div>
                         <div className="flex shrink-0 items-center gap-2">
-                          {/* Muscle group tags (WORK-03) */}
-                          {exercise.targetMuscles && exercise.targetMuscles.length > 0 && (
-                            <span className="bg-fitness/10 text-fitness hidden rounded-full px-2 py-0.5 text-[10px] font-medium sm:inline-block">
-                              {exercise.targetMuscles.join(", ")}
+                          {/* Equipment badge (visible in collapsed state) */}
+                          {exercise.equipment && (
+                            <span className="bg-fitness/8 text-fitness hidden rounded-full px-2 py-0.5 text-[10px] font-medium sm:inline-block">
+                              {exercise.equipment}
                             </span>
                           )}
                           <ChevronDown
@@ -608,7 +601,7 @@ export default function WorkoutPlanPage() {
                         </div>
                       )}
 
-                      {/* Expanded Content (WORK-04) */}
+                      {/* Expanded Content */}
                       <div
                         className={cn(
                           "overflow-hidden transition-all duration-200 ease-in-out",
@@ -616,6 +609,20 @@ export default function WorkoutPlanPage() {
                         )}
                       >
                         <div className="border-border space-y-3 border-t px-3.5 pt-3 pb-3.5">
+                          {/* Exercise GIF */}
+                          {exercise.exerciseDbId &&
+                            exerciseMedia[exercise.exerciseDbId] &&
+                            (exerciseMedia[exercise.exerciseDbId].gifUrl ||
+                              exerciseMedia[exercise.exerciseDbId].gifStorageUrl) && (
+                              <ExerciseGif
+                                url={
+                                  (exerciseMedia[exercise.exerciseDbId].gifUrl ||
+                                    exerciseMedia[exercise.exerciseDbId].gifStorageUrl)!
+                                }
+                                alt={exercise.name}
+                              />
+                            )}
+
                           {/* Muscle body map visualization */}
                           {exercise.targetMuscles && exercise.targetMuscles.length > 0 && (
                             <MuscleMap
@@ -680,40 +687,38 @@ export default function WorkoutPlanPage() {
                 })}
               </div>
 
-              {/* Cooldown */}
-              {dayPlan.cooldown &&
-                Array.isArray(dayPlan.cooldown.exercises) &&
-                dayPlan.cooldown.exercises.length > 0 && (
-                  <div className="border-border bg-card shadow-card animate-slide-up overflow-hidden rounded-xl border">
-                    <div className="border-border flex items-center gap-2 border-b bg-neutral-50 p-4">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-md bg-neutral-200 text-xs font-bold">
-                        C
-                      </span>
-                      <h3 className="text-sm font-semibold">{t("cooldown")}</h3>
-                    </div>
-                    <div className="divide-border divide-y">
-                      {dayPlan.cooldown.exercises.map((exercise, index) => (
-                        <div key={index} className="p-4">
-                          <div className="mb-1.5 flex items-center justify-between">
-                            <span className="text-sm font-medium">{exercise.name}</span>
-                            <span className="text-muted-foreground rounded-md bg-neutral-100 px-2 py-0.5 text-xs">
-                              {toLocalDigits(exercise.duration, locale)}
-                              {tUnits("sec")}
-                            </span>
-                          </div>
-                          <ul className="text-muted-foreground space-y-0.5 text-xs">
-                            {(Array.isArray(exercise.instructions)
-                              ? exercise.instructions
-                              : []
-                            ).map((instruction: string, i: number) => (
-                              <li key={i}>&#8226; {instruction}</li>
-                            ))}
-                          </ul>
+              {/* Cooldown (collapsed by default) */}
+              {dayPlan.cooldown.exercises.length > 0 && (
+                <CollapsibleSection
+                  title={t("cooldown")}
+                  durationMins={sectionDurationMinutes(dayPlan.cooldown.exercises)}
+                  tUnits={tUnits}
+                  locale={locale}
+                  colorClass="bg-blue-50 border-blue-200"
+                  badgeClass="bg-blue-100 text-blue-700"
+                >
+                  <div className="divide-border divide-y">
+                    {dayPlan.cooldown.exercises.map((exercise, index) => (
+                      <div key={index} className="p-4">
+                        <div className="mb-1.5 flex items-center justify-between">
+                          <span className="text-sm font-medium">{exercise.name}</span>
+                          <span className="text-muted-foreground rounded-md bg-neutral-100 px-2 py-0.5 text-xs">
+                            {toLocalDigits(exercise.duration, locale)}
+                            {tUnits("sec")}
+                          </span>
                         </div>
-                      ))}
-                    </div>
+                        <ul className="text-muted-foreground space-y-0.5 text-xs">
+                          {(Array.isArray(exercise.instructions) ? exercise.instructions : []).map(
+                            (instruction: string, i: number) => (
+                              <li key={i}>&#8226; {instruction}</li>
+                            ),
+                          )}
+                        </ul>
+                      </div>
+                    ))}
                   </div>
-                )}
+                </CollapsibleSection>
+              )}
             </>
           )}
         </>
@@ -742,6 +747,117 @@ export default function WorkoutPlanPage() {
               </li>
             ))}
           </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Collapsible Warmup/Cooldown Section ──────────────────────────────────────
+
+function CollapsibleSection({
+  title,
+  durationMins,
+  tUnits,
+  locale,
+  colorClass,
+  badgeClass,
+  children,
+}: {
+  title: string;
+  durationMins: number;
+  tUnits: ReturnType<typeof useTranslations>;
+  locale: string;
+  colorClass: string;
+  badgeClass: string;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const panelId = `section-panel-${title.toLowerCase().replace(/\s+/g, "-")}`;
+
+  return (
+    <div className={cn("animate-slide-up overflow-hidden rounded-xl border", colorClass)}>
+      <button
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-controls={panelId}
+        className="flex w-full items-center justify-between p-4 text-start"
+      >
+        <div className="flex items-center gap-2">
+          <span className={cn("rounded-md px-2 py-0.5 text-xs font-bold", badgeClass)}>
+            {title}
+          </span>
+          <span className="text-muted-foreground text-xs">
+            · {toLocalDigits(durationMins, locale)} {tUnits("min")}
+          </span>
+        </div>
+        <ChevronDown
+          className={cn(
+            "text-muted-foreground h-4 w-4 transition-transform duration-200",
+            open && "rotate-180",
+          )}
+        />
+      </button>
+      <div
+        id={panelId}
+        role="region"
+        className={cn(
+          "overflow-hidden transition-all duration-200",
+          open ? "max-h-[5000px] opacity-100" : "max-h-0 opacity-0",
+        )}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ── Enhanced Rest Day View ───────────────────────────────────────────────────
+
+function RestDayView({
+  t,
+  prevWorkout,
+  nextWorkout,
+}: {
+  t: ReturnType<typeof useTranslations>;
+  prevWorkout: NormalizedWorkoutDay | null;
+  nextWorkout: NormalizedWorkoutDay | null;
+}) {
+  return (
+    <div className="border-border bg-card shadow-card animate-slide-up space-y-4 rounded-xl border p-8 text-center">
+      {/* Icon */}
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-50">
+        <Moon className="h-8 w-8 text-blue-400" />
+      </div>
+
+      {/* Title */}
+      <h3 className="text-lg font-semibold">{t("restDayTitle")}</h3>
+      <p className="text-muted-foreground mx-auto max-w-sm text-sm">{t("restDescription")}</p>
+
+      {/* Recovery context */}
+      {prevWorkout && prevWorkout.workoutName && (
+        <p className="text-muted-foreground text-sm">
+          {t("restDayRecovery", { workout: prevWorkout.workoutName })}
+        </p>
+      )}
+
+      {/* Next workout preview */}
+      {nextWorkout && (
+        <div className="mx-auto max-w-xs rounded-lg border border-blue-100 bg-blue-50/50 p-3 text-start">
+          <p className="mb-1 text-xs font-semibold text-blue-600">{t("nextWorkout")}</p>
+          <p className="text-sm font-medium">{nextWorkout.workoutName}</p>
+          {nextWorkout.targetMuscles.length > 0 && (
+            <div className="mt-1.5 flex flex-wrap gap-1">
+              {nextWorkout.targetMuscles.map((muscle, i) => (
+                <span
+                  key={i}
+                  className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-medium text-blue-700"
+                >
+                  {muscle}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

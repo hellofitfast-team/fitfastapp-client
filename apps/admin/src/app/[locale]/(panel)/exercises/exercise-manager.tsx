@@ -38,6 +38,7 @@ interface ExerciseFormData {
   defaultRepsMax: number;
   defaultRestSeconds: number;
   sortOrder: number;
+  gifUrl: string;
 }
 
 const INITIAL_FORM: ExerciseFormData = {
@@ -57,6 +58,7 @@ const INITIAL_FORM: ExerciseFormData = {
   defaultRepsMax: 12,
   defaultRestSeconds: 60,
   sortOrder: 100,
+  gifUrl: "",
 };
 
 export function ExerciseManager() {
@@ -114,6 +116,7 @@ export function ExerciseManager() {
       defaultRepsMax: exercise.defaultRepsMax,
       defaultRestSeconds: exercise.defaultRestSeconds,
       sortOrder: exercise.sortOrder ?? 100,
+      gifUrl: exercise.gifUrl ?? "",
     });
     setShowModal(true);
   }
@@ -145,6 +148,7 @@ export function ExerciseManager() {
         defaultRepsMax: form.defaultRepsMax,
         defaultRestSeconds: form.defaultRestSeconds,
         sortOrder: form.sortOrder,
+        ...(form.gifUrl.trim() ? { gifUrl: form.gifUrl.trim() } : {}),
       };
 
       if (editingId) {
@@ -473,6 +477,42 @@ export function ExerciseManager() {
                   rows={2}
                   className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm"
                 />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="mb-1 block text-xs font-medium text-stone-600">
+                  {t("gifUrl")}
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    value={form.gifUrl}
+                    onChange={(e) => setForm({ ...form, gifUrl: e.target.value })}
+                    placeholder={t("gifUrlPlaceholder")}
+                    className="flex-1"
+                  />
+                  {form.gifUrl.trim() && (
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, gifUrl: "" })}
+                      className="rounded-md border border-stone-200 px-2 text-xs text-stone-500 hover:bg-stone-50"
+                    >
+                      {t("removeGif")}
+                    </button>
+                  )}
+                </div>
+                {form.gifUrl.trim() && /^https:\/\/.+/.test(form.gifUrl.trim()) && (
+                  <div className="mt-2">
+                    <p className="mb-1 text-xs text-stone-500">{t("gifPreview")}</p>
+                    <img
+                      src={form.gifUrl}
+                      alt="Exercise GIF preview"
+                      className="h-32 w-32 rounded-lg border border-stone-200 object-contain"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               <div>

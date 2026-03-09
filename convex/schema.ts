@@ -40,6 +40,7 @@ const filePurposeValidator = v.union(
   v.literal("ticket_screenshot"),
   v.literal("payment_proof"),
   v.literal("knowledge_pdf"),
+  v.literal("exercise_media"),
 );
 
 /** Reusable gender validator */
@@ -431,6 +432,8 @@ export default defineSchema({
     defaultRestSeconds: v.number(),
     isActive: v.boolean(),
     sortOrder: v.optional(v.number()),
+    gifUrl: v.optional(v.string()),
+    gifStorageId: v.optional(v.id("_storage")),
     createdAt: v.number(),
     updatedAt: v.number(),
   })

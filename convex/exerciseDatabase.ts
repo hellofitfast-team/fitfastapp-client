@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation, internalQuery, internalMutation } from "./_generated/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { requireCoach } from "./helpers";
 
 // ---------------------------------------------------------------------------
@@ -103,6 +104,8 @@ export const createExercise = mutation({
     defaultRestSeconds: v.number(),
     isActive: v.optional(v.boolean()),
     sortOrder: v.optional(v.number()),
+    gifUrl: v.optional(v.string()),
+    gifStorageId: v.optional(v.id("_storage")),
   },
   handler: async (ctx, args) => {
     await requireCoach(ctx);
@@ -137,6 +140,8 @@ export const updateExercise = mutation({
     defaultRestSeconds: v.optional(v.number()),
     isActive: v.optional(v.boolean()),
     sortOrder: v.optional(v.number()),
+    gifUrl: v.optional(v.string()),
+    gifStorageId: v.optional(v.id("_storage")),
   },
   handler: async (ctx, { id, ...fields }) => {
     await requireCoach(ctx);
@@ -188,6 +193,35 @@ export const deleteExercise = mutation({
       isActive: false,
       updatedAt: Date.now(),
     });
+  },
+});
+
+// ---------------------------------------------------------------------------
+// Client query — exercise media lookup (authenticated, not coach-only)
+// ---------------------------------------------------------------------------
+
+const MAX_EXERCISE_MEDIA_IDS = 20;
+
+export const getExerciseMedia = query({
+  args: { exerciseIds: v.array(v.id("exerciseDatabase")) },
+  handler: async (ctx, { exerciseIds }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId || exerciseIds.length > MAX_EXERCISE_MEDIA_IDS) return {};
+
+    const result: Record<string, { gifUrl?: string; gifStorageUrl?: string }> = {};
+    for (const id of exerciseIds) {
+      const ex = await ctx.db.get(id);
+      if (ex && (ex.gifUrl || ex.gifStorageId)) {
+        const entry: { gifUrl?: string; gifStorageUrl?: string } = {};
+        if (ex.gifUrl) entry.gifUrl = ex.gifUrl;
+        if (ex.gifStorageId) {
+          const url = await ctx.storage.getUrl(ex.gifStorageId);
+          if (url) entry.gifStorageUrl = url;
+        }
+        result[id] = entry;
+      }
+    }
+    return result;
   },
 });
 

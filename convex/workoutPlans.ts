@@ -236,6 +236,7 @@ export const swapExercise = mutation({
     const lang = plan.language;
     const newExercise = {
       name: lang === "ar" && best.nameAr ? best.nameAr : best.name,
+      exerciseDbId: best._id,
       sets: currentExercise.sets ?? best.defaultSets,
       reps:
         best.defaultRepsMin === best.defaultRepsMax

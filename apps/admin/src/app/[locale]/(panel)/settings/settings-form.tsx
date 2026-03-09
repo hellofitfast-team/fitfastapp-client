@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useConvexAuth, useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Calendar, DollarSign, Share2, Wallet, UtensilsCrossed, Dumbbell } from "lucide-react";
+import { Calendar, DollarSign, Share2, Wallet, Dumbbell } from "lucide-react";
 import * as Sentry from "@sentry/nextjs";
 import { MAX_PRICING_PLANS } from "@/convex/constants";
 import { PlansManager } from "./plans-manager";
@@ -28,29 +28,18 @@ export function AdminSettingsForm() {
       : "skip",
   );
 
-  const mealDurationConfig = useQuery(
-    api.systemConfig.getConfig,
-    isAuthenticated ? { key: "meal_plan_duration_days" } : "skip",
-  );
-
   const workoutDurationConfig = useQuery(
     api.systemConfig.getConfig,
     isAuthenticated ? { key: "workout_plan_duration_days" } : "skip",
   );
 
   const [checkInDays, setCheckInDays] = useState<string | null>(null);
-  const [mealDuration, setMealDuration] = useState<string | null>(null);
   const [workoutDuration, setWorkoutDuration] = useState<string | null>(null);
 
   const effectiveCheckInDays = checkInDays ?? String(checkInConfig?.value ?? "10");
-  const effectiveMealDuration = mealDuration ?? String(mealDurationConfig?.value ?? "10");
   const effectiveWorkoutDuration = workoutDuration ?? String(workoutDurationConfig?.value ?? "10");
 
-  if (
-    checkInConfig === undefined ||
-    mealDurationConfig === undefined ||
-    workoutDurationConfig === undefined
-  ) {
+  if (checkInConfig === undefined || workoutDurationConfig === undefined) {
     return null;
   }
 
@@ -68,10 +57,6 @@ export function AdminSettingsForm() {
           value: clamp(effectiveCheckInDays, 7, 30, 10),
         }),
         setConfig({
-          key: "meal_plan_duration_days",
-          value: clamp(effectiveMealDuration, 1, 30, 10),
-        }),
-        setConfig({
           key: "workout_plan_duration_days",
           value: clamp(effectiveWorkoutDuration, 1, 30, 10),
         }),
@@ -84,11 +69,7 @@ export function AdminSettingsForm() {
           panel: "admin",
         },
         extra: {
-          configKeys: [
-            "check_in_frequency_days",
-            "meal_plan_duration_days",
-            "workout_plan_duration_days",
-          ],
+          configKeys: ["check_in_frequency_days", "workout_plan_duration_days"],
         },
       });
       throw error;
@@ -117,27 +98,6 @@ export function AdminSettingsForm() {
               className="text-primary focus:ring-primary/20 focus:border-primary h-11 w-24 rounded-xl border border-stone-200 bg-stone-50 px-3 text-center text-lg font-bold transition-all focus:ring-2 focus:outline-none"
             />
             <span className="text-sm text-stone-500">{t("daysBetweenCheckIns")}</span>
-          </div>
-        </div>
-
-        {/* Meal plan duration */}
-        <div className="rounded-xl border border-stone-200 bg-white p-6">
-          <div className="mb-4 flex items-center gap-2">
-            <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-lg">
-              <UtensilsCrossed className="h-4 w-4" />
-            </div>
-            <h2 className="text-sm font-semibold text-stone-900">{t("mealPlanDuration")}</h2>
-          </div>
-          <div className="flex items-center gap-3">
-            <input
-              type="number"
-              min="1"
-              max="30"
-              value={effectiveMealDuration}
-              onChange={(e) => setMealDuration(e.target.value)}
-              className="text-primary focus:ring-primary/20 focus:border-primary h-11 w-24 rounded-xl border border-stone-200 bg-stone-50 px-3 text-center text-lg font-bold transition-all focus:ring-2 focus:outline-none"
-            />
-            <span className="text-sm text-stone-500">{t("daysMealPlan")}</span>
           </div>
         </div>
 

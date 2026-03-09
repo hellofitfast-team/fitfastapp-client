@@ -1,11 +1,7 @@
 import { v } from "convex/values";
 import { internalQuery } from "./_generated/server";
 import { getAuthUserId } from "./auth";
-import {
-  DEFAULT_CHECK_IN_FREQUENCY_DAYS,
-  DEFAULT_MEAL_PLAN_DURATION_DAYS,
-  DEFAULT_WORKOUT_PLAN_DURATION_DAYS,
-} from "./constants";
+import { DEFAULT_CHECK_IN_FREQUENCY_DAYS, DEFAULT_WORKOUT_PLAN_DURATION_DAYS } from "./constants";
 
 /**
  * Fetch the coach-configured check-in frequency from systemConfig.
@@ -69,22 +65,11 @@ export const getCheckInInternal = internalQuery({
 });
 
 /**
- * Fetch the coach-configured meal plan duration from systemConfig.
- * Fallback chain: meal_plan_duration_days → check_in_frequency_days → DEFAULT_MEAL_PLAN_DURATION_DAYS
+ * Meal plan duration always equals check-in frequency
+ * (plans regenerate every check-in, so a separate config is redundant).
  */
 export async function getMealPlanDurationDays(ctx: { db: any }): Promise<number> {
-  const config = await ctx.db
-    .query("systemConfig")
-    .withIndex("by_key", (q: any) => q.eq("key", "meal_plan_duration_days"))
-    .unique();
-  const raw = config?.value;
-  if (raw != null) {
-    const num = typeof raw === "number" ? raw : Number(raw);
-    if (!isNaN(num) && num >= 1) return num;
-  }
-  // Fallback to check-in frequency, then constant default
-  const freq = await getCheckInFrequencyDays(ctx);
-  return freq > 0 ? freq : DEFAULT_MEAL_PLAN_DURATION_DAYS;
+  return getCheckInFrequencyDays(ctx);
 }
 
 /**

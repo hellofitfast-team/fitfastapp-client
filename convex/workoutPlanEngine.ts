@@ -54,12 +54,14 @@ export interface WorkoutPlanInput {
 
 interface WarmupCooldownExercise {
   name: string;
+  exerciseDbId: string;
   duration: number;
   instructions: string[];
 }
 
 interface WorkoutExercise {
   name: string;
+  exerciseDbId: string;
   sets: number;
   reps: string;
   restBetweenSets: string;
@@ -425,6 +427,7 @@ function buildTrainingDay(
 
     return {
       name: exerciseName(ex, lang),
+      exerciseDbId: ex._id,
       sets,
       reps: repsStr,
       restBetweenSets: `${restSec}s`,
@@ -436,6 +439,7 @@ function buildTrainingDay(
   // Warmup exercises
   const warmupList: WarmupCooldownExercise[] = warmups.map((ex) => ({
     name: exerciseName(ex, lang),
+    exerciseDbId: ex._id,
     duration: ex.defaultRestSeconds > 0 ? ex.defaultRestSeconds : 30,
     instructions: exerciseInstructions(ex, lang).slice(0, 1),
   }));
@@ -443,6 +447,7 @@ function buildTrainingDay(
   // Cooldown exercises
   const cooldownList: WarmupCooldownExercise[] = cooldowns.map((ex) => ({
     name: exerciseName(ex, lang),
+    exerciseDbId: ex._id,
     duration: ex.defaultRestSeconds > 0 ? ex.defaultRestSeconds : 30,
     instructions: exerciseInstructions(ex, lang).slice(0, 1),
   }));

@@ -3,23 +3,12 @@
 import { useTranslations, useLocale } from "next-intl";
 import { toLocalDigits, formatDateShort } from "@/lib/utils";
 import { useCurrentMealPlan } from "@/hooks/use-meal-plans";
-import {
-  UtensilsCrossed,
-  TrendingUp,
-  RefreshCw,
-  Clock,
-  Flame,
-  Loader2,
-  ChevronDown,
-  ChevronUp,
-  Sparkles,
-  Info,
-} from "lucide-react";
+import { UtensilsCrossed, Loader2, ChevronDown, Sparkles, Info } from "lucide-react";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { cn } from "@fitfast/ui/cn";
 import { usePlanStream } from "@/hooks/use-plan-stream";
 import { EmptyState } from "@fitfast/ui/empty-state";
-import { DaySelector } from "./_components/day-selector";
+import { DayNavigator } from "./_components/day-navigator";
 import type { GeneratedMealPlan } from "@/lib/ai/meal-plan-generator";
 import { useAction, useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -129,8 +118,6 @@ export default function MealPlanPage() {
   const [selectedDay, setSelectedDay] = useState(0);
   const [expandedMeal, setExpandedMeal] = useState<number | null>(0);
   const [expandedAlts, setExpandedAlts] = useState<Set<string>>(new Set());
-  const daySelectorRef = useRef<HTMLDivElement>(null);
-  const isRTL = locale === "ar";
   const { profile } = useAuth();
 
   // Translation: detect locale mismatch and auto-translate
@@ -194,26 +181,6 @@ export default function MealPlanPage() {
       setIsGenerating(false);
     }
   };
-
-  // Scroll day selector to show day 1 on the correct edge for RTL
-  useEffect(() => {
-    const el = daySelectorRef.current;
-    if (!el) return;
-    if (isRTL) {
-      // In RTL, scroll to the end so day 1 appears on the right edge
-      el.scrollLeft = el.scrollWidth - el.clientWidth;
-    }
-  }, [isRTL]);
-
-  // Scroll selected day into view
-  useEffect(() => {
-    const el = daySelectorRef.current;
-    if (!el) return;
-    const activeBtn = el.querySelector("[data-active='true']");
-    if (activeBtn) {
-      activeBtn.scrollIntoView({ inline: "nearest", block: "nearest", behavior: "smooth" });
-    }
-  }, [selectedDay]);
 
   // Streaming support
   const streamId = mealPlan?.streamId;
@@ -426,7 +393,9 @@ export default function MealPlanPage() {
     <div className="mx-auto max-w-3xl space-y-5 px-4 py-6 lg:px-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
+        <h1 className="text-2xl font-bold">
+          {selectedDay === todayDayIndex ? t("todaysMeals") : t("title")}
+        </h1>
         <p className="text-muted-foreground mt-0.5 text-sm">
           {formatDateShort(mealPlan.startDate, locale)} -{" "}
           {formatDateShort(mealPlan.endDate, locale)}
@@ -444,8 +413,8 @@ export default function MealPlanPage() {
         </div>
       )}
 
-      {/* Day Selector (1-10) */}
-      <DaySelector
+      {/* Day Navigator */}
+      <DayNavigator
         totalDays={totalDays}
         selectedDay={selectedDay}
         onSelectDay={(day) => {
@@ -453,6 +422,7 @@ export default function MealPlanPage() {
           setExpandedMeal(0);
         }}
         planStartDate={mealPlan.startDate}
+        todayDayIndex={todayDayIndex}
         featureColor="nutrition"
       />
 

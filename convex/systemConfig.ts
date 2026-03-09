@@ -14,7 +14,6 @@ const PUBLIC_CONFIG_KEYS = new Set([
   "paymentMethods",
   "social_links",
   "check_in_frequency_days",
-  "meal_plan_duration_days",
   "workout_plan_duration_days",
 ]);
 
@@ -215,11 +214,7 @@ export const updatePaymentMethods = mutation({
 });
 
 // Keys whose values must always be stored as numbers
-const NUMERIC_CONFIG_KEYS = new Set([
-  "check_in_frequency_days",
-  "meal_plan_duration_days",
-  "workout_plan_duration_days",
-]);
+const NUMERIC_CONFIG_KEYS = new Set(["check_in_frequency_days", "workout_plan_duration_days"]);
 
 export const setConfig = mutation({
   args: {
@@ -250,8 +245,7 @@ export const setConfig = mutation({
             : fallback;
 
       // Plan duration keys: clamp to [MIN, MAX]; others: clamp to min 1
-      const isPlanDuration =
-        key === "meal_plan_duration_days" || key === "workout_plan_duration_days";
+      const isPlanDuration = key === "workout_plan_duration_days";
       storedValue = isPlanDuration
         ? Math.min(MAX_PLAN_DURATION_DAYS, Math.max(MIN_PLAN_DURATION_DAYS, num))
         : Math.max(1, num);

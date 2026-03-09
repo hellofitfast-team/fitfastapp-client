@@ -16,6 +16,7 @@
     "search": "بحث",
     "noResults": "لا توجد نتائج",
     "today": "اليوم",
+    "backToToday": "العودة لليوم",
     "yesterday": "أمس",
     "week": "أسبوع",
     "month": "شهر",
@@ -253,7 +254,11 @@
     "translating": "جاري ترجمة خطة التمارين...",
     "translatingDescription": "ستُحدَّث الخطة تلقائيًا خلال ثوانٍ.",
     "swapExercise": "استبدال التمرين",
-    "swapping": "جاري الاستبدال..."
+    "swapping": "جاري الاستبدال...",
+    "restDayTitle": "راحة واستشفاء",
+    "restDayRecovery": "عضلاتك تتعافى بعد {workout}",
+    "nextWorkout": "التمرين القادم",
+    "exerciseGuide": "دليل التمرين"
   },
   "checkIn": {
     "title": "المتابعة",

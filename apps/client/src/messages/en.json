@@ -16,6 +16,7 @@
     "search": "Search",
     "noResults": "No results found",
     "today": "Today",
+    "backToToday": "Back to Today",
     "yesterday": "Yesterday",
     "week": "Week",
     "month": "Month",
@@ -258,7 +259,11 @@
     "translating": "Translating your workout plan...",
     "translatingDescription": "Your plan will update automatically in a few seconds.",
     "swapExercise": "Swap Exercise",
-    "swapping": "Swapping..."
+    "swapping": "Swapping...",
+    "restDayTitle": "Rest & Recovery",
+    "restDayRecovery": "Your muscles are recovering after {workout}",
+    "nextWorkout": "Next workout",
+    "exerciseGuide": "Exercise Guide"
   },
   "checkIn": {
     "title": "Check-in",

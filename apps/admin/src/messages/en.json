@@ -101,8 +101,6 @@
     "authorizedAccess": "Coach Panel · Authorized Access Only",
     "checkInFrequency": "Check-in Frequency",
     "daysBetweenCheckIns": "days between check-ins",
-    "mealPlanDuration": "Meal Plan Duration",
-    "daysMealPlan": "days per meal plan",
     "workoutPlanDuration": "Workout Plan Duration",
     "daysWorkoutPlan": "days per workout plan",
     "configurePlans": "Configure up to {maxPlans} pricing plans shown on the marketing page.",
@@ -663,6 +661,10 @@
     "exerciseSaved": "Exercise saved successfully",
     "exerciseDeleted": "Exercise deleted successfully",
     "exerciseCount": "{count} exercises",
-    "saveFailed": "Failed to save. Please try again."
+    "saveFailed": "Failed to save. Please try again.",
+    "gifUrl": "GIF URL",
+    "gifUrlPlaceholder": "https://example.com/exercise.gif",
+    "gifPreview": "Preview",
+    "removeGif": "Remove"
   }
 }
