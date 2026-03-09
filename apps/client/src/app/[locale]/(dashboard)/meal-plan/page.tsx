@@ -21,10 +21,11 @@ import { usePlanStream } from "@/hooks/use-plan-stream";
 import { EmptyState } from "@fitfast/ui/empty-state";
 import { DaySelector } from "./_components/day-selector";
 import type { GeneratedMealPlan } from "@/lib/ai/meal-plan-generator";
-import { useAction, useQuery } from "convex/react";
+import { useAction, useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@fitfast/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { ArrowLeftRight } from "lucide-react";
 
 /** Normalized meal with flat macros (handles both old nested and new flat formats) */
 interface NormalizedMeal {
@@ -152,6 +153,10 @@ export default function MealPlanPage() {
     translationRequested.current = false;
   }, [mealPlan?._id]);
 
+  // Meal swap mutation
+  const swapMeal = useMutation(api.mealPlans.swapMeal);
+  const [swappingKey, setSwappingKey] = useState<string | null>(null);
+
   // Generate meal plan action + plan duration config
   const generateMealPlan = useAction(api.ai.generateMealPlan);
   const frequencyConfig = useQuery(api.systemConfig.getConfig, { key: "check_in_frequency_days" });
@@ -211,11 +216,11 @@ export default function MealPlanPage() {
 
   // Streaming support
   const streamId = mealPlan?.streamId;
-  const { streamedText, isStreaming } = usePlanStream(
+  const streamArg =
     mealPlan && (!mealPlan.planData || (mealPlan.planData as Record<string, unknown>)?.parseError)
       ? streamId
-      : undefined,
-  );
+      : undefined;
+  const { streamedText, isStreaming, parsedDays } = usePlanStream(streamArg);
 
   // Compute today's day index from plan start date
   const maxDayIndex =
@@ -250,22 +255,56 @@ export default function MealPlanPage() {
     );
   }
 
-  // Show streaming banner while AI generates (only if planData not yet parsed)
+  // Show progressive streaming view while AI generates (only if planData not yet parsed)
   if (mealPlan && isStreaming && streamedText && !mealPlan.planData) {
+    const streamingDayKeys = Array.from(parsedDays.keys()).sort();
+    const hasAnyDays = streamingDayKeys.length > 0;
+
     return (
       <div className="mx-auto max-w-3xl space-y-5 px-4 py-6 lg:px-6">
         <div>
           <h1 className="text-2xl font-bold">{t("title")}</h1>
           <p className="text-muted-foreground mt-0.5 text-sm">{t("generating")}</p>
         </div>
+
+        {/* Show parsed days as real meal cards */}
+        {hasAnyDays &&
+          streamingDayKeys.map((dayKey) => {
+            const dayData = parsedDays.get(dayKey) as MealDayPlan | undefined;
+            if (!dayData?.meals) return null;
+            const dayNumber = dayKey.replace("day", "");
+            const dayMeals = (dayData.meals ?? []).map(normalizeMeal);
+
+            return (
+              <div key={dayKey} className="space-y-2">
+                <h2 className="text-sm font-semibold text-stone-600">
+                  {t("dayLabel", { n: dayNumber })}
+                </h2>
+                {dayMeals.map((meal, idx) => (
+                  <div key={idx} className="bg-card border-border rounded-xl border p-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-semibold">{meal.name}</h3>
+                      <span className="text-nutrition text-sm font-semibold">
+                        {toLocalDigits(meal.calories, locale)} {t("kcal")}
+                      </span>
+                    </div>
+                    <p className="text-muted-foreground mt-1 text-xs">
+                      {meal.ingredients.slice(0, 3).join(", ")}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+
+        {/* Generating indicator */}
         <div className="border-nutrition/30 bg-nutrition/5 rounded-xl border p-5">
-          <div className="mb-3 flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <Sparkles className="text-nutrition h-4 w-4 animate-pulse" />
-            <span className="text-nutrition text-sm font-semibold">{t("aiGenerating")}</span>
+            <span className="text-nutrition text-sm font-semibold">
+              {t("generatingDay", { day: String(streamingDayKeys.length + 1) })}
+            </span>
           </div>
-          <pre className="text-muted-foreground max-h-96 overflow-y-auto font-sans text-sm leading-relaxed whitespace-pre-wrap">
-            {streamedText}
-          </pre>
         </div>
       </div>
     );
@@ -603,6 +642,26 @@ export default function MealPlanPage() {
                               });
                             };
                             const normalizedAlt = normalizeMeal(alt);
+                            const swapKey = `${selectedDay}-${index}-${i}`;
+                            const isSwapping = swappingKey === swapKey;
+
+                            const handleSwap = async (e: React.MouseEvent) => {
+                              e.stopPropagation();
+                              if (!mealPlan?._id || isSwapping) return;
+                              setSwappingKey(swapKey);
+                              try {
+                                await swapMeal({
+                                  planId: mealPlan._id,
+                                  dayKey: `day${selectedDay + 1}`,
+                                  mealIndex: index,
+                                  alternativeIndex: i,
+                                });
+                              } catch (err) {
+                                console.error("Swap failed:", err);
+                              } finally {
+                                setSwappingKey(null);
+                              }
+                            };
 
                             return (
                               <div
@@ -610,29 +669,44 @@ export default function MealPlanPage() {
                                 className="border-nutrition/20 overflow-hidden rounded-md border bg-white/60"
                               >
                                 {/* Collapsed header */}
-                                <button
-                                  onClick={toggleAlt}
-                                  aria-expanded={isAltExpanded}
-                                  className="hover:bg-nutrition/5 flex w-full items-center justify-between gap-2 px-3 py-2 text-start transition-colors"
-                                >
-                                  <div className="flex min-w-0 items-center gap-2">
-                                    <span className="text-nutrition shrink-0 text-sm">&#8596;</span>
-                                    <span className="truncate text-sm font-medium">
-                                      {normalizedAlt.name}
-                                    </span>
-                                  </div>
-                                  <div className="flex shrink-0 items-center gap-2">
-                                    <span className="bg-nutrition/10 text-nutrition rounded-full px-2 py-0.5 text-[10px] font-semibold">
-                                      {toLocalDigits(normalizedAlt.calories, locale)} {t("kcal")}
-                                    </span>
-                                    <ChevronDown
-                                      className={cn(
-                                        "text-nutrition/60 h-3.5 w-3.5 transition-transform duration-150",
-                                        isAltExpanded && "rotate-180",
-                                      )}
+                                <div className="flex items-center">
+                                  <button
+                                    onClick={toggleAlt}
+                                    aria-expanded={isAltExpanded}
+                                    className="hover:bg-nutrition/5 flex min-w-0 flex-1 items-center justify-between gap-2 px-3 py-2 text-start transition-colors"
+                                  >
+                                    <div className="flex min-w-0 items-center gap-2">
+                                      <span className="text-nutrition shrink-0 text-sm">
+                                        &#8596;
+                                      </span>
+                                      <span className="truncate text-sm font-medium">
+                                        {normalizedAlt.name}
+                                      </span>
+                                    </div>
+                                    <div className="flex shrink-0 items-center gap-2">
+                                      <span className="bg-nutrition/10 text-nutrition rounded-full px-2 py-0.5 text-[10px] font-semibold">
+                                        {toLocalDigits(normalizedAlt.calories, locale)} {t("kcal")}
+                                      </span>
+                                      <ChevronDown
+                                        className={cn(
+                                          "text-nutrition/60 h-3.5 w-3.5 transition-transform duration-150",
+                                          isAltExpanded && "rotate-180",
+                                        )}
+                                      />
+                                    </div>
+                                  </button>
+                                  <button
+                                    onClick={handleSwap}
+                                    disabled={isSwapping}
+                                    className="text-nutrition hover:bg-nutrition/10 border-nutrition/20 flex h-full shrink-0 items-center gap-1 border-s px-2.5 py-2 text-xs font-medium transition-colors disabled:opacity-50"
+                                    title={t("swap")}
+                                  >
+                                    <ArrowLeftRight
+                                      className={cn("h-3.5 w-3.5", isSwapping && "animate-spin")}
                                     />
-                                  </div>
-                                </button>
+                                    <span className="hidden sm:inline">{t("swap")}</span>
+                                  </button>
+                                </div>
 
                                 {/* Expanded body */}
                                 <div

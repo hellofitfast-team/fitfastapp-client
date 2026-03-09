@@ -195,6 +195,7 @@
     "ingredients": "المكونات",
     "instructions": "طريقة التحضير",
     "alternatives": "البدائل",
+    "swap": "استبدال",
     "markComplete": "تم الإكمال",
     "completed": "مكتمل",
     "todaysMeals": "وجبات اليوم",
@@ -210,6 +211,7 @@
     "coachNotes": "ملاحظات المدرب",
     "kcal": "سعرة",
     "aiGenerating": "الذكاء الاصطناعي يُعد خطة وجباتك...",
+    "generatingDay": "جاري إعداد يوم {day}...",
     "calorieExplanation": "الذكاء الاصطناعي بيستهدف حوالي {calories} سعرة/يوم ({protein} جرام بروتين) بناءً على بياناتك و{trainingDays} أيام تمرين/أسبوع. الوجبات الفعلية ممكن تختلف بسيط.",
     "dayLabel": "يوم {n}",
     "translating": "جاري ترجمة خطة الوجبات...",
@@ -248,7 +250,9 @@
     "aiGenerating": "الذكاء الاصطناعي يُعد خطة تمارينك...",
     "trainingSplit": "نظام التقسيم",
     "translating": "جاري ترجمة خطة التمارين...",
-    "translatingDescription": "ستُحدَّث الخطة تلقائيًا خلال ثوانٍ."
+    "translatingDescription": "ستُحدَّث الخطة تلقائيًا خلال ثوانٍ.",
+    "swapExercise": "استبدال التمرين",
+    "swapping": "جاري الاستبدال..."
   },
   "checkIn": {
     "title": "المتابعة",

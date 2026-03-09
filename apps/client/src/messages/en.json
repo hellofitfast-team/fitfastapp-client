@@ -200,6 +200,7 @@
     "ingredients": "Ingredients",
     "instructions": "Instructions",
     "alternatives": "Alternatives",
+    "swap": "Swap",
     "markComplete": "Mark as Complete",
     "completed": "Completed",
     "todaysMeals": "Today's Meals",
@@ -215,6 +216,7 @@
     "coachNotes": "Coach Notes",
     "kcal": "KCAL",
     "aiGenerating": "AI is crafting your meal plan...",
+    "generatingDay": "Generating day {day}...",
     "calorieExplanation": "AI aims for around {calories} kcal/day ({protein}g protein) based on your profile and {trainingDays} training days/week. Actual meals may vary slightly.",
     "dayLabel": "Day {n}",
     "translating": "Translating your meal plan...",
@@ -253,7 +255,9 @@
     "aiGenerating": "AI is crafting your workout plan...",
     "trainingSplit": "Training Split",
     "translating": "Translating your workout plan...",
-    "translatingDescription": "Your plan will update automatically in a few seconds."
+    "translatingDescription": "Your plan will update automatically in a few seconds.",
+    "swapExercise": "Swap Exercise",
+    "swapping": "Swapping..."
   },
   "checkIn": {
     "title": "Check-in",
