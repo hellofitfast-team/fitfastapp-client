@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { routing } from "@fitfast/i18n/routing";
+import { Toaster } from "@fitfast/ui/toaster";
 import { ConvexClientProvider } from "@/components/providers/convex-provider";
 import { PWAProviders } from "@/components/pwa/PWAProviders";
 
@@ -31,6 +32,7 @@ export default async function LocaleLayout({
       <NextIntlClientProvider messages={messages}>
         <PWAProviders />
         {children}
+        <Toaster />
       </NextIntlClientProvider>
     </ConvexClientProvider>
   );

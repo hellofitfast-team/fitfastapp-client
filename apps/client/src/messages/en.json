@@ -20,7 +20,8 @@
     "week": "Week",
     "month": "Month",
     "year": "Year",
-    "min": "min"
+    "min": "min",
+    "offline": "You are offline"
   },
   "emptyStates": {
     "noPlan": {

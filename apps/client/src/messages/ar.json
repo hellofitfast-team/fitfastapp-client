@@ -20,7 +20,8 @@
     "week": "أسبوع",
     "month": "شهر",
     "year": "سنة",
-    "min": "د"
+    "min": "د",
+    "offline": "أنت غير متصل بالإنترنت"
   },
   "emptyStates": {
     "noPlan": {

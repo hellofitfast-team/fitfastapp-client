@@ -1,5 +1,5 @@
 // FitFast Service Worker
-// Native Web Push + offline fallback
+// Native Web Push + offline fallback + controlled updates
 
 const CACHE_NAME = "fitfast-offline-v1";
 const OFFLINE_URL = "/offline.html";
@@ -7,7 +7,8 @@ const OFFLINE_URL = "/offline.html";
 // Pre-cache the offline page on install
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.add(OFFLINE_URL)));
-  self.skipWaiting();
+  // Do NOT call skipWaiting() here — let the client control activation
+  // so the page reloads with fresh assets at the right time
 });
 
 // Clean up old caches on activate
@@ -33,6 +34,13 @@ self.addEventListener("fetch", (event) => {
         .then((cached) => cached || new Response("Offline", { status: 503 })),
     ),
   );
+});
+
+// Listen for skip-waiting message from client (update flow)
+self.addEventListener("message", (event) => {
+  if (event.data?.action === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 // Handle incoming push notifications

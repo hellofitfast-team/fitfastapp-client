@@ -11,11 +11,17 @@ const InstallPrompt = dynamic(() => import("./InstallPrompt").then((m) => m.Inst
   ssr: false,
 });
 
+const OfflineIndicator = dynamic(
+  () => import("./OfflineIndicator").then((m) => m.OfflineIndicator),
+  { ssr: false },
+);
+
 export function PWAProviders() {
   return (
     <>
       <ServiceWorkerRegistration />
       <InstallPrompt />
+      <OfflineIndicator />
     </>
   );
 }
