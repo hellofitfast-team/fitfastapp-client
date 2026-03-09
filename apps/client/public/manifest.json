@@ -3,6 +3,7 @@
   "short_name": "FitFast",
   "description": "Personalized meal plans and workout routines powered by AI",
   "start_url": "/",
+  "id": "/",
   "display": "standalone",
   "display_override": ["standalone"],
   "background_color": "#FFFFFF",
@@ -38,5 +39,8 @@
   "categories": ["health", "fitness", "lifestyle"],
   "lang": "en",
   "dir": "auto",
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
 }

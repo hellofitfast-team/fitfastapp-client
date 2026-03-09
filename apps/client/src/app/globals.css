@@ -215,6 +215,12 @@
     scroll-behavior: smooth;
     color-scheme: light;
     overflow-x: hidden;
+    /* Prevent double-tap zoom and pinch-zoom — iOS + Android */
+    touch-action: pan-x pan-y;
+    /* Prevent text inflation on orientation change — iOS + Android Chrome */
+    -webkit-text-size-adjust: 100%;
+    /* Remove blue tap highlight on Android Chrome */
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
@@ -225,6 +231,8 @@
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
     max-width: 100%;
+    /* Prevent overscroll bounce revealing blank space on iOS */
+    overscroll-behavior-y: none;
   }
 
   input,
@@ -232,6 +240,13 @@
   select,
   button {
     color: var(--color-foreground);
+  }
+
+  /* Prevent iOS Safari auto-zoom on input focus — triggers at font-size < 16px */
+  input,
+  textarea,
+  select {
+    font-size: max(1rem, 16px);
   }
 
   input::placeholder,
@@ -348,6 +363,34 @@
 
 .animate-marquee {
   animation: marquee 30s linear infinite;
+}
+
+/* PWA Standalone Mode — native app-like behavior on iOS + Android Home Screen */
+@media all and (display-mode: standalone) {
+  html {
+    /* Lock viewport in standalone — prevent any zoom gestures */
+    touch-action: pan-x pan-y;
+    /* iOS: prevent long-press callout menus */
+    -webkit-touch-callout: none;
+    /* Android: disable pull-to-refresh in standalone */
+    overscroll-behavior-y: contain;
+  }
+
+  /* Remove tap highlight on Android Chrome (blue flash on tap) */
+  *,
+  *::before,
+  *::after {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent text selection on UI chrome (native app feel) — both platforms */
+  nav,
+  header,
+  footer,
+  button {
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }
 
 /* Reduced Motion — covers all animations globally */

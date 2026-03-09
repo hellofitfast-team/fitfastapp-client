@@ -74,3 +74,24 @@ testing-instapay-screenshot.png
 
 # AI agent skills
 .agents/
+
+# Speckit
+.specify/
+
+# Planning & specs (local-only)
+plans/
+specs/
+
+# Brand assets (large binaries)
+brand-logos/
+
+# Misc screenshots & design files
+*.jpeg
+*.png
+*.excalidraw
+*.pdf
+!apps/*/public/**
+
+# Memory files
+MEMORY.md
+SKILL.md
