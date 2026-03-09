@@ -1,7 +1,11 @@
 import { v } from "convex/values";
 import { internalQuery } from "./_generated/server";
 import { getAuthUserId } from "./auth";
-import { DEFAULT_CHECK_IN_FREQUENCY_DAYS } from "./constants";
+import {
+  DEFAULT_CHECK_IN_FREQUENCY_DAYS,
+  DEFAULT_MEAL_PLAN_DURATION_DAYS,
+  DEFAULT_WORKOUT_PLAN_DURATION_DAYS,
+} from "./constants";
 
 /**
  * Fetch the coach-configured check-in frequency from systemConfig.
@@ -61,6 +65,61 @@ export const getCheckInInternal = internalQuery({
   args: { checkInId: v.id("checkIns") },
   handler: async (ctx, { checkInId }) => {
     return ctx.db.get(checkInId);
+  },
+});
+
+/**
+ * Fetch the coach-configured meal plan duration from systemConfig.
+ * Fallback chain: meal_plan_duration_days → check_in_frequency_days → DEFAULT_MEAL_PLAN_DURATION_DAYS
+ */
+export async function getMealPlanDurationDays(ctx: { db: any }): Promise<number> {
+  const config = await ctx.db
+    .query("systemConfig")
+    .withIndex("by_key", (q: any) => q.eq("key", "meal_plan_duration_days"))
+    .unique();
+  const raw = config?.value;
+  if (raw != null) {
+    const num = typeof raw === "number" ? raw : Number(raw);
+    if (!isNaN(num) && num >= 1) return num;
+  }
+  // Fallback to check-in frequency, then constant default
+  const freq = await getCheckInFrequencyDays(ctx);
+  return freq > 0 ? freq : DEFAULT_MEAL_PLAN_DURATION_DAYS;
+}
+
+/**
+ * Fetch the coach-configured workout plan duration from systemConfig.
+ * Fallback chain: workout_plan_duration_days → check_in_frequency_days → DEFAULT_WORKOUT_PLAN_DURATION_DAYS
+ */
+export async function getWorkoutPlanDurationDays(ctx: { db: any }): Promise<number> {
+  const config = await ctx.db
+    .query("systemConfig")
+    .withIndex("by_key", (q: any) => q.eq("key", "workout_plan_duration_days"))
+    .unique();
+  const raw = config?.value;
+  if (raw != null) {
+    const num = typeof raw === "number" ? raw : Number(raw);
+    if (!isNaN(num) && num >= 1) return num;
+  }
+  const freq = await getCheckInFrequencyDays(ctx);
+  return freq > 0 ? freq : DEFAULT_WORKOUT_PLAN_DURATION_DAYS;
+}
+
+/** Internal query wrapper for getMealPlanDurationDays — used by actions */
+export const getMealPlanDurationInternal = internalQuery({
+  args: {},
+  returns: v.number(),
+  handler: async (ctx): Promise<number> => {
+    return getMealPlanDurationDays(ctx);
+  },
+});
+
+/** Internal query wrapper for getWorkoutPlanDurationDays — used by actions */
+export const getWorkoutPlanDurationInternal = internalQuery({
+  args: {},
+  returns: v.number(),
+  handler: async (ctx): Promise<number> => {
+    return getWorkoutPlanDurationDays(ctx);
   },
 });
 

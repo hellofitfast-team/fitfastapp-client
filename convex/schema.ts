@@ -397,4 +397,45 @@ export default defineSchema({
   })
     .index("by_type", ["type"])
     .index("by_createdAt", ["createdAt"]),
+
+  exerciseDatabase: defineTable({
+    name: v.string(),
+    nameAr: v.string(),
+    category: v.union(
+      v.literal("compound"),
+      v.literal("accessory"),
+      v.literal("isolation"),
+      v.literal("warmup"),
+      v.literal("cooldown"),
+      v.literal("cardio"),
+    ),
+    movementPattern: v.union(
+      v.literal("push"),
+      v.literal("pull"),
+      v.literal("squat"),
+      v.literal("hinge"),
+      v.literal("carry"),
+      v.literal("rotation"),
+      v.literal("other"),
+    ),
+    primaryMuscles: v.array(v.string()),
+    secondaryMuscles: v.array(v.string()),
+    equipment: v.array(v.string()),
+    difficulty: v.union(v.literal("beginner"), v.literal("intermediate"), v.literal("advanced")),
+    instructions: v.string(),
+    instructionsAr: v.string(),
+    contraindications: v.array(v.string()),
+    defaultSets: v.number(),
+    defaultRepsMin: v.number(),
+    defaultRepsMax: v.number(),
+    defaultRestSeconds: v.number(),
+    isActive: v.boolean(),
+    sortOrder: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_category", ["category", "isActive"])
+    .index("by_movement", ["movementPattern", "isActive"])
+    .index("by_difficulty", ["difficulty", "isActive"])
+    .searchIndex("search_name", { searchField: "name" }),
 });

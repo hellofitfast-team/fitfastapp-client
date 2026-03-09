@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { query, action, internalMutation, internalQuery } from "./_generated/server";
+import { query, mutation, action, internalMutation, internalQuery } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { getAuthUserId } from "./auth";
 
@@ -159,5 +159,128 @@ export const getCurrentPlanInternal = internalQuery({
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .order("desc")
       .first();
+  },
+});
+
+// ---------------------------------------------------------------------------
+// Exercise swap — queries exercise DB for alternatives
+// ---------------------------------------------------------------------------
+
+export const swapExercise = mutation({
+  args: {
+    planId: v.id("workoutPlans"),
+    dayKey: v.string(),
+    exerciseIndex: v.number(),
+  },
+  handler: async (ctx, { planId, dayKey, exerciseIndex }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const plan = await ctx.db.get(planId);
+    if (!plan || plan.userId !== userId) throw new Error("Plan not found");
+
+    const planData = plan.planData as Record<string, any>;
+    const weeklyPlan = planData?.weeklyPlan;
+    if (!weeklyPlan?.[dayKey]) throw new Error("Day not found");
+
+    const dayPlan = weeklyPlan[dayKey];
+    if (dayPlan.restDay) throw new Error("Cannot swap exercises on a rest day");
+
+    const exercises = dayPlan.exercises;
+    if (!Array.isArray(exercises) || exerciseIndex < 0 || exerciseIndex >= exercises.length) {
+      throw new Error("Invalid exercise index");
+    }
+
+    const currentExercise = exercises[exerciseIndex];
+    const currentName = currentExercise.name?.toLowerCase() ?? "";
+    const targetMuscles: string[] = currentExercise.targetMuscles ?? [];
+
+    // Get all exercises already in this day to avoid duplicates
+    const usedNames = new Set(exercises.map((e: any) => (e.name ?? "").toLowerCase()));
+
+    // Query exercise database for alternatives with matching muscles
+    const allExercises = await ctx.db.query("exerciseDatabase").collect();
+    const activeExercises = allExercises.filter((e) => e.isActive);
+
+    // Score alternatives by muscle match
+    const targetSet = new Set(targetMuscles.map((m) => m.toLowerCase()));
+    const candidates = activeExercises
+      .filter((e) => {
+        // Must not be the current exercise or already in today's workout
+        if (e.name.toLowerCase() === currentName) return false;
+        if (usedNames.has(e.name.toLowerCase())) return false;
+        // Must not be warmup/cooldown
+        if (e.category === "warmup" || e.category === "cooldown") return false;
+        return true;
+      })
+      .map((e) => {
+        let score = 0;
+        for (const m of e.primaryMuscles) {
+          if (targetSet.has(m.toLowerCase())) score += 5;
+        }
+        for (const m of e.secondaryMuscles) {
+          if (targetSet.has(m.toLowerCase())) score += 1;
+        }
+        if (e.category === "compound") score += 3;
+        return { exercise: e, score };
+      })
+      .filter((c) => c.score > 0)
+      .sort((a, b) => b.score - a.score);
+
+    if (candidates.length === 0) throw new Error("No alternative exercises available");
+
+    // Pick the best match
+    const best = candidates[0]!.exercise;
+    const lang = plan.language;
+    const newExercise = {
+      name: lang === "ar" && best.nameAr ? best.nameAr : best.name,
+      sets: currentExercise.sets ?? best.defaultSets,
+      reps:
+        best.defaultRepsMin === best.defaultRepsMax
+          ? `${best.defaultRepsMin}`
+          : `${best.defaultRepsMin}-${best.defaultRepsMax}`,
+      restBetweenSets: `${best.defaultRestSeconds}s`,
+      targetMuscles: best.primaryMuscles,
+      instructions: [lang === "ar" && best.instructionsAr ? best.instructionsAr : best.instructions]
+        .flatMap((s) =>
+          s
+            .split(/\n|(?<=\.)\s+/)
+            .map((p) => p.trim())
+            .filter(Boolean),
+        )
+        .slice(0, 2),
+    };
+
+    // Replace in planData
+    exercises[exerciseIndex] = newExercise;
+    await ctx.db.patch(planId, { planData });
+
+    // Also swap in translatedPlanData if it exists
+    if (plan.translatedPlanData) {
+      try {
+        const translated = plan.translatedPlanData as Record<string, any>;
+        const translatedDay = translated?.weeklyPlan?.[dayKey];
+        if (translatedDay?.exercises?.[exerciseIndex]) {
+          const altLang = plan.language === "en" ? "ar" : "en";
+          translatedDay.exercises[exerciseIndex] = {
+            ...newExercise,
+            name: altLang === "ar" && best.nameAr ? best.nameAr : best.name,
+            instructions: [
+              altLang === "ar" && best.instructionsAr ? best.instructionsAr : best.instructions,
+            ]
+              .flatMap((s) =>
+                s
+                  .split(/\n|(?<=\.)\s+/)
+                  .map((p) => p.trim())
+                  .filter(Boolean),
+              )
+              .slice(0, 2),
+          };
+          await ctx.db.patch(planId, { translatedPlanData: translated });
+        }
+      } catch {
+        // Ignore translation swap errors — primary swap succeeded
+      }
+    }
   },
 });

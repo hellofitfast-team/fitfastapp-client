@@ -1,7 +1,8 @@
 import { v } from "convex/values";
-import { query, action, internalMutation, internalQuery } from "./_generated/server";
+import { query, action, mutation, internalMutation, internalQuery } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { getAuthUserId } from "./auth";
+import type { MealPlanData, Meal, MealAlternative, Macros } from "./planTypes";
 
 export const getCurrentPlan = query({
   args: {},
@@ -160,5 +161,115 @@ export const getCurrentPlanInternal = internalQuery({
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .order("desc")
       .first();
+  },
+});
+
+/** Recalculate daily totals from meal macros */
+function recalcDailyTotals(
+  meals: Array<{ calories: number; protein: number; carbs: number; fat: number }>,
+): Macros {
+  return meals.reduce(
+    (acc, m) => ({
+      calories: acc.calories + (m.calories || 0),
+      protein: acc.protein + (m.protein || 0),
+      carbs: acc.carbs + (m.carbs || 0),
+      fat: acc.fat + (m.fat || 0),
+    }),
+    { calories: 0, protein: 0, carbs: 0, fat: 0 },
+  );
+}
+
+/** Perform swap on a planData object: exchange meal ↔ alternative */
+function performSwap(
+  planData: MealPlanData,
+  dayKey: string,
+  mealIndex: number,
+  alternativeIndex: number,
+): MealPlanData {
+  const day = planData.weeklyPlan[dayKey];
+  if (!day) throw new Error(`Day "${dayKey}" not found in plan`);
+  if (!day.meals[mealIndex]) throw new Error(`Meal index ${mealIndex} out of bounds`);
+
+  const meal = day.meals[mealIndex] as Meal;
+  if (!meal.alternatives?.[alternativeIndex]) {
+    throw new Error(`Alternative index ${alternativeIndex} out of bounds`);
+  }
+
+  const alt = meal.alternatives[alternativeIndex] as MealAlternative;
+
+  // Build the new meal from the alternative, carrying over the old meal as an alternative
+  const oldMealAsAlt: MealAlternative = {
+    name: meal.name,
+    type: meal.type,
+    calories: meal.calories,
+    protein: meal.protein,
+    carbs: meal.carbs,
+    fat: meal.fat,
+    ingredients: meal.ingredients,
+    instructions: meal.instructions,
+  };
+
+  const newAlternatives = [...meal.alternatives];
+  newAlternatives[alternativeIndex] = oldMealAsAlt;
+
+  const newMeal: Meal = {
+    name: alt.name,
+    type: alt.type,
+    calories: alt.calories,
+    protein: alt.protein,
+    carbs: alt.carbs,
+    fat: alt.fat,
+    ingredients: alt.ingredients,
+    instructions: alt.instructions,
+    alternatives: newAlternatives,
+  };
+
+  const newMeals = [...day.meals];
+  newMeals[mealIndex] = newMeal;
+
+  const newDailyTotals = recalcDailyTotals(newMeals);
+
+  return {
+    ...planData,
+    weeklyPlan: {
+      ...planData.weeklyPlan,
+      [dayKey]: { ...day, meals: newMeals, dailyTotals: newDailyTotals },
+    },
+  };
+}
+
+export const swapMeal = mutation({
+  args: {
+    planId: v.id("mealPlans"),
+    dayKey: v.string(),
+    mealIndex: v.number(),
+    alternativeIndex: v.number(),
+  },
+  handler: async (ctx, { planId, dayKey, mealIndex, alternativeIndex }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const plan = await ctx.db.get(planId);
+    if (!plan) throw new Error("Meal plan not found");
+    if (plan.userId !== userId) throw new Error("Not authorized");
+
+    const planData = plan.planData as MealPlanData;
+    if (!planData?.weeklyPlan) throw new Error("Invalid plan data");
+
+    // Perform swap on primary planData
+    const updatedPlanData = performSwap(planData, dayKey, mealIndex, alternativeIndex);
+
+    // Mirror swap on translatedPlanData if it exists
+    const patch: Record<string, unknown> = { planData: updatedPlanData };
+    if (plan.translatedPlanData) {
+      try {
+        const translatedData = plan.translatedPlanData as MealPlanData;
+        patch.translatedPlanData = performSwap(translatedData, dayKey, mealIndex, alternativeIndex);
+      } catch {
+        // Translation may have different structure; skip mirroring
+      }
+    }
+
+    await ctx.db.patch(planId, patch);
   },
 });

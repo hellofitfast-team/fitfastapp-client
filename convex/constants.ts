@@ -8,6 +8,12 @@
 // ── Check-in & Scheduling ──────────────────────────────────────────────────
 export const DEFAULT_CHECK_IN_FREQUENCY_DAYS = 10;
 
+// ── Plan Durations ────────────────────────────────────────────────────────
+export const DEFAULT_MEAL_PLAN_DURATION_DAYS = 10;
+export const DEFAULT_WORKOUT_PLAN_DURATION_DAYS = 10;
+export const MIN_PLAN_DURATION_DAYS = 1;
+export const MAX_PLAN_DURATION_DAYS = 30;
+
 // ── Data Retention ─────────────────────────────────────────────────────────
 export const DATA_RETENTION_DAYS = 90;
 
@@ -65,8 +71,8 @@ export const NUTRITION = {
 } as const;
 
 // ── AI Generation ─────────────────────────────────────────────────────────
-export const MEAL_OUTPUT_TOKENS_EN = 12000;
-export const MEAL_OUTPUT_TOKENS_AR = 16000;
+export const MEAL_OUTPUT_TOKENS_EN = 16000;
+export const MEAL_OUTPUT_TOKENS_AR = 22000;
 export const WORKOUT_OUTPUT_TOKENS_EN = 16000;
 export const WORKOUT_OUTPUT_TOKENS_AR = 20000;
 export const PLAN_GENERATION_TIMEOUT_MS = 240_000; // 4 minutes (2 min per model attempt with fallback)
