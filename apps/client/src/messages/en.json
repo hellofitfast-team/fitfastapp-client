@@ -201,6 +201,7 @@
     "instructions": "Instructions",
     "alternatives": "Alternatives",
     "swap": "Swap",
+    "swapFailed": "Failed to swap meal. Please try again.",
     "markComplete": "Mark as Complete",
     "completed": "Completed",
     "todaysMeals": "Today's Meals",

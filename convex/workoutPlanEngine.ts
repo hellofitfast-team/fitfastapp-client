@@ -235,8 +235,8 @@ function findPreviousExercise(
     for (const ex of dayData.exercises) {
       if (ex.name === name) {
         const repsParts = String(ex.reps).split("-").map(Number);
-        const rMin = repsParts[0] ?? 0;
-        const rMax = repsParts.length > 1 ? repsParts[1]! : rMin;
+        const rMin = isNaN(repsParts[0]!) ? 0 : repsParts[0]!;
+        const rMax = repsParts.length > 1 && !isNaN(repsParts[1]!) ? repsParts[1]! : rMin;
         return { sets: ex.sets ?? 3, repsMin: rMin, repsMax: rMax };
       }
     }

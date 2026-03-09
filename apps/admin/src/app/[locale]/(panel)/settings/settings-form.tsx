@@ -56,18 +56,24 @@ export function AdminSettingsForm() {
 
   const handleSave = async () => {
     try {
+      const clamp = (val: string, min: number, max: number, fallback: number) => {
+        const n = Number(val);
+        if (isNaN(n)) return fallback;
+        return Math.max(min, Math.min(max, Math.round(n)));
+      };
+
       await Promise.all([
         setConfig({
           key: "check_in_frequency_days",
-          value: Number(effectiveCheckInDays) || 10,
+          value: clamp(effectiveCheckInDays, 7, 30, 10),
         }),
         setConfig({
           key: "meal_plan_duration_days",
-          value: Number(effectiveMealDuration) || 10,
+          value: clamp(effectiveMealDuration, 1, 30, 10),
         }),
         setConfig({
           key: "workout_plan_duration_days",
-          value: Number(effectiveWorkoutDuration) || 10,
+          value: clamp(effectiveWorkoutDuration, 1, 30, 10),
         }),
       ]);
     } catch (error) {

@@ -26,9 +26,15 @@ export function usePlanStream(streamId: string | undefined) {
 
   const streamedText = streamBody?.text ?? "";
 
+  // Update the incremental parse state synchronously during render so
+  // the snapshot below always reflects the current streamedText.
+  if (streamedText) {
+    parseIncrementalDays(streamedText, parseStateRef.current);
+  }
+
+  // Create an immutable snapshot for consumers (new Map triggers re-render diff)
   const parsedDays = useMemo(() => {
     if (!streamedText) return new Map<string, unknown>();
-    parseIncrementalDays(streamedText, parseStateRef.current);
     return new Map(parseStateRef.current.parsedDays);
   }, [streamedText]);
 

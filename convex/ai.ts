@@ -614,30 +614,33 @@ Daily meal macros MUST sum to the targets above (±5% tolerance). Respond ONLY w
     });
     let fullText = "";
     let lastFlushed = 0;
-    for await (const chunk of streamResult.textStream) {
-      fullText += chunk;
-      if (fullText.length - lastFlushed > streamChunkSize) {
+    try {
+      for await (const chunk of streamResult.textStream) {
+        fullText += chunk;
+        if (fullText.length - lastFlushed > streamChunkSize) {
+          await ctx.runMutation(internal.streamingManager.appendChunk, {
+            streamId,
+            text: fullText.substring(lastFlushed),
+            final: false,
+          });
+          lastFlushed = fullText.length;
+        }
+      }
+    } finally {
+      // Always finalize the stream so clients don't hang
+      if (fullText.length > lastFlushed) {
         await ctx.runMutation(internal.streamingManager.appendChunk, {
           streamId,
           text: fullText.substring(lastFlushed),
-          final: false,
+          final: true,
         });
-        lastFlushed = fullText.length;
+      } else {
+        await ctx.runMutation(internal.streamingManager.appendChunk, {
+          streamId,
+          text: "",
+          final: true,
+        });
       }
-    }
-    // Flush remainder
-    if (fullText.length > lastFlushed) {
-      await ctx.runMutation(internal.streamingManager.appendChunk, {
-        streamId,
-        text: fullText.substring(lastFlushed),
-        final: true,
-      });
-    } else {
-      await ctx.runMutation(internal.streamingManager.appendChunk, {
-        streamId,
-        text: "",
-        final: true,
-      });
     }
     const finishReason = await streamResult.finishReason;
     return { text: fullText, finishReason };
@@ -659,6 +662,12 @@ Daily meal macros MUST sum to the targets above (±5% tolerance). Respond ONLY w
       abortSignal: AbortSignal.timeout(halfTimeout),
     });
     result = { text: batchResult.text, finishReason: batchResult.finishReason };
+    // Write fallback result to stream so client can see it
+    await ctx.runMutation(internal.streamingManager.appendChunk, {
+      streamId,
+      text: batchResult.text,
+      final: true,
+    });
   }
 
   // --- Truncation detection + retry with reduced scope ---
@@ -799,29 +808,22 @@ async function generateWorkoutPlanHandler(
   const latestCheckIn = clientCtx.checkInHistory?.[0] ?? null;
   const injuries = parseInjuries(assessment, latestCheckIn);
 
-  // Compute adherence/energy/sleep from check-in history
+  // Compute adherence/energy/sleep from check-in history (nullish-safe: 0 is a valid value)
   const recentCheckIns = clientCtx.checkInHistory ?? [];
-  const avgAdherence =
-    recentCheckIns.length > 0
-      ? recentCheckIns.reduce(
-          (s: number, c: Record<string, unknown>) => s + (Number(c.dietaryAdherence) || 75),
-          0,
-        ) / recentCheckIns.length
-      : null;
-  const avgEnergy =
-    recentCheckIns.length > 0
-      ? recentCheckIns.reduce(
-          (s: number, c: Record<string, unknown>) => s + (Number(c.energyLevel) || 7),
-          0,
-        ) / recentCheckIns.length
-      : null;
-  const avgSleep =
-    recentCheckIns.length > 0
-      ? recentCheckIns.reduce(
-          (s: number, c: Record<string, unknown>) => s + (Number(c.sleepQuality) || 7),
-          0,
-        ) / recentCheckIns.length
-      : null;
+  function avgField(field: string): number | null {
+    if (recentCheckIns.length === 0) return null;
+    const values = recentCheckIns
+      .map((c: Record<string, unknown>) => {
+        const v = c[field];
+        return v != null ? Number(v) : null;
+      })
+      .filter((v): v is number => v != null && !isNaN(v));
+    if (values.length === 0) return null;
+    return values.reduce((s, v) => s + v, 0) / values.length;
+  }
+  const avgAdherence = avgField("dietaryAdherence");
+  const avgEnergy = avgField("energyLevel");
+  const avgSleep = avgField("sleepQuality");
 
   // Generate deterministic plan from exercise database
   const planData = buildWorkoutPlan(exercises as any[], {
@@ -837,9 +839,11 @@ async function generateWorkoutPlanHandler(
     sleepQuality: avgSleep,
     previousPlan: previousPlan?.planData ?? null,
     language,
-    availableEquipment: (assessment.lifestyleHabits as any)?.equipment
-      ? [(assessment.lifestyleHabits as any).equipment]
-      : undefined,
+    availableEquipment: (() => {
+      const eq = (assessment.lifestyleHabits as any)?.equipment;
+      if (!eq) return undefined;
+      return Array.isArray(eq) ? eq : [eq];
+    })(),
   });
 
   // Create stream and mark it done immediately (backward compat)

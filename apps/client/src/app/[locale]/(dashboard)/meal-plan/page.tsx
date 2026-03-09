@@ -156,6 +156,7 @@ export default function MealPlanPage() {
   // Meal swap mutation
   const swapMeal = useMutation(api.mealPlans.swapMeal);
   const [swappingKey, setSwappingKey] = useState<string | null>(null);
+  const [swapError, setSwapError] = useState<string | null>(null);
 
   // Generate meal plan action + plan duration config
   const generateMealPlan = useAction(api.ai.generateMealPlan);
@@ -493,6 +494,16 @@ export default function MealPlanPage() {
         </div>
       )}
 
+      {/* Swap error banner */}
+      {swapError && (
+        <div className="border-error-500/30 bg-error-500/10 flex items-center justify-between rounded-lg border px-3 py-2">
+          <p className="text-error-500 text-sm">{swapError}</p>
+          <button onClick={() => setSwapError(null)} className="text-error-500 text-xs font-medium">
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Meals */}
       {dayPlan && (
         <div className="space-y-3">
@@ -649,6 +660,7 @@ export default function MealPlanPage() {
                               e.stopPropagation();
                               if (!mealPlan?._id || isSwapping) return;
                               setSwappingKey(swapKey);
+                              setSwapError(null);
                               try {
                                 await swapMeal({
                                   planId: mealPlan._id,
@@ -658,8 +670,9 @@ export default function MealPlanPage() {
                                 });
                               } catch (err) {
                                 console.error("Swap failed:", err);
+                                setSwapError(err instanceof Error ? err.message : t("swapFailed"));
                               } finally {
-                                setSwappingKey(null);
+                                setSwappingKey((prev) => (prev === swapKey ? null : prev));
                               }
                             };
 

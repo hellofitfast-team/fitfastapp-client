@@ -69,6 +69,7 @@ export function ExerciseManager() {
   const [editingId, setEditingId] = useState<Id<"exerciseDatabase"> | null>(null);
   const [form, setForm] = useState<ExerciseFormData>(INITIAL_FORM);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
   // Queries
@@ -119,6 +120,7 @@ export function ExerciseManager() {
 
   async function handleSave() {
     setSaving(true);
+    setSaveError(null);
     try {
       const splitToArray = (s: string) =>
         s
@@ -153,6 +155,7 @@ export function ExerciseManager() {
       setShowModal(false);
     } catch (err) {
       console.error("Save failed:", err);
+      setSaveError(err instanceof Error ? err.message : t("saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -162,6 +165,9 @@ export function ExerciseManager() {
     setTogglingId(id);
     try {
       await toggleActive({ id });
+    } catch (err) {
+      console.error("Toggle failed:", err);
+      alert(err instanceof Error ? err.message : t("saveFailed"));
     } finally {
       setTogglingId(null);
     }
@@ -169,7 +175,12 @@ export function ExerciseManager() {
 
   async function handleDelete(id: Id<"exerciseDatabase">) {
     if (!confirm(t("deleteConfirm"))) return;
-    await deleteExercise({ id });
+    try {
+      await deleteExercise({ id });
+    } catch (err) {
+      console.error("Delete failed:", err);
+      alert(err instanceof Error ? err.message : t("saveFailed"));
+    }
   }
 
   const isLoading = exercises === undefined;
@@ -208,8 +219,7 @@ export function ExerciseManager() {
       {/* Exercise count */}
       {filteredExercises && (
         <p className="text-sm text-stone-500">
-          {filteredExercises.length}{" "}
-          {t("allCategories").toLowerCase() !== t("allCategories") ? "" : "exercises"}
+          {t("exerciseCount", { count: filteredExercises.length })}
         </p>
       )}
 
@@ -506,6 +516,12 @@ export function ExerciseManager() {
                 />
               </div>
             </div>
+
+            {saveError && (
+              <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                {saveError}
+              </p>
+            )}
 
             <div className="mt-6 flex justify-end gap-3">
               <Button variant="outline" onClick={() => setShowModal(false)}>

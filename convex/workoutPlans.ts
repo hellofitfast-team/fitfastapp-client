@@ -193,7 +193,9 @@ export const swapExercise = mutation({
 
     const currentExercise = exercises[exerciseIndex];
     const currentName = currentExercise.name?.toLowerCase() ?? "";
-    const targetMuscles: string[] = currentExercise.targetMuscles ?? [];
+    const targetMuscles: string[] = Array.isArray(currentExercise.targetMuscles)
+      ? currentExercise.targetMuscles
+      : [];
 
     // Get all exercises already in this day to avoid duplicates
     const usedNames = new Set(exercises.map((e: any) => (e.name ?? "").toLowerCase()));
@@ -215,10 +217,10 @@ export const swapExercise = mutation({
       })
       .map((e) => {
         let score = 0;
-        for (const m of e.primaryMuscles) {
+        for (const m of e.primaryMuscles ?? []) {
           if (targetSet.has(m.toLowerCase())) score += 5;
         }
-        for (const m of e.secondaryMuscles) {
+        for (const m of e.secondaryMuscles ?? []) {
           if (targetSet.has(m.toLowerCase())) score += 1;
         }
         if (e.category === "compound") score += 3;

@@ -661,6 +661,8 @@
     "intermediate": "متوسط",
     "advanced": "متقدم",
     "exerciseSaved": "تم حفظ التمرين بنجاح",
-    "exerciseDeleted": "تم حذف التمرين بنجاح"
+    "exerciseDeleted": "تم حذف التمرين بنجاح",
+    "exerciseCount": "{count} تمرين",
+    "saveFailed": "فشل الحفظ. يرجى المحاولة مرة أخرى."
   }
 }

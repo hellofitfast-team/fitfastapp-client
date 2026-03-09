@@ -182,7 +182,12 @@ export const deleteExercise = mutation({
     const existing = await ctx.db.get(id);
     if (!existing) throw new Error("Exercise not found");
 
-    await ctx.db.delete(id);
+    // Soft-delete: deactivate instead of hard-deleting to preserve referential integrity
+    // (existing workout plans may reference this exercise by name)
+    await ctx.db.patch(id, {
+      isActive: false,
+      updatedAt: Date.now(),
+    });
   },
 });
 

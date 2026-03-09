@@ -196,6 +196,7 @@
     "instructions": "طريقة التحضير",
     "alternatives": "البدائل",
     "swap": "استبدال",
+    "swapFailed": "فشل استبدال الوجبة. يرجى المحاولة مرة أخرى.",
     "markComplete": "تم الإكمال",
     "completed": "مكتمل",
     "todaysMeals": "وجبات اليوم",

@@ -661,6 +661,8 @@
     "intermediate": "Intermediate",
     "advanced": "Advanced",
     "exerciseSaved": "Exercise saved successfully",
-    "exerciseDeleted": "Exercise deleted successfully"
+    "exerciseDeleted": "Exercise deleted successfully",
+    "exerciseCount": "{count} exercises",
+    "saveFailed": "Failed to save. Please try again."
   }
 }

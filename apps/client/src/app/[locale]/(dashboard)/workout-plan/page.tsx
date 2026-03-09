@@ -591,7 +591,7 @@ export default function WorkoutPlanPage() {
                               } catch (err) {
                                 console.error("Swap failed:", err);
                               } finally {
-                                setSwappingKey(null);
+                                setSwappingKey((prev) => (prev === key ? null : prev));
                               }
                             }}
                             className="text-fitness hover:bg-fitness/10 flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
