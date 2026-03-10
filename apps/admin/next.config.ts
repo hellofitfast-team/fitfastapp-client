@@ -14,6 +14,15 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["lucide-react", "@sentry/nextjs", "react-hook-form", "zod"],
   },
 
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.convex.cloud",
+      },
+    ],
+  },
+
   transpilePackages: ["@fitfast/ui", "@fitfast/i18n"],
 
   async headers() {

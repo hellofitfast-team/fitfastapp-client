@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 interface ExerciseGifProps {
   url: string;
@@ -18,13 +19,15 @@ export function ExerciseGif({ url, alt }: ExerciseGifProps) {
       {!loaded && (
         <div className="absolute inset-0 animate-pulse bg-neutral-200 dark:bg-neutral-700" />
       )}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Image
         src={url}
         alt={alt}
+        width={256}
+        height={256}
         className="h-full w-full object-contain"
         onLoad={() => setLoaded(true)}
         onError={() => setError(true)}
+        loading="lazy"
       />
     </div>
   );

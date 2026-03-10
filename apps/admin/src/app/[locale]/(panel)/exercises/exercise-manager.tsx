@@ -9,6 +9,7 @@ import { Button } from "@fitfast/ui/button";
 import { Input } from "@fitfast/ui/input";
 import { cn } from "@fitfast/ui/cn";
 import { Plus, Search, Pencil, Trash2, Power, Loader2, X } from "lucide-react";
+import Image from "next/image";
 
 type Category = "compound" | "accessory" | "isolation" | "warmup" | "cooldown" | "cardio";
 
@@ -270,10 +271,13 @@ export function ExerciseManager() {
                 >
                   <td className="px-4 py-3">
                     {exercise.imageUrl ? (
-                      <img
+                      <Image
                         src={exercise.imageUrl}
                         alt={exercise.name}
-                        className="h-10 w-10 rounded-md border border-stone-200 object-contain"
+                        width={40}
+                        height={40}
+                        className="rounded-md border border-stone-200 object-contain"
+                        loading="lazy"
                       />
                     ) : (
                       <div className="flex h-10 w-10 items-center justify-center rounded-md border border-dashed border-stone-200 text-xs text-stone-300">
@@ -507,10 +511,12 @@ export function ExerciseManager() {
                         <p className="mb-1 text-xs font-medium text-stone-600">
                           {t("currentImage")}
                         </p>
-                        <img
+                        <Image
                           src={editExercise.imageUrl}
                           alt={editExercise.name}
-                          className="h-32 w-32 rounded-lg border border-stone-200 object-contain"
+                          width={128}
+                          height={128}
+                          className="rounded-lg border border-stone-200 object-contain"
                         />
                       </div>
                     ) : null;
