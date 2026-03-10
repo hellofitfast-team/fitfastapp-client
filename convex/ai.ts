@@ -605,12 +605,13 @@ async function generateMealPlanHandler(
   // Defense in depth: ensure planDuration is always at least 1
   const safeDuration = Math.max(planDuration, 1);
 
-  // --- DEMO MODE: skip AI when no API keys are configured ---
+  // --- DEMO MODE: skip AI when explicitly enabled or no API keys are configured ---
+  const demoMode = process.env.DEMO_MODE === "true";
   const hasGoogleKey = !!process.env.GOOGLE_GENERATIVE_AI_API_KEY;
   const hasDeepSeekKey = !!process.env.DEEPSEEK_API_KEY;
-  if (!hasGoogleKey && !hasDeepSeekKey) {
+  if (demoMode || (!hasGoogleKey && !hasDeepSeekKey)) {
     console.warn(
-      `[AI] DEMO MODE: No AI API keys configured — generating mock meal plan for user ${userId}`,
+      `[AI] DEMO MODE: ${demoMode ? "Explicitly enabled" : "No AI API keys configured"} — generating mock meal plan for user ${userId}`,
     );
     const clientCtx = await fetchClientContextWithRetry(ctx, userId, checkInId);
     return generateDemoMealPlan(ctx, { userId, checkInId, language, safeDuration, clientCtx });

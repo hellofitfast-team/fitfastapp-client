@@ -17,7 +17,7 @@ import { cn } from "@fitfast/ui/cn";
 import { useQuery, useAction, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { usePlanStream } from "@/hooks/use-plan-stream";
-import { MuscleMap } from "@/components/workout/MuscleMap";
+
 import { EmptyState } from "@fitfast/ui/empty-state";
 import { DayNavigator } from "../meal-plan/_components/day-navigator";
 import { ExerciseGif } from "./_components/exercise-gif";
@@ -434,53 +434,32 @@ export default function WorkoutPlanPage() {
             <RestDayView t={t} prevWorkout={findPrevWorkout()} nextWorkout={findNextWorkout()} />
           ) : (
             <>
-              {/* Condensed Summary Card — muscle map + stats in one card */}
+              {/* Condensed Summary Card — stats */}
               <div className="border-border bg-card shadow-card animate-slide-up rounded-xl border p-4">
-                <div className="flex items-center gap-4">
-                  {/* Muscle map (compact) */}
-                  {dayPlan.targetMuscles && dayPlan.targetMuscles.length > 0 && (
-                    <div className="hidden shrink-0 sm:block">
-                      <MuscleMap
-                        targetMuscles={dayPlan.targetMuscles}
-                        className="flex justify-center [&_svg]:h-16 [&_svg]:w-16"
-                      />
-                    </div>
-                  )}
-                  {/* Stats grid */}
-                  <div className="flex flex-1 items-center">
-                    <div className="flex-1 text-center">
-                      <p className="text-sm font-bold sm:text-base">
-                        {Array.isArray(dayPlan.targetMuscles)
-                          ? dayPlan.targetMuscles.join(", ")
-                          : "-"}
-                      </p>
-                      <p className="text-muted-foreground text-[10px]">{t("targetMuscles")}</p>
-                    </div>
-                    <div className="bg-border h-8 w-px" />
-                    <div className="flex-1 text-center">
-                      <p className="text-sm font-bold sm:text-base">
-                        {toLocalDigits(dayPlan.exercises?.length || 0, locale)}
-                      </p>
-                      <p className="text-muted-foreground text-[10px]">{t("exercises")}</p>
-                    </div>
-                    <div className="bg-border h-8 w-px" />
-                    <div className="flex-1 text-center">
-                      <p className="text-sm font-bold sm:text-base">
-                        {dayPlan.duration ? toLocalDigits(dayPlan.duration, locale) : "-"}
-                      </p>
-                      <p className="text-muted-foreground text-[10px]">{t("duration")}</p>
-                    </div>
+                <div className="flex flex-1 items-center">
+                  <div className="flex-1 text-center">
+                    <p className="text-sm font-bold sm:text-base">
+                      {Array.isArray(dayPlan.targetMuscles)
+                        ? dayPlan.targetMuscles.join(", ")
+                        : "-"}
+                    </p>
+                    <p className="text-muted-foreground text-[10px]">{t("targetMuscles")}</p>
+                  </div>
+                  <div className="bg-border h-8 w-px" />
+                  <div className="flex-1 text-center">
+                    <p className="text-sm font-bold sm:text-base">
+                      {toLocalDigits(dayPlan.exercises?.length || 0, locale)}
+                    </p>
+                    <p className="text-muted-foreground text-[10px]">{t("exercises")}</p>
+                  </div>
+                  <div className="bg-border h-8 w-px" />
+                  <div className="flex-1 text-center">
+                    <p className="text-sm font-bold sm:text-base">
+                      {dayPlan.duration ? toLocalDigits(dayPlan.duration, locale) : "-"}
+                    </p>
+                    <p className="text-muted-foreground text-[10px]">{t("duration")}</p>
                   </div>
                 </div>
-                {/* Mobile-only muscle map below stats */}
-                {dayPlan.targetMuscles && dayPlan.targetMuscles.length > 0 && (
-                  <div className="mt-3 sm:hidden">
-                    <MuscleMap
-                      targetMuscles={dayPlan.targetMuscles}
-                      className="flex justify-center"
-                    />
-                  </div>
-                )}
               </div>
 
               {/* Warmup (collapsed by default) */}
@@ -619,31 +598,23 @@ export default function WorkoutPlanPage() {
                         )}
                       >
                         <div className="border-border space-y-3 border-t px-3.5 pt-3 pb-3.5">
-                          {/* Exercise GIF */}
+                          {/* Exercise image — prefer new AI-generated images over old external URLs */}
                           {exercise.exerciseDbId &&
                             exerciseMedia[exercise.exerciseDbId] &&
-                            (exerciseMedia[exercise.exerciseDbId].gifUrl ||
-                              exerciseMedia[exercise.exerciseDbId].gifStorageUrl) && (
+                            (exerciseMedia[exercise.exerciseDbId].gifStorageUrl ||
+                              exerciseMedia[exercise.exerciseDbId].gifUrl) && (
                               <ExerciseGif
                                 url={
-                                  (exerciseMedia[exercise.exerciseDbId].gifUrl ||
-                                    exerciseMedia[exercise.exerciseDbId].gifStorageUrl)!
+                                  (exerciseMedia[exercise.exerciseDbId].gifStorageUrl ||
+                                    exerciseMedia[exercise.exerciseDbId].gifUrl)!
                                 }
                                 alt={exercise.name}
                               />
                             )}
 
-                          {/* Muscle body map visualization */}
+                          {/* Muscle tags */}
                           {exercise.targetMuscles && exercise.targetMuscles.length > 0 && (
-                            <MuscleMap
-                              targetMuscles={exercise.targetMuscles}
-                              className="flex justify-center"
-                            />
-                          )}
-
-                          {/* Muscle tags (visible on mobile when expanded) */}
-                          {exercise.targetMuscles && exercise.targetMuscles.length > 0 && (
-                            <div className="flex flex-wrap gap-1 sm:hidden">
+                            <div className="flex flex-wrap gap-1">
                               {exercise.targetMuscles.map((muscle: string, mi: number) => (
                                 <span
                                   key={mi}

@@ -161,9 +161,9 @@ const DAY_LABEL_MUSCLES: Record<string, string[]> = {
 
 /** Exercise count ranges per experience level. */
 const EXERCISE_COUNTS: Record<string, { min: number; max: number }> = {
-  beginner: { min: 4, max: 5 },
-  intermediate: { min: 5, max: 6 },
-  advanced: { min: 6, max: 8 },
+  beginner: { min: 6, max: 8 },
+  intermediate: { min: 7, max: 9 },
+  advanced: { min: 8, max: 10 },
 };
 
 /** Goal-based programming parameters. */
@@ -289,7 +289,7 @@ function selectExercisesForDay(
   const levelRank = DIFFICULTY_RANK[input.experienceLevel] ?? 0;
 
   // Filter eligible exercises (main categories only)
-  const eligible = allExercises.filter(
+  let eligible = allExercises.filter(
     (ex) =>
       ex.isActive &&
       (ex.category === "compound" ||
@@ -300,6 +300,20 @@ function selectExercisesForDay(
       !hasInjuryConflict(ex, input.injuries) &&
       equipmentAvailable(ex, input.availableEquipment),
   );
+
+  // Fallback: if too few exercises pass the strict filter, relax difficulty constraint
+  if (eligible.length < 6) {
+    eligible = allExercises.filter(
+      (ex) =>
+        ex.isActive &&
+        (ex.category === "compound" ||
+          ex.category === "accessory" ||
+          ex.category === "isolation" ||
+          ex.category === "cardio") &&
+        !hasInjuryConflict(ex, input.injuries) &&
+        equipmentAvailable(ex, input.availableEquipment),
+    );
+  }
 
   // Score and sort
   const scored = eligible

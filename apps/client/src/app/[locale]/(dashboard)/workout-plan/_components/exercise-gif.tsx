@@ -15,19 +15,21 @@ export function ExerciseGif({ url, alt }: ExerciseGifProps) {
   if (error || !/^https:\/\/.+/.test(url)) return null;
 
   return (
-    <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-800">
+    <div className="relative w-full overflow-hidden rounded-lg">
       {!loaded && (
-        <div className="absolute inset-0 animate-pulse bg-neutral-200 dark:bg-neutral-700" />
+        <div className="aspect-[4/3] w-full animate-pulse rounded-lg bg-neutral-200 dark:bg-neutral-700" />
       )}
       <Image
         src={url}
         alt={alt}
-        width={256}
-        height={256}
-        className="h-full w-full object-contain"
+        width={512}
+        height={384}
+        sizes="(max-width: 640px) 100vw, 400px"
+        className={`h-auto w-full rounded-lg ${loaded ? "block" : "hidden"}`}
         onLoad={() => setLoaded(true)}
         onError={() => setError(true)}
         loading="lazy"
+        quality={75}
       />
     </div>
   );
