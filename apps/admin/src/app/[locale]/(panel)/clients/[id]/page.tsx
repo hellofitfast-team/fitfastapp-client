@@ -25,6 +25,7 @@ import {
   MinusCircle,
   Bell,
   Send,
+  ChevronDown,
 } from "lucide-react";
 import { Link } from "@fitfast/i18n/navigation";
 import { formatDate } from "@/lib/utils";
@@ -148,6 +149,233 @@ function SignupPaymentCard({ signup }: { signup: SignupRecord }) {
           )}
         </dl>
       </div>
+    </div>
+  );
+}
+
+function AssessmentCard({
+  assessment,
+}: {
+  assessment: Record<string, unknown> | null | undefined;
+}) {
+  const t = useTranslations("admin");
+  const tA = useTranslations("assessmentDetails");
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="rounded-xl border border-stone-200 bg-white p-5">
+      <div className="mb-4 flex items-center gap-2">
+        <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-lg">
+          <TrendingUp className="h-4 w-4" />
+        </div>
+        <h2 className="text-sm font-semibold text-stone-900">{t("clientDetail.assessment")}</h2>
+      </div>
+      {assessment ? (
+        <div>
+          <dl className="space-y-2.5 text-sm">
+            <div className="flex justify-between">
+              <dt className="text-stone-500">{t("clientDetail.weight")}</dt>
+              <dd className="text-stone-900">{(assessment.currentWeight as number) ?? "---"} kg</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-stone-500">{t("clientDetail.height")}</dt>
+              <dd className="text-stone-900">{(assessment.height as number) ?? "---"} cm</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-stone-500">{t("clientDetail.level")}</dt>
+              <dd className="text-stone-900 capitalize">
+                {(assessment.experienceLevel as string) ?? "---"}
+              </dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-stone-500">{t("clientDetail.goals")}</dt>
+              <dd className="max-w-[120px] truncate text-stone-900">
+                {(assessment.goals as string) ?? "---"}
+              </dd>
+            </div>
+          </dl>
+
+          {/* Expandable details */}
+          <button
+            type="button"
+            onClick={() => setExpanded(!expanded)}
+            className="mt-3 flex w-full items-center justify-center gap-1 rounded-lg py-1.5 text-xs font-medium text-stone-400 transition-colors hover:text-stone-600"
+          >
+            {expanded ? tA("showLess") : tA("showMore")}
+            <ChevronDown
+              className={`h-3.5 w-3.5 transition-transform ${expanded ? "rotate-180" : ""}`}
+            />
+          </button>
+
+          {expanded && (
+            <dl className="mt-2 space-y-2.5 border-t border-stone-100 pt-3 text-sm">
+              {assessment.age != null && (
+                <div className="flex justify-between">
+                  <dt className="text-stone-500">{tA("age")}</dt>
+                  <dd className="text-stone-900">{assessment.age as number}</dd>
+                </div>
+              )}
+              {assessment.gender != null && (
+                <div className="flex justify-between">
+                  <dt className="text-stone-500">{tA("gender")}</dt>
+                  <dd className="text-stone-900 capitalize">{assessment.gender as string}</dd>
+                </div>
+              )}
+              {assessment.activityLevel != null && (
+                <div className="flex justify-between">
+                  <dt className="text-stone-500">{tA("activityLevel")}</dt>
+                  <dd className="text-stone-900 capitalize">
+                    {(assessment.activityLevel as string).replace("_", " ")}
+                  </dd>
+                </div>
+              )}
+              {assessment.exerciseHistory != null && (
+                <div className="flex justify-between">
+                  <dt className="text-stone-500">{tA("exerciseHistory")}</dt>
+                  <dd className="max-w-[140px] truncate text-stone-900">
+                    {assessment.exerciseHistory as string}
+                  </dd>
+                </div>
+              )}
+              {/* Schedule */}
+              {assessment.scheduleAvailability != null && (
+                <div>
+                  <dt className="mb-1 text-stone-500">{tA("schedule")}</dt>
+                  <dd className="rounded-lg bg-stone-50 p-2.5 text-xs text-stone-700">
+                    {(() => {
+                      const sched = assessment.scheduleAvailability as {
+                        days?: string[];
+                        sessionDuration?: number;
+                        preferredTime?: string;
+                      };
+                      const parts: string[] = [];
+                      if (sched.days?.length) parts.push(sched.days.join(", "));
+                      if (sched.sessionDuration) parts.push(`${sched.sessionDuration} min`);
+                      if (sched.preferredTime) parts.push(sched.preferredTime);
+                      return parts.join(" · ") || "---";
+                    })()}
+                  </dd>
+                </div>
+              )}
+              {/* Measurements */}
+              {assessment.measurements != null && (
+                <div>
+                  <dt className="mb-1 text-stone-500">{tA("measurements")}</dt>
+                  <dd className="flex flex-wrap gap-2">
+                    {Object.entries(assessment.measurements as Record<string, number | undefined>)
+                      .filter(([, v]) => v != null)
+                      .map(([key, val]) => (
+                        <span
+                          key={key}
+                          className="inline-flex rounded-md bg-stone-50 px-2 py-0.5 text-xs text-stone-700"
+                        >
+                          {tA(`measurement_${key}`)}: {val} cm
+                        </span>
+                      ))}
+                  </dd>
+                </div>
+              )}
+              {/* Array fields: food preferences, allergies, restrictions, conditions, injuries */}
+              {(assessment.foodPreferences as string[] | undefined)?.length ? (
+                <div>
+                  <dt className="mb-1 text-stone-500">{tA("foodPreferences")}</dt>
+                  <dd className="flex flex-wrap gap-1.5">
+                    {(assessment.foodPreferences as string[]).map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              ) : null}
+              {(assessment.allergies as string[] | undefined)?.length ? (
+                <div>
+                  <dt className="mb-1 text-stone-500">{tA("allergies")}</dt>
+                  <dd className="flex flex-wrap gap-1.5">
+                    {(assessment.allergies as string[]).map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-full bg-red-50 px-2 py-0.5 text-xs text-red-700"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              ) : null}
+              {(assessment.dietaryRestrictions as string[] | undefined)?.length ? (
+                <div>
+                  <dt className="mb-1 text-stone-500">{tA("dietaryRestrictions")}</dt>
+                  <dd className="flex flex-wrap gap-1.5">
+                    {(assessment.dietaryRestrictions as string[]).map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-full bg-amber-50 px-2 py-0.5 text-xs text-amber-700"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              ) : null}
+              {(assessment.medicalConditions as string[] | undefined)?.length ? (
+                <div>
+                  <dt className="mb-1 text-stone-500">{tA("medicalConditions")}</dt>
+                  <dd className="flex flex-wrap gap-1.5">
+                    {(assessment.medicalConditions as string[]).map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-full bg-purple-50 px-2 py-0.5 text-xs text-purple-700"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              ) : null}
+              {(assessment.injuries as string[] | undefined)?.length ? (
+                <div>
+                  <dt className="mb-1 text-stone-500">{tA("injuries")}</dt>
+                  <dd className="flex flex-wrap gap-1.5">
+                    {(assessment.injuries as string[]).map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-full bg-red-50 px-2 py-0.5 text-xs text-red-700"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              ) : null}
+              {/* Lifestyle habits */}
+              {assessment.lifestyleHabits != null && (
+                <div>
+                  <dt className="mb-1 text-stone-500">{tA("lifestyle")}</dt>
+                  <dd className="rounded-lg bg-stone-50 p-2.5 text-xs text-stone-700">
+                    {(() => {
+                      const habits = assessment.lifestyleHabits as {
+                        equipment?: string;
+                        mealsPerDay?: number;
+                      };
+                      const parts: string[] = [];
+                      if (habits.equipment) parts.push(`${tA("equipment")}: ${habits.equipment}`);
+                      if (habits.mealsPerDay)
+                        parts.push(`${tA("mealsPerDay")}: ${habits.mealsPerDay}`);
+                      return parts.join(" · ") || "---";
+                    })()}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          )}
+        </div>
+      ) : (
+        <p className="text-sm text-stone-400">{t("clientDetail.noAssessment")}</p>
+      )}
     </div>
   );
 }
@@ -553,39 +781,8 @@ export default function ClientDetailPage() {
           </dl>
         </div>
 
-        {/* Assessment summary */}
-        <div className="rounded-xl border border-stone-200 bg-white p-5">
-          <div className="mb-4 flex items-center gap-2">
-            <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-lg">
-              <TrendingUp className="h-4 w-4" />
-            </div>
-            <h2 className="text-sm font-semibold text-stone-900">{t("clientDetail.assessment")}</h2>
-          </div>
-          {assessment ? (
-            <dl className="space-y-2.5 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-stone-500">{t("clientDetail.weight")}</dt>
-                <dd className="text-stone-900">{assessment.currentWeight ?? "---"} kg</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-stone-500">{t("clientDetail.height")}</dt>
-                <dd className="text-stone-900">{assessment.height ?? "---"} cm</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-stone-500">{t("clientDetail.level")}</dt>
-                <dd className="text-stone-900 capitalize">{assessment.experienceLevel ?? "---"}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-stone-500">{t("clientDetail.goals")}</dt>
-                <dd className="max-w-[120px] truncate text-stone-900">
-                  {assessment.goals ?? "---"}
-                </dd>
-              </div>
-            </dl>
-          ) : (
-            <p className="text-sm text-stone-400">{t("clientDetail.noAssessment")}</p>
-          )}
-        </div>
+        {/* Assessment summary with expandable details */}
+        <AssessmentCard assessment={assessment} />
 
         {/* Payment history — shown for all clients */}
         <div className="rounded-xl border border-stone-200 bg-white p-5 lg:col-span-2">

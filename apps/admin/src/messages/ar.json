@@ -699,5 +699,28 @@
     "totalTickets": "إجمالي التذاكر",
     "lastTicket": "آخر تذكرة",
     "noTickets": "لا توجد تذاكر"
+  },
+  "assessmentDetails": {
+    "showMore": "عرض المزيد من التفاصيل",
+    "showLess": "عرض أقل",
+    "age": "العمر",
+    "gender": "الجنس",
+    "activityLevel": "مستوى النشاط",
+    "exerciseHistory": "تاريخ التمارين",
+    "schedule": "الجدول المتاح",
+    "measurements": "قياسات الجسم",
+    "measurement_chest": "الصدر",
+    "measurement_waist": "الخصر",
+    "measurement_hips": "الأرداف",
+    "measurement_arms": "الذراعين",
+    "measurement_thighs": "الفخذين",
+    "foodPreferences": "تفضيلات الطعام",
+    "allergies": "الحساسية",
+    "dietaryRestrictions": "القيود الغذائية",
+    "medicalConditions": "الحالات الطبية",
+    "injuries": "الإصابات",
+    "lifestyle": "نمط الحياة",
+    "equipment": "المعدات",
+    "mealsPerDay": "الوجبات/يوم"
   }
 }

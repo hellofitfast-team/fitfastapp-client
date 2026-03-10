@@ -699,5 +699,28 @@
     "totalTickets": "Total Tickets",
     "lastTicket": "Last Ticket",
     "noTickets": "No tickets"
+  },
+  "assessmentDetails": {
+    "showMore": "Show more details",
+    "showLess": "Show less",
+    "age": "Age",
+    "gender": "Gender",
+    "activityLevel": "Activity Level",
+    "exerciseHistory": "Exercise History",
+    "schedule": "Schedule Availability",
+    "measurements": "Body Measurements",
+    "measurement_chest": "Chest",
+    "measurement_waist": "Waist",
+    "measurement_hips": "Hips",
+    "measurement_arms": "Arms",
+    "measurement_thighs": "Thighs",
+    "foodPreferences": "Food Preferences",
+    "allergies": "Allergies",
+    "dietaryRestrictions": "Dietary Restrictions",
+    "medicalConditions": "Medical Conditions",
+    "injuries": "Injuries",
+    "lifestyle": "Lifestyle",
+    "equipment": "Equipment",
+    "mealsPerDay": "Meals/Day"
   }
 }
