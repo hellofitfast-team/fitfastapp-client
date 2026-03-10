@@ -225,6 +225,16 @@ function equipmentAvailable(ex: Exercise, available: string[] | undefined): bool
   return ex.equipment.some((eq) => set.has(eq.toLowerCase()));
 }
 
+function muscleMatchesTarget(ex: Exercise, targetSet: Set<string>): boolean {
+  for (const m of ex.primaryMuscles) {
+    if (targetSet.has(m.toLowerCase())) return true;
+  }
+  for (const m of ex.secondaryMuscles) {
+    if (targetSet.has(m.toLowerCase())) return true;
+  }
+  return false;
+}
+
 function goalParams(goal: string) {
   const key = goal.toLowerCase();
   if (key.includes("strength") || key.includes("قوة")) return GOAL_PARAMS.strength!;
@@ -266,14 +276,14 @@ function scoreExercise(ex: Exercise, targetMuscles: string[]): number {
   else if (ex.category === "accessory") score += 3;
   else if (ex.category === "isolation") score += 1;
 
-  // Primary muscle match
+  // Primary muscle match (strong signal — must outrank category bonus alone)
   for (const m of ex.primaryMuscles) {
-    if (targetSet.has(m.toLowerCase())) score += 5;
+    if (targetSet.has(m.toLowerCase())) score += 20;
   }
 
-  // Secondary muscle match (smaller bonus)
+  // Secondary muscle match
   for (const m of ex.secondaryMuscles) {
-    if (targetSet.has(m.toLowerCase())) score += 1;
+    if (targetSet.has(m.toLowerCase())) score += 5;
   }
 
   // Stable sort tiebreaker
@@ -330,9 +340,14 @@ function selectExercisesForDay(
   }
 
   // Score and sort
+  const targetSet = new Set(targetMuscles.map((m) => m.toLowerCase()));
   const scored = eligible
     .map((ex) => ({ ex, score: scoreExercise(ex, targetMuscles) }))
     .sort((a, b) => b.score - a.score);
+
+  // Partition: muscle-matched exercises vs non-matched
+  const matched = scored.filter((s) => muscleMatchesTarget(s.ex, targetSet));
+  const unmatched = scored.filter((s) => !muscleMatchesTarget(s.ex, targetSet));
 
   // Determine count based on session duration if available, otherwise use level-based ranges
   const range = EXERCISE_COUNTS[input.experienceLevel] ?? EXERCISE_COUNTS.intermediate!;
@@ -349,10 +364,12 @@ function selectExercisesForDay(
     count = range.max;
   }
 
-  // Low adherence: reduce to 3-4 compounds only
+  // Low adherence: reduce to 3-4 compounds only (prefer matched muscles)
   const lowAdherence = input.adherenceLevel != null && input.adherenceLevel < 50;
   if (lowAdherence) {
-    const compounds = scored.filter((s) => s.ex.category === "compound");
+    const compounds = matched
+      .filter((s) => s.ex.category === "compound")
+      .concat(unmatched.filter((s) => s.ex.category === "compound"));
     return compounds.slice(0, Math.min(4, Math.max(3, compounds.length))).map((s) => s.ex);
   }
 
@@ -364,7 +381,13 @@ function selectExercisesForDay(
     count = Math.max(range.min - 1, Math.round(count * 0.8));
   }
 
-  return scored.slice(0, count).map((s) => s.ex);
+  // Two-pass: fill from matched first, supplement from unmatched only if needed
+  const selected = matched.slice(0, count);
+  if (selected.length < count) {
+    selected.push(...unmatched.slice(0, count - selected.length));
+  }
+
+  return selected.map((s) => s.ex);
 }
 
 function selectWarmupExercises(

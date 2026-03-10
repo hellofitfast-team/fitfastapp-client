@@ -190,6 +190,28 @@ export const processPdfUpload = internalAction({
   },
 });
 
+/** Re-embed all knowledge entries. Run after changing embedding model/dimension. */
+export const reEmbedAll = internalAction({
+  args: {},
+  handler: async (ctx): Promise<void> => {
+    const entries = await ctx.runQuery(internal.knowledgeBase.listAllEntryIds);
+    console.log(`[RAG] Re-embedding ${entries.length} entries...`);
+    const failures: string[] = [];
+    for (const entryId of entries) {
+      try {
+        await ctx.runAction(internal.knowledgeBaseActions.embedEntry, { entryId });
+      } catch (err) {
+        console.error(`[RAG] Failed to re-embed ${entryId}:`, err);
+        failures.push(entryId);
+      }
+    }
+    console.log(`[RAG] Re-embedding complete. Failures: ${failures.length}/${entries.length}`);
+    if (failures.length > 0) {
+      console.warn(`[RAG] Failed entry IDs: ${failures.join(", ")}`);
+    }
+  },
+});
+
 export const removeFromRag = internalAction({
   args: { key: v.string() },
   handler: async (ctx, { key }): Promise<void> => {
