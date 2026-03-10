@@ -662,7 +662,9 @@
     "exerciseDeleted": "تم حذف التمرين بنجاح",
     "exerciseCount": "{count} تمرين",
     "saveFailed": "فشل الحفظ. يرجى المحاولة مرة أخرى.",
-    "gifUrl": "رابط الصورة المتحركة",
+    "image": "صورة",
+    "currentImage": "الصورة الحالية",
+    "gifUrl": "رابط صورة مخصص (اختياري)",
     "gifUrlPlaceholder": "https://example.com/exercise.gif",
     "gifPreview": "معاينة",
     "removeGif": "إزالة"

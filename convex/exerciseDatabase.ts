@@ -59,11 +59,24 @@ export const listExercises = query({
 
     // Sort by category then sortOrder
     const categoryOrder = ["compound", "accessory", "isolation", "warmup", "cooldown", "cardio"];
-    return exercises.sort((a, b) => {
+    const sorted = exercises.sort((a, b) => {
       const catDiff = categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category);
       if (catDiff !== 0) return catDiff;
       return (a.sortOrder ?? 9999) - (b.sortOrder ?? 9999);
     });
+
+    // Resolve gifStorageId → URL for admin thumbnail display
+    return Promise.all(
+      sorted.map(async (ex) => {
+        let imageUrl: string | undefined;
+        if (ex.gifUrl) {
+          imageUrl = ex.gifUrl;
+        } else if (ex.gifStorageId) {
+          imageUrl = (await ctx.storage.getUrl(ex.gifStorageId)) ?? undefined;
+        }
+        return { ...ex, imageUrl };
+      }),
+    );
   },
 });
 

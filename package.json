@@ -46,6 +46,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",
+    "@google/genai": "^1.44.0",
     "@playwright/test": "^1.58.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -55,11 +56,14 @@
     "convex-test": "^0.0.41",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
+    "imagetracerjs": "^1.2.6",
     "jsdom": "^28.1.0",
     "lint-staged": "^16.2.7",
     "pino-pretty": "^13.0.0",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
+    "sharp": "^0.34.5",
+    "svgo": "^4.0.1",
     "turbo": "^2.5.4",
     "vitest": "^4.0.18"
   },

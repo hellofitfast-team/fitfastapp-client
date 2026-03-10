@@ -662,7 +662,9 @@
     "exerciseDeleted": "Exercise deleted successfully",
     "exerciseCount": "{count} exercises",
     "saveFailed": "Failed to save. Please try again.",
-    "gifUrl": "GIF URL",
+    "image": "Image",
+    "currentImage": "Current Image",
+    "gifUrl": "GIF URL (override)",
     "gifUrlPlaceholder": "https://example.com/exercise.gif",
     "gifPreview": "Preview",
     "removeGif": "Remove"

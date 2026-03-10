@@ -239,6 +239,9 @@ export function ExerciseManager() {
           <table className="w-full text-sm">
             <thead className="bg-stone-50">
               <tr>
+                <th className="w-14 px-4 py-3 text-start font-medium text-stone-600">
+                  {t("image")}
+                </th>
                 <th className="px-4 py-3 text-start font-medium text-stone-600">{t("name")}</th>
                 <th className="hidden px-4 py-3 text-start font-medium text-stone-600 md:table-cell">
                   {t("nameAr")}
@@ -263,6 +266,19 @@ export function ExerciseManager() {
                     !exercise.isActive && "opacity-50",
                   )}
                 >
+                  <td className="px-4 py-3">
+                    {exercise.imageUrl ? (
+                      <img
+                        src={exercise.imageUrl}
+                        alt={exercise.name}
+                        className="h-10 w-10 rounded-md border border-stone-200 object-contain"
+                      />
+                    ) : (
+                      <div className="flex h-10 w-10 items-center justify-center rounded-md border border-dashed border-stone-200 text-xs text-stone-300">
+                        —
+                      </div>
+                    )}
+                  </td>
                   <td className="px-4 py-3 font-medium">{exercise.name}</td>
                   <td className="hidden px-4 py-3 text-stone-500 md:table-cell" dir="rtl">
                     {exercise.nameAr}
@@ -480,6 +496,23 @@ export function ExerciseManager() {
               </div>
 
               <div className="md:col-span-2">
+                {/* Show stored image if it exists */}
+                {editingId &&
+                  (() => {
+                    const editExercise = filteredExercises?.find((e) => e._id === editingId);
+                    return editExercise?.imageUrl && !form.gifUrl.trim() ? (
+                      <div className="mb-3">
+                        <p className="mb-1 text-xs font-medium text-stone-600">
+                          {t("currentImage")}
+                        </p>
+                        <img
+                          src={editExercise.imageUrl}
+                          alt={editExercise.name}
+                          className="h-32 w-32 rounded-lg border border-stone-200 object-contain"
+                        />
+                      </div>
+                    ) : null;
+                  })()}
                 <label className="mb-1 block text-xs font-medium text-stone-600">
                   {t("gifUrl")}
                 </label>
