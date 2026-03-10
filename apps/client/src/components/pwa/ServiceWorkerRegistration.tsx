@@ -31,6 +31,17 @@ export function ServiceWorkerRegistration() {
             }
           });
         });
+
+        // Check for SW updates every 30 minutes while the app is open
+        const UPDATE_INTERVAL_MS = 30 * 60 * 1000;
+        setInterval(() => registration.update(), UPDATE_INTERVAL_MS);
+
+        // Also check for updates when the app regains focus (user switches back to the PWA)
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "visible") {
+            registration.update();
+          }
+        });
       })
       .catch((err) => {
         console.error("SW registration failed:", err);

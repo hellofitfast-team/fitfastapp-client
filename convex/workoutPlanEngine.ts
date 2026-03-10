@@ -46,6 +46,7 @@ export interface WorkoutPlanInput {
   previousPlan: any | null;
   language: "en" | "ar";
   availableEquipment?: string[];
+  gender?: "male" | "female";
 }
 
 // ---------------------------------------------------------------------------
@@ -482,26 +483,36 @@ function buildRestDay(lang: "en" | "ar"): RestDay {
 // ---------------------------------------------------------------------------
 
 function generateProgressionNotes(input: WorkoutPlanInput): string {
-  const { language: lang, experienceLevel, goal } = input;
+  const { language: lang, experienceLevel, goal, gender } = input;
   if (lang === "ar") {
     const goalText =
       goal.toLowerCase().includes("strength") || goal.includes("قوة")
         ? "زيادة الأوزان تدريجياً"
         : "زيادة التكرارات أو المجموعات تدريجياً";
-    return `ركز على ${goalText} كل أسبوع. حافظ على الأداء الصحيح قبل زيادة الحمل.`;
+    let note = `ركز على ${goalText} كل أسبوع. حافظ على الأداء الصحيح قبل زيادة الحمل.`;
+    if (gender === "female") {
+      note +=
+        " ملاحظة: من الطبيعي أن يتغير أداؤك خلال الشهر بسبب الدورة الشهرية — استمعي لجسمك وعدّلي الشدة حسب الحاجة.";
+    }
+    return note;
   }
   const goalText = goal.toLowerCase().includes("strength")
     ? "increasing weight gradually"
     : "adding reps or sets progressively";
-  return `Focus on ${goalText} each week. Maintain proper form before increasing load. ${
+  let note = `Focus on ${goalText} each week. Maintain proper form before increasing load. ${
     experienceLevel === "beginner"
       ? "Master movement patterns first."
       : "Track your lifts to ensure consistent progress."
   }`;
+  if (gender === "female") {
+    note +=
+      " Note: Performance naturally fluctuates throughout your menstrual cycle — listen to your body and adjust intensity as needed. This is normal and not a setback.";
+  }
+  return note;
 }
 
 function generateSafetyTips(input: WorkoutPlanInput): string[] {
-  const { language: lang, injuries } = input;
+  const { language: lang, injuries, gender } = input;
   if (lang === "ar") {
     const tips = [
       "قم بالإحماء دائماً قبل التمرين",
@@ -511,6 +522,14 @@ function generateSafetyTips(input: WorkoutPlanInput): string[] {
     ];
     if (injuries.length > 0) {
       tips.push("تجنب التمارين التي تسبب ألماً في المناطق المصابة");
+    }
+    if (gender === "female") {
+      tips.push(
+        "أثناء الدورة الشهرية: خففي شدة التمرين إذا شعرتِ بتعب أو تقلصات، ولا بأس من تقليل الأوزان",
+      );
+      tips.push(
+        "ركزي على تمارين الإحماء والتمدد بشكل أكبر خلال فترة ما قبل الدورة للتخفيف من الانتفاخ والتشنجات",
+      );
     }
     return tips;
   }
@@ -523,6 +542,14 @@ function generateSafetyTips(input: WorkoutPlanInput): string[] {
   if (injuries.length > 0) {
     tips.push(
       "Avoid exercises that cause pain in injured areas and consult your coach if discomfort persists",
+    );
+  }
+  if (gender === "female") {
+    tips.push(
+      "During your menstrual cycle: reduce intensity if you feel fatigued or experience cramps — lighter weights and fewer sets are perfectly fine",
+    );
+    tips.push(
+      "Focus on extra warm-up and stretching during premenstrual days to help with bloating and cramps",
     );
   }
   return tips;

@@ -673,6 +673,22 @@ async function generateMealPlanHandler(
   const isArabic = language === "ar";
 
   const contextBlock = formatContextForPrompt(clientCtx);
+  const isFemale = assessment.gender === "female";
+
+  // Female-specific nutritional guidelines injected when client is female
+  const femaleNutritionBlock = isFemale
+    ? `
+FEMALE-SPECIFIC NUTRITION GUIDELINES (MANDATORY for this client):
+- IRON: Include iron-rich foods daily (red meat 2-3x/week, lentils, spinach, molasses, fortified cereals). Pair with vitamin C sources (lemon, tomato, bell pepper) to boost absorption. Menstrual blood loss increases iron needs to ~18mg/day.
+- CALCIUM & VITAMIN D: Target 1000mg calcium/day — include dairy (yogurt, labneh, white cheese), tahini, sardines, or fortified alternatives. Recommend sun exposure or supplementation note for vitamin D.
+- FOLATE: Include folate-rich foods (dark leafy greens, lentils, chickpeas, fortified grains) — important for women of reproductive age.
+- HORMONAL CYCLE AWARENESS: During luteal phase (days 15-28), women may experience increased appetite and cravings — include slightly more complex carbs and magnesium-rich foods (dark chocolate, nuts, bananas) to manage PMS symptoms.
+- BLOATING & PMS: Include anti-inflammatory foods (ginger, turmeric, omega-3 from fish/flaxseed), limit excess sodium during premenstrual days, and include potassium-rich foods (bananas, sweet potatoes, avocado).
+- BONE HEALTH: Prioritize weight-bearing exercise support nutrition — adequate protein + calcium + vitamin K (leafy greens).
+- NEVER assume pregnancy. Do NOT provide pregnancy-specific dietary advice unless the client's medical conditions explicitly mention pregnancy.
+- If client notes mention pregnancy or breastfeeding in their medical conditions, add a prominent disclaimer: "Consult your OB-GYN before following any diet plan during pregnancy or breastfeeding."
+`
+    : "";
 
   const systemPrompt = `You are an expert sports nutritionist and meal planning AI specializing in ${isArabic ? "Middle Eastern and Egyptian cuisine" : "international cuisine"}. Create personalized meal plans.
 HARD CONSTRAINT: All meals MUST be halal. Never include pork, alcohol, or non-halal meat. This is non-negotiable.
@@ -687,7 +703,7 @@ NUTRITION CONSTRAINTS (calculated from client data via Mifflin-St Jeor — DO NO
 - Macro cross-check: Protein(g)×4 + Carbs(g)×4 + Fat(g)×9 must equal total calories for each meal (±30 cal tolerance)
 - MINIMUM daily calories: ${nutritionTargets.minCalories} kcal — NEVER go below this
 - Distribute calories across 4-5 meals (breakfast, snack, lunch, snack, dinner)
-
+${femaleNutritionBlock}
 Egyptian/MENA Staple Foods (prefer these when culturally appropriate):
 - Proteins: eggs, chicken breast, beef, lentils, fava beans (foul), white cheese, labneh, Greek yogurt
 - Carbs: baladi bread, rice, sweet potato, oats, freekeh, couscous
@@ -1001,6 +1017,7 @@ async function generateWorkoutPlanHandler(
       if (!eq) return undefined;
       return Array.isArray(eq) ? eq : [eq];
     })(),
+    gender: assessment.gender === "female" ? "female" : "male",
   });
 
   // Create stream and mark it done immediately (backward compat)
