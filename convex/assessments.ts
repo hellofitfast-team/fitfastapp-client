@@ -1,8 +1,9 @@
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalMutation } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { getAuthUserId } from "./auth";
 import { rateLimiter } from "./rateLimiter";
+import { inBodyDataValidator } from "./checkIns";
 
 export const getMyAssessment = query({
   args: {},
@@ -82,6 +83,8 @@ export const submitAssessment = mutation({
         mealsPerDay: v.optional(v.number()),
       }),
     ),
+    measurementMethod: v.optional(v.union(v.literal("manual"), v.literal("inbody"))),
+    inBodyStorageId: v.optional(v.id("_storage")),
     // Optional: trigger server-side plan generation after assessment
     generatePlans: v.optional(
       v.object({
@@ -162,6 +165,14 @@ export const submitAssessment = mutation({
       });
     }
 
+    // Schedule InBody OCR extraction if uploaded
+    if (assessmentData.measurementMethod === "inbody" && assessmentData.inBodyStorageId) {
+      await ctx.scheduler.runAfter(0, internal.ocrExtraction.extractAssessmentInBodyData, {
+        assessmentId,
+        storageId: assessmentData.inBodyStorageId,
+      });
+    }
+
     // Schedule server-side plan generation (survives client navigation)
     if (generatePlans) {
       await ctx.scheduler.runAfter(0, internal.ai.generateMealPlanInternal, {
@@ -177,5 +188,21 @@ export const submitAssessment = mutation({
     }
 
     return assessmentId;
+  },
+});
+
+/** Patch InBody OCR results onto an assessment record (called by extractAssessmentInBodyData). */
+export const patchAssessmentInBodyData = internalMutation({
+  args: {
+    assessmentId: v.id("initialAssessments"),
+    inBodyData: inBodyDataValidator,
+  },
+  handler: async (ctx, { assessmentId, inBodyData }): Promise<void> => {
+    const existing = await ctx.db.get(assessmentId);
+    if (!existing) {
+      console.warn("[patchAssessmentInBodyData] Assessment not found", { assessmentId });
+      return;
+    }
+    await ctx.db.patch(assessmentId, { inBodyData });
   },
 });

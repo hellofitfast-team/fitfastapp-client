@@ -264,14 +264,20 @@ function AssessmentCard({
                   <dd className="flex flex-wrap gap-2">
                     {Object.entries(assessment.measurements as Record<string, number | undefined>)
                       .filter(([, v]) => v != null)
-                      .map(([key, val]) => (
-                        <span
-                          key={key}
-                          className="inline-flex rounded-md bg-stone-50 px-2 py-0.5 text-xs text-stone-700"
-                        >
-                          {tA(`measurement_${key}`)}: {val} cm
-                        </span>
-                      ))}
+                      .map(([key, val]) => {
+                        const knownKeys = new Set(["chest", "waist", "hips", "arms", "thighs"]);
+                        const label = knownKeys.has(key)
+                          ? tA(`measurement_${key}`)
+                          : key.charAt(0).toUpperCase() + key.slice(1);
+                        return (
+                          <span
+                            key={key}
+                            className="inline-flex rounded-md bg-stone-50 px-2 py-0.5 text-xs text-stone-700"
+                          >
+                            {label}: {val} cm
+                          </span>
+                        );
+                      })}
                   </dd>
                 </div>
               )}

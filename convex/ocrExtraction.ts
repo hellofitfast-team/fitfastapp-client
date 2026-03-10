@@ -96,6 +96,96 @@ Respond with ONLY the JSON object, no markdown or explanation.`,
   },
 });
 
+/** Shared InBody OCR prompt */
+const INBODY_PROMPT = `Extract body composition data from this InBody result sheet. Return ONLY valid JSON with these fields (use null for any field you cannot find):
+{
+  "bodyFatPercentage": number or null,
+  "leanBodyMass": number in kg or null,
+  "skeletalMuscleMass": number in kg or null,
+  "bmi": number or null,
+  "visceralFatLevel": number or null,
+  "basalMetabolicRate": number in kcal or null,
+  "totalBodyWater": number in liters or null
+}
+Respond with ONLY the JSON object, no markdown or explanation.`;
+
+/** Physiological range validation — skip values outside plausible ranges */
+const INBODY_FIELD_RANGES: Record<string, [number, number]> = {
+  bodyFatPercentage: [3, 60],
+  leanBodyMass: [20, 150],
+  skeletalMuscleMass: [10, 80],
+  bmi: [10, 60],
+  visceralFatLevel: [1, 30],
+  basalMetabolicRate: [800, 4000],
+  totalBodyWater: [10, 80],
+};
+
+/** Shared InBody OCR extraction logic — returns validated data or empty object */
+async function runInBodyOcr(
+  imageUrl: string,
+  logPrefix: string,
+  contextId: string,
+): Promise<Record<string, number>> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      `[${logPrefix}] OPENROUTER_API_KEY not set — check Convex environment variables`,
+    );
+  }
+
+  const { createOpenRouter } = await import("@openrouter/ai-sdk-provider");
+  const { generateText } = await import("ai");
+
+  const openrouter = createOpenRouter({ apiKey });
+
+  const { text } = await generateText({
+    model: openrouter(OCR_MODEL),
+    messages: [
+      {
+        role: "user",
+        content: [
+          { type: "image", image: new URL(imageUrl) },
+          { type: "text", text: INBODY_PROMPT },
+        ],
+      },
+    ],
+    maxOutputTokens: 300,
+  });
+
+  // Robust JSON extraction (handles markdown fences, trailing commas, brace extraction)
+  let cleaned = text
+    .replace(/```(?:json)?\s*/g, "")
+    .replace(/```/g, "")
+    .replace(/,\s*([\]}])/g, "$1")
+    .trim();
+  const braceStart = cleaned.indexOf("{");
+  const braceEnd = cleaned.lastIndexOf("}");
+  if (braceStart !== -1 && braceEnd > braceStart) {
+    cleaned = cleaned.slice(braceStart, braceEnd + 1);
+  }
+  const parsed = JSON.parse(cleaned);
+
+  // Build typed InBody data — parse strings to numbers as fallback
+  const inBodyData: Record<string, number> = {};
+  for (const [field, [min, max]] of Object.entries(INBODY_FIELD_RANGES)) {
+    const val = parsed[field];
+    if (val !== null && val !== undefined) {
+      const num = typeof val === "number" ? val : parseFloat(String(val));
+      if (!isNaN(num)) {
+        if (num < min || num > max) {
+          console.warn(`[${logPrefix}] ${field}=${num} outside range [${min}, ${max}], skipping`, {
+            id: contextId,
+          });
+        } else {
+          inBodyData[field] = num;
+        }
+      }
+    }
+  }
+
+  return inBodyData;
+}
+
 /**
  * Extract body composition data from an InBody result sheet photo.
  * Scheduled after check-in save when measurementMethod === "inbody".
@@ -112,92 +202,8 @@ export const extractInBodyData = internalAction({
       return;
     }
 
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) {
-      throw new Error(
-        "[OCR:extractInBodyData] OPENROUTER_API_KEY not set — check Convex environment variables",
-      );
-    }
-
     try {
-      const { createOpenRouter } = await import("@openrouter/ai-sdk-provider");
-      const { generateText } = await import("ai");
-
-      const openrouter = createOpenRouter({ apiKey });
-
-      const { text } = await generateText({
-        model: openrouter(OCR_MODEL),
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "image",
-                image: new URL(imageUrl),
-              },
-              {
-                type: "text",
-                text: `Extract body composition data from this InBody result sheet. Return ONLY valid JSON with these fields (use null for any field you cannot find):
-{
-  "bodyFatPercentage": number or null,
-  "leanBodyMass": number in kg or null,
-  "skeletalMuscleMass": number in kg or null,
-  "bmi": number or null,
-  "visceralFatLevel": number or null,
-  "basalMetabolicRate": number in kcal or null,
-  "totalBodyWater": number in liters or null
-}
-Respond with ONLY the JSON object, no markdown or explanation.`,
-              },
-            ],
-          },
-        ],
-        maxOutputTokens: 300,
-      });
-
-      // Robust JSON extraction (handles markdown fences, trailing commas, brace extraction)
-      let cleaned = text
-        .replace(/```(?:json)?\s*/g, "")
-        .replace(/```/g, "")
-        .replace(/,\s*([\]}])/g, "$1")
-        .trim();
-      // Extract outermost JSON object if surrounded by text
-      const braceStart = cleaned.indexOf("{");
-      const braceEnd = cleaned.lastIndexOf("}");
-      if (braceStart !== -1 && braceEnd > braceStart) {
-        cleaned = cleaned.slice(braceStart, braceEnd + 1);
-      }
-      const parsed = JSON.parse(cleaned);
-
-      // Physiological range validation — skip values outside plausible ranges
-      const fieldRanges: Record<string, [number, number]> = {
-        bodyFatPercentage: [3, 60],
-        leanBodyMass: [20, 150],
-        skeletalMuscleMass: [10, 80],
-        bmi: [10, 60],
-        visceralFatLevel: [1, 30],
-        basalMetabolicRate: [800, 4000],
-        totalBodyWater: [10, 80],
-      };
-
-      // Build typed InBody data — parse strings to numbers as fallback (Qwen3-VL sometimes returns string numbers)
-      const inBodyData: Record<string, number> = {};
-      for (const [field, [min, max]] of Object.entries(fieldRanges)) {
-        const val = parsed[field];
-        if (val !== null && val !== undefined) {
-          const num = typeof val === "number" ? val : parseFloat(String(val));
-          if (!isNaN(num)) {
-            if (num < min || num > max) {
-              console.warn(
-                `[OCR:extractInBodyData] ${field}=${num} outside range [${min}, ${max}], skipping`,
-                { checkInId },
-              );
-            } else {
-              inBodyData[field] = num;
-            }
-          }
-        }
-      }
+      const inBodyData = await runInBodyOcr(imageUrl, "OCR:extractInBodyData", String(checkInId));
 
       if (Object.keys(inBodyData).length > 0) {
         await ctx.runMutation(internal.checkInWorkflow.patchInBodyData, {
@@ -205,18 +211,57 @@ Respond with ONLY the JSON object, no markdown or explanation.`,
           inBodyData,
         });
       } else {
-        console.warn("[OCR:extractInBodyData] AI returned no extractable fields", {
-          checkInId,
-          rawText: text.slice(0, 200),
-        });
+        console.warn("[OCR:extractInBodyData] AI returned no extractable fields", { checkInId });
       }
     } catch (err) {
       console.error("[OCR:extractInBodyData] Extraction failed", {
         checkInId,
         error: err instanceof Error ? err.message : String(err),
       });
-      // Non-critical — don't throw. The check-in still exists without InBody data.
-      // The user can manually enter data or re-upload.
+    }
+  },
+});
+
+/**
+ * Extract body composition data from an InBody result sheet photo for initial assessment.
+ * Scheduled after assessment save when measurementMethod === "inbody".
+ */
+export const extractAssessmentInBodyData = internalAction({
+  args: {
+    assessmentId: v.id("initialAssessments"),
+    storageId: v.id("_storage"),
+  },
+  handler: async (ctx, { assessmentId, storageId }): Promise<void> => {
+    const imageUrl = await ctx.storage.getUrl(storageId);
+    if (!imageUrl) {
+      console.error("[OCR:extractAssessmentInBodyData] Could not resolve storage URL", {
+        storageId,
+      });
+      return;
+    }
+
+    try {
+      const inBodyData = await runInBodyOcr(
+        imageUrl,
+        "OCR:extractAssessmentInBodyData",
+        String(assessmentId),
+      );
+
+      if (Object.keys(inBodyData).length > 0) {
+        await ctx.runMutation(internal.assessments.patchAssessmentInBodyData, {
+          assessmentId,
+          inBodyData,
+        });
+      } else {
+        console.warn("[OCR:extractAssessmentInBodyData] AI returned no extractable fields", {
+          assessmentId,
+        });
+      }
+    } catch (err) {
+      console.error("[OCR:extractAssessmentInBodyData] Extraction failed", {
+        assessmentId,
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
   },
 });

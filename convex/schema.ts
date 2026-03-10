@@ -136,6 +136,19 @@ export default defineSchema({
         mealsPerDay: v.optional(v.number()),
       }),
     ),
+    measurementMethod: v.optional(v.union(v.literal("manual"), v.literal("inbody"))),
+    inBodyStorageId: v.optional(v.id("_storage")),
+    inBodyData: v.optional(
+      v.object({
+        bodyFatPercentage: v.optional(v.number()),
+        leanBodyMass: v.optional(v.number()),
+        skeletalMuscleMass: v.optional(v.number()),
+        bmi: v.optional(v.number()),
+        visceralFatLevel: v.optional(v.number()),
+        basalMetabolicRate: v.optional(v.number()),
+        totalBodyWater: v.optional(v.number()),
+      }),
+    ),
   }).index("by_userId", ["userId"]),
 
   checkIns: defineTable({

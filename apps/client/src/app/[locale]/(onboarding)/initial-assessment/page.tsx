@@ -16,8 +16,9 @@ import { ScheduleSection } from "./_components/schedule-section";
 import { getDayLimits } from "./_components/constants";
 import { DietarySection } from "./_components/dietary-section";
 import { MedicalSection } from "./_components/medical-section";
+import { MeasurementsSection } from "./_components/measurements-section";
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 export default function InitialAssessmentPage() {
   const t = useTranslations("onboarding.assessment");
@@ -32,6 +33,7 @@ export default function InitialAssessmentPage() {
 
   const submitAssessment = useMutation(api.assessments.submitAssessment);
   const updateProfile = useMutation(api.profiles.updateProfile);
+  const generateUploadUrl = useMutation(api.storage.generateUploadUrl);
 
   // Fetch admin-configured cycle duration for initial plan generation
   const frequencyConfig = useQuery(api.systemConfig.getConfig, { key: "check_in_frequency_days" });
@@ -47,6 +49,7 @@ export default function InitialAssessmentPage() {
     t("steps.bodyInfo"),
     t("steps.schedule"),
     t("steps.diet"),
+    t("steps.measurements"),
     t("steps.medical"),
   ];
 
@@ -71,6 +74,13 @@ export default function InitialAssessmentPage() {
   const [restrictionsOther, setRestrictionsOther] = useState("");
   const [equipment, setEquipment] = useState("");
   const [equipmentOther, setEquipmentOther] = useState("");
+  const [measurementMethod, setMeasurementMethod] = useState<"manual" | "inbody">("manual");
+  const [chest, setChest] = useState("");
+  const [waist, setWaist] = useState("");
+  const [hips, setHips] = useState("");
+  const [arms, setArms] = useState("");
+  const [thighs, setThighs] = useState("");
+  const [inBodyFile, setInBodyFile] = useState<File | null>(null);
   const [medicalNotes, setMedicalNotes] = useState("");
 
   const getFinalValues = (selected: string[], otherValue: string) => {
@@ -111,7 +121,14 @@ export default function InitialAssessmentPage() {
       }
       case 4:
         return null; // Dietary is optional
-      case 5:
+      case 5: {
+        // Measurements: InBody requires file, manual is optional
+        if (measurementMethod === "inbody" && !inBodyFile) {
+          return tErrors("inBodyFileRequired");
+        }
+        return null;
+      }
+      case 6:
         return null; // Medical is optional
       default:
         return null;
@@ -210,6 +227,32 @@ export default function InitialAssessmentPage() {
 
       const language = (locale === "ar" ? "ar" : "en") as "en" | "ar";
 
+      // Upload InBody file to storage if present
+      let inBodyStorageId: string | undefined;
+      if (measurementMethod === "inbody" && inBodyFile) {
+        const uploadUrl = await generateUploadUrl({});
+        const result = await fetch(uploadUrl, {
+          method: "POST",
+          headers: { "Content-Type": inBodyFile.type },
+          body: inBodyFile,
+        });
+        if (!result.ok) throw new Error("Failed to upload InBody file");
+        const { storageId } = await result.json();
+        inBodyStorageId = storageId;
+      }
+
+      // Build measurements from manual input
+      const measurements =
+        measurementMethod === "manual"
+          ? {
+              chest: chest ? parseFloat(chest) : undefined,
+              waist: waist ? parseFloat(waist) : undefined,
+              hips: hips ? parseFloat(hips) : undefined,
+              arms: arms ? parseFloat(arms) : undefined,
+              thighs: thighs ? parseFloat(thighs) : undefined,
+            }
+          : {};
+
       await submitAssessment({
         goals: finalGoals.join(", "),
         currentWeight: parseFloat(currentWeight),
@@ -230,7 +273,9 @@ export default function InitialAssessmentPage() {
         dietaryRestrictions: finalRestrictions.length > 0 ? finalRestrictions : undefined,
         medicalConditions: medicalNotes ? [medicalNotes] : undefined,
         exerciseHistory: finalEquipment,
-        measurements: {},
+        measurements,
+        measurementMethod,
+        inBodyStorageId: inBodyStorageId as any,
         lifestyleHabits: {
           equipment: finalEquipment,
           mealsPerDay: mealsPerDay ? parseInt(mealsPerDay) : undefined,
@@ -378,6 +423,27 @@ export default function InitialAssessmentPage() {
             </div>
           )}
           {currentStep === 5 && (
+            <div style={{ animation: "fadeIn 0.2s ease-out" }}>
+              <MeasurementsSection
+                measurementMethod={measurementMethod}
+                setMeasurementMethod={setMeasurementMethod}
+                chest={chest}
+                setChest={setChest}
+                waist={waist}
+                setWaist={setWaist}
+                hips={hips}
+                setHips={setHips}
+                arms={arms}
+                setArms={setArms}
+                thighs={thighs}
+                setThighs={setThighs}
+                inBodyFile={inBodyFile}
+                onInBodyFileChange={setInBodyFile}
+                isLoading={isLoading}
+              />
+            </div>
+          )}
+          {currentStep === 6 && (
             <div style={{ animation: "fadeIn 0.2s ease-out" }}>
               <MedicalSection
                 medicalNotes={medicalNotes}
