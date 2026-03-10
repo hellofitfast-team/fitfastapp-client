@@ -88,8 +88,10 @@ export function ExerciseManager() {
   const deleteExercise = useMutation(api.exerciseDatabase.deleteExercise);
 
   const exercises = searchQuery.trim() ? searchResults : allExercises;
-  const filteredExercises =
-    filterCategory === "all" ? exercises : exercises?.filter((e) => e.category === filterCategory);
+  // imageUrl is dynamically added by listExercises (resolves gifStorageId → CDN URL)
+  const filteredExercises = (
+    filterCategory === "all" ? exercises : exercises?.filter((e) => e.category === filterCategory)
+  ) as (NonNullable<typeof exercises>[number] & { imageUrl?: string })[] | undefined;
 
   function openAddModal() {
     setEditingId(null);
@@ -97,7 +99,7 @@ export function ExerciseManager() {
     setShowModal(true);
   }
 
-  function openEditModal(exercise: NonNullable<typeof allExercises>[number]) {
+  function openEditModal(exercise: NonNullable<typeof filteredExercises>[number]) {
     setEditingId(exercise._id);
     setForm({
       name: exercise.name,
