@@ -25,7 +25,7 @@ export function ExerciseGif({ url, alt }: ExerciseGifProps) {
         width={512}
         height={384}
         sizes="(max-width: 640px) 100vw, 400px"
-        className={`h-auto w-full rounded-lg ${loaded ? "block" : "hidden"}`}
+        className={`h-auto w-full rounded-lg transition-opacity duration-200 ${loaded ? "opacity-100" : "absolute opacity-0"}`}
         onLoad={() => setLoaded(true)}
         onError={() => setError(true)}
         loading="lazy"

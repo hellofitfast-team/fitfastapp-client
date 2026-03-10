@@ -1087,6 +1087,7 @@ async function generateWorkoutPlanHandler(
   const avgSleep = avgField("sleepQuality");
 
   // Generate deterministic plan from exercise database
+  const sessionDuration = (scheduleData as any)?.sessionDuration as number | undefined;
   const planData = buildWorkoutPlan(exercises as any[], {
     split,
     planDuration: safeDuration,
@@ -1100,6 +1101,7 @@ async function generateWorkoutPlanHandler(
     sleepQuality: avgSleep,
     previousPlan: previousPlan?.planData ?? null,
     language,
+    sessionDuration: sessionDuration ?? undefined,
     availableEquipment: (() => {
       const eq = (assessment.lifestyleHabits as any)?.equipment;
       if (!eq) return undefined;

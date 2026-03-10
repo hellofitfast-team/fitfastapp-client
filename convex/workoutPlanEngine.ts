@@ -46,6 +46,7 @@ export interface WorkoutPlanInput {
   previousPlan: any | null;
   language: "en" | "ar";
   availableEquipment?: string[];
+  sessionDuration?: number; // Client's preferred session duration in minutes
   gender?: "male" | "female";
   femaleHealth?: {
     menstrualStatus?: string;
@@ -320,9 +321,20 @@ function selectExercisesForDay(
     .map((ex) => ({ ex, score: scoreExercise(ex, targetMuscles) }))
     .sort((a, b) => b.score - a.score);
 
-  // Determine count
+  // Determine count based on session duration if available, otherwise use level-based ranges
   const range = EXERCISE_COUNTS[input.experienceLevel] ?? EXERCISE_COUNTS.intermediate!;
-  let count = range.max;
+  const gp = goalParams(input.goal);
+  let count: number;
+
+  if (input.sessionDuration && input.sessionDuration > 0) {
+    // Target the client's preferred session duration
+    // Formula: duration = 5 (warmup) + exercises * sets * 1.5 + 5 (cooldown)
+    // So: exercises = (duration - 10) / (sets * 1.5)
+    const availableMins = input.sessionDuration - 10; // subtract warmup + cooldown
+    count = Math.max(range.min, Math.round(availableMins / (gp.sets * 1.5)));
+  } else {
+    count = range.max;
+  }
 
   // Low adherence: reduce to 3-4 compounds only
   const lowAdherence = input.adherenceLevel != null && input.adherenceLevel < 50;
