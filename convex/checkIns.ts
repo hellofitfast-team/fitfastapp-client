@@ -168,6 +168,15 @@ export const submitCheckIn = mutation({
     progressPhotoBack: v.optional(v.id("_storage")),
     progressPhotoSide: v.optional(v.id("_storage")),
     notes: v.optional(v.string()),
+    cyclePhase: v.optional(
+      v.union(
+        v.literal("menstrual"),
+        v.literal("follicular"),
+        v.literal("ovulatory"),
+        v.literal("luteal"),
+        v.literal("not_tracking"),
+      ),
+    ),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -217,6 +226,15 @@ export const startCheckInWorkflow = mutation({
     progressPhotoBack: v.optional(v.id("_storage")),
     progressPhotoSide: v.optional(v.id("_storage")),
     notes: v.optional(v.string()),
+    cyclePhase: v.optional(
+      v.union(
+        v.literal("menstrual"),
+        v.literal("follicular"),
+        v.literal("ovulatory"),
+        v.literal("luteal"),
+        v.literal("not_tracking"),
+      ),
+    ),
   },
   returns: v.string(), // WorkflowId
   handler: async (ctx, { language, planDuration, ...checkInFields }): Promise<string> => {

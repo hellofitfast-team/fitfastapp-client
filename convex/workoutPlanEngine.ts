@@ -47,6 +47,11 @@ export interface WorkoutPlanInput {
   language: "en" | "ar";
   availableEquipment?: string[];
   gender?: "male" | "female";
+  femaleHealth?: {
+    menstrualStatus?: string;
+    isPregnant?: boolean;
+    isBreastfeeding?: boolean;
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -483,14 +488,19 @@ function buildRestDay(lang: "en" | "ar"): RestDay {
 // ---------------------------------------------------------------------------
 
 function generateProgressionNotes(input: WorkoutPlanInput): string {
-  const { language: lang, experienceLevel, goal, gender } = input;
+  const { language: lang, experienceLevel, goal, gender, femaleHealth } = input;
+  const isCycling =
+    femaleHealth?.menstrualStatus === "regular" || femaleHealth?.menstrualStatus === "irregular";
+
   if (lang === "ar") {
     const goalText =
       goal.toLowerCase().includes("strength") || goal.includes("قوة")
         ? "زيادة الأوزان تدريجياً"
         : "زيادة التكرارات أو المجموعات تدريجياً";
     let note = `ركز على ${goalText} كل أسبوع. حافظ على الأداء الصحيح قبل زيادة الحمل.`;
-    if (gender === "female") {
+    if (gender === "female" && femaleHealth?.isPregnant) {
+      note += " ⚠️ أنتِ حامل — ركزي على الحفاظ على اللياقة وليس زيادة الأوزان. استشيري طبيبتك.";
+    } else if (gender === "female" && isCycling) {
       note +=
         " ملاحظة: من الطبيعي أن يتغير أداؤك خلال الشهر بسبب الدورة الشهرية — استمعي لجسمك وعدّلي الشدة حسب الحاجة.";
     }
@@ -504,7 +514,10 @@ function generateProgressionNotes(input: WorkoutPlanInput): string {
       ? "Master movement patterns first."
       : "Track your lifts to ensure consistent progress."
   }`;
-  if (gender === "female") {
+  if (gender === "female" && femaleHealth?.isPregnant) {
+    note +=
+      " You are pregnant — focus on maintaining fitness, not increasing load. Consult your OB-GYN.";
+  } else if (gender === "female" && isCycling) {
     note +=
       " Note: Performance naturally fluctuates throughout your menstrual cycle — listen to your body and adjust intensity as needed. This is normal and not a setback.";
   }
@@ -512,7 +525,7 @@ function generateProgressionNotes(input: WorkoutPlanInput): string {
 }
 
 function generateSafetyTips(input: WorkoutPlanInput): string[] {
-  const { language: lang, injuries, gender } = input;
+  const { language: lang, injuries, gender, femaleHealth } = input;
   if (lang === "ar") {
     const tips = [
       "قم بالإحماء دائماً قبل التمرين",
@@ -523,13 +536,27 @@ function generateSafetyTips(input: WorkoutPlanInput): string[] {
     if (injuries.length > 0) {
       tips.push("تجنب التمارين التي تسبب ألماً في المناطق المصابة");
     }
-    if (gender === "female") {
+    if (gender === "female" && femaleHealth?.isPregnant) {
       tips.push(
-        "أثناء الدورة الشهرية: خففي شدة التمرين إذا شعرتِ بتعب أو تقلصات، ولا بأس من تقليل الأوزان",
+        "⚠️ أنتِ حامل — تجنبي تمارين الاستلقاء على الظهر بعد الثلث الأول، ولا رياضات تلامس. حافظي على نبض قلب معتدل. استشيري طبيبتك.",
       );
-      tips.push(
-        "ركزي على تمارين الإحماء والتمدد بشكل أكبر خلال فترة ما قبل الدورة للتخفيف من الانتفاخ والتشنجات",
-      );
+    } else if (gender === "female") {
+      if (
+        femaleHealth?.menstrualStatus === "regular" ||
+        femaleHealth?.menstrualStatus === "irregular"
+      ) {
+        tips.push(
+          "أثناء الدورة الشهرية: خففي شدة التمرين إذا شعرتِ بتعب أو تقلصات، ولا بأس من تقليل الأوزان",
+        );
+        tips.push(
+          "ركزي على تمارين الإحماء والتمدد بشكل أكبر خلال فترة ما قبل الدورة للتخفيف من الانتفاخ والتشنجات",
+        );
+      }
+      if (femaleHealth?.menstrualStatus === "amenorrhea") {
+        tips.push(
+          "إذا توقفت دورتك الشهرية، قد يكون ذلك مؤشراً على الإفراط في التمرين — تحدثي مع مدربك",
+        );
+      }
     }
     return tips;
   }
@@ -544,13 +571,27 @@ function generateSafetyTips(input: WorkoutPlanInput): string[] {
       "Avoid exercises that cause pain in injured areas and consult your coach if discomfort persists",
     );
   }
-  if (gender === "female") {
+  if (gender === "female" && femaleHealth?.isPregnant) {
     tips.push(
-      "During your menstrual cycle: reduce intensity if you feel fatigued or experience cramps — lighter weights and fewer sets are perfectly fine",
+      "You are pregnant — avoid supine (lying on back) exercises after the first trimester, no contact sports, keep heart rate moderate. Consult your OB-GYN before following this plan.",
     );
-    tips.push(
-      "Focus on extra warm-up and stretching during premenstrual days to help with bloating and cramps",
-    );
+  } else if (gender === "female") {
+    if (
+      femaleHealth?.menstrualStatus === "regular" ||
+      femaleHealth?.menstrualStatus === "irregular"
+    ) {
+      tips.push(
+        "During your menstrual cycle: reduce intensity if you feel fatigued or experience cramps — lighter weights and fewer sets are perfectly fine",
+      );
+      tips.push(
+        "Focus on extra warm-up and stretching during premenstrual days to help with bloating and cramps",
+      );
+    }
+    if (femaleHealth?.menstrualStatus === "amenorrhea") {
+      tips.push(
+        "If your period has stopped, this may indicate overtraining or underfueling — please discuss with your coach",
+      );
+    }
   }
   return tips;
 }

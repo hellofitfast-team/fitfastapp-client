@@ -56,6 +56,9 @@ function createCheckInSchema(t: (key: string) => string) {
     dietNotes: z.string().optional(),
     newInjuries: z.string().optional(),
     notes: z.string().optional(),
+    cyclePhase: z
+      .enum(["menstrual", "follicular", "ovulatory", "luteal", "not_tracking"])
+      .optional(),
   });
 }
 
@@ -77,6 +80,8 @@ export default function CheckInPage() {
   const router = useRouter();
   const { profile } = useAuth();
   const { toast } = useToast();
+  const assessment = useQuery(api.assessments.getMyAssessment);
+  const isFemale = assessment?.gender === "female";
 
   const checkInSchema = createCheckInSchema((key) => t(key));
 
@@ -341,6 +346,7 @@ export default function CheckInPage() {
         newInjuries: data.newInjuries || undefined,
         ...photoUploads,
         notes: [data.dietNotes, data.notes].filter(Boolean).join("\n\n") || undefined,
+        cyclePhase: data.cyclePhase || undefined,
         language,
         planDuration: frequencyDays,
       });
@@ -425,7 +431,7 @@ export default function CheckInPage() {
                   )}
 
                   {/* Step 2: Fitness Metrics */}
-                  {currentStep === 2 && <FitnessStep />}
+                  {currentStep === 2 && <FitnessStep isFemale={isFemale} />}
 
                   {/* Step 3: Dietary Adherence */}
                   {currentStep === 3 && <DietaryStep />}

@@ -156,6 +156,25 @@ export function formatContextForPrompt(ctx: ClientContext): string {
     parts.push(`BODY: ${a.currentWeight}kg, ${a.height}cm`);
     parts.push(`AGE: ${a.age || "Not specified"}`);
     parts.push(`GENDER: ${a.gender || "Not specified"}`);
+    // Female health data (collected during assessment)
+    if (a.gender === "female" && a.femaleHealth) {
+      const fh = a.femaleHealth as {
+        menstrualStatus?: string;
+        isPregnant?: boolean;
+        isBreastfeeding?: boolean;
+        hormonalMedication?: string;
+        notes?: string;
+      };
+      const fhParts: string[] = [];
+      if (fh.menstrualStatus && fh.menstrualStatus !== "prefer_not_say")
+        fhParts.push(`Cycle: ${fh.menstrualStatus}`);
+      if (fh.isPregnant) fhParts.push("PREGNANT");
+      if (fh.isBreastfeeding) fhParts.push("Breastfeeding");
+      if (fh.hormonalMedication)
+        fhParts.push(`Hormonal meds: ${sanitizeForPrompt(fh.hormonalMedication, 100)}`);
+      if (fh.notes) fhParts.push(`Notes: ${sanitizeForPrompt(fh.notes, 200)}`);
+      if (fhParts.length > 0) parts.push(`FEMALE HEALTH: ${fhParts.join(", ")}`);
+    }
     parts.push(`EXPERIENCE: ${a.experienceLevel || "Not specified"}`);
     parts.push(`SCHEDULE: ${JSON.stringify(a.scheduleAvailability || {})}`);
     parts.push(
@@ -220,6 +239,8 @@ export function formatContextForPrompt(ctx: ClientContext): string {
       parts.push(`WORKOUT FEEDBACK: ${sanitizeForPrompt(ci.workoutPerformance)}`);
     if (ci.newInjuries) parts.push(`NEW INJURIES: ${sanitizeForPrompt(ci.newInjuries)}`);
     if (ci.notes) parts.push(`CLIENT NOTES: ${sanitizeForPrompt(ci.notes)}`);
+    if ((ci as any).cyclePhase && (ci as any).cyclePhase !== "not_tracking")
+      parts.push(`CURRENT CYCLE PHASE: ${(ci as any).cyclePhase}`);
   }
 
   // ── Adherence data ──

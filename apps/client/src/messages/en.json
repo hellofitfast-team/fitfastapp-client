@@ -349,6 +349,15 @@
       "notes": "Share any other thoughts, questions, or concerns...",
       "photoUpload": "Click to upload photos"
     },
+    "cyclePhase": "Current Cycle Phase",
+    "cyclePhaseDescription": "Helps us adjust your plan intensity",
+    "cyclePhaseOptions": {
+      "menstrual": "Menstrual (days 1-5)",
+      "follicular": "Follicular (days 6-13)",
+      "ovulatory": "Ovulatory (days 14-16)",
+      "luteal": "Luteal (days 17-28)",
+      "notTracking": "Not tracking"
+    },
     "validation": {
       "weightPositive": "Weight must be positive",
       "weightTooLow": "Weight seems too low",
@@ -698,6 +707,25 @@
       "medicalNotesTitle": "Medical Notes",
       "medicalNotesDescription": "Optional: injuries, conditions, or limitations",
       "medicalNotesPlaceholder": "E.g., knee injury, back pain, diabetes, high blood pressure...",
+      "femaleHealth": {
+        "title": "Female Health",
+        "description": "Helps us tailor your nutrition and workout plans to your body's needs. All fields are optional.",
+        "menstrualStatus": "Menstrual Cycle",
+        "regular": "Regular",
+        "irregular": "Irregular",
+        "amenorrhea": "Absent",
+        "postmenopausal": "Postmenopausal",
+        "preferNotSay": "Prefer not to say",
+        "pregnant": "Are you currently pregnant?",
+        "breastfeeding": "Are you currently breastfeeding?",
+        "yes": "Yes",
+        "no": "No",
+        "hormonalMedication": "Hormonal medication (optional)",
+        "hormonalMedicationPlaceholder": "e.g., birth control type, HRT",
+        "notes": "Additional notes (optional)",
+        "notesPlaceholder": "Any other health details you'd like us to know",
+        "pregnancyWarning": "Please consult your doctor before following any exercise or diet plan during pregnancy."
+      },
       "injuries": "Current Injuries",
       "exerciseHistory": "Exercise History",
       "basicInfo": "Basic Information",

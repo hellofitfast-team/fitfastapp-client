@@ -150,6 +150,23 @@ export default defineSchema({
         totalBodyWater: v.optional(v.number()),
       }),
     ),
+    femaleHealth: v.optional(
+      v.object({
+        menstrualStatus: v.optional(
+          v.union(
+            v.literal("regular"),
+            v.literal("irregular"),
+            v.literal("amenorrhea"),
+            v.literal("postmenopausal"),
+            v.literal("prefer_not_say"),
+          ),
+        ),
+        isPregnant: v.optional(v.boolean()),
+        isBreastfeeding: v.optional(v.boolean()),
+        hormonalMedication: v.optional(v.string()),
+        notes: v.optional(v.string()),
+      }),
+    ),
   }).index("by_userId", ["userId"]),
 
   checkIns: defineTable({
@@ -188,6 +205,15 @@ export default defineSchema({
     progressPhotoBack: v.optional(v.id("_storage")),
     progressPhotoSide: v.optional(v.id("_storage")),
     notes: v.optional(v.string()),
+    cyclePhase: v.optional(
+      v.union(
+        v.literal("menstrual"),
+        v.literal("follicular"),
+        v.literal("ovulatory"),
+        v.literal("luteal"),
+        v.literal("not_tracking"),
+      ),
+    ),
   }).index("by_userId", ["userId"]),
 
   mealPlans: defineTable({

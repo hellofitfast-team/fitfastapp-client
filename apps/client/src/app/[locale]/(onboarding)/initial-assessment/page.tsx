@@ -17,6 +17,7 @@ import { getDayLimits } from "./_components/constants";
 import { DietarySection } from "./_components/dietary-section";
 import { MedicalSection } from "./_components/medical-section";
 import { MeasurementsSection } from "./_components/measurements-section";
+import { FemaleHealthSection, type FemaleHealthData } from "./_components/female-health-section";
 
 const TOTAL_STEPS = 6;
 
@@ -82,6 +83,7 @@ export default function InitialAssessmentPage() {
   const [thighs, setThighs] = useState("");
   const [inBodyFile, setInBodyFile] = useState<File | null>(null);
   const [medicalNotes, setMedicalNotes] = useState("");
+  const [femaleHealth, setFemaleHealth] = useState<FemaleHealthData>({});
 
   const getFinalValues = (selected: string[], otherValue: string) => {
     const values = selected.filter((s) => s !== "other" && s !== "none");
@@ -276,6 +278,8 @@ export default function InitialAssessmentPage() {
         measurements,
         measurementMethod,
         inBodyStorageId: inBodyStorageId as any,
+        femaleHealth:
+          gender === "female" && Object.keys(femaleHealth).length > 0 ? femaleHealth : undefined,
         lifestyleHabits: {
           equipment: finalEquipment,
           mealsPerDay: mealsPerDay ? parseInt(mealsPerDay) : undefined,
@@ -444,7 +448,14 @@ export default function InitialAssessmentPage() {
             </div>
           )}
           {currentStep === 6 && (
-            <div style={{ animation: "fadeIn 0.2s ease-out" }}>
+            <div className="space-y-4" style={{ animation: "fadeIn 0.2s ease-out" }}>
+              {gender === "female" && (
+                <FemaleHealthSection
+                  data={femaleHealth}
+                  onChange={setFemaleHealth}
+                  isLoading={isLoading}
+                />
+              )}
               <MedicalSection
                 medicalNotes={medicalNotes}
                 setMedicalNotes={setMedicalNotes}

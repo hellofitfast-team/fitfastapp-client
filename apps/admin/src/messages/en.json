@@ -736,6 +736,16 @@
     "injuries": "Injuries",
     "lifestyle": "Lifestyle",
     "equipment": "Equipment",
-    "mealsPerDay": "Meals/Day"
+    "mealsPerDay": "Meals/Day",
+    "femaleHealth": "Female Health",
+    "menstrualStatus": "Cycle Status",
+    "menstrualStatus_regular": "Regular",
+    "menstrualStatus_irregular": "Irregular",
+    "menstrualStatus_amenorrhea": "Absent",
+    "menstrualStatus_postmenopausal": "Postmenopausal",
+    "menstrualStatus_prefer_not_say": "Prefers not to say",
+    "pregnant": "Pregnant",
+    "breastfeeding": "Breastfeeding",
+    "hormonalMedication": "Hormonal Medication"
   }
 }

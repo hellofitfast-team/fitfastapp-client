@@ -344,6 +344,15 @@
       "notes": "شارك أي أفكار، أسئلة، أو مخاوف أخرى...",
       "photoUpload": "اضغط لرفع الصور"
     },
+    "cyclePhase": "مرحلة الدورة الحالية",
+    "cyclePhaseDescription": "يساعدنا في ضبط شدة خطتك",
+    "cyclePhaseOptions": {
+      "menstrual": "الحيض (أيام 1-5)",
+      "follicular": "الجريبية (أيام 6-13)",
+      "ovulatory": "الإباضة (أيام 14-16)",
+      "luteal": "الأصفرية (أيام 17-28)",
+      "notTracking": "لا أتتبع"
+    },
     "validation": {
       "weightPositive": "يجب أن يكون الوزن موجبًا",
       "weightTooLow": "الوزن يبدو منخفضًا جدًا",
@@ -693,6 +702,25 @@
       "medicalNotesTitle": "ملاحظات طبية",
       "medicalNotesDescription": "اختياري: إصابات أو حالات صحية أو قيود",
       "medicalNotesPlaceholder": "مثال: إصابة في الركبة، آلام الظهر، سكري، ضغط دم مرتفع...",
+      "femaleHealth": {
+        "title": "صحة المرأة",
+        "description": "يساعدنا في تخصيص خطط التغذية والتمارين حسب احتياجات جسمك. جميع الحقول اختيارية.",
+        "menstrualStatus": "الدورة الشهرية",
+        "regular": "منتظمة",
+        "irregular": "غير منتظمة",
+        "amenorrhea": "غائبة",
+        "postmenopausal": "بعد سن اليأس",
+        "preferNotSay": "أفضل عدم الإجابة",
+        "pregnant": "هل أنتِ حامل حالياً؟",
+        "breastfeeding": "هل ترضعين طبيعياً حالياً؟",
+        "yes": "نعم",
+        "no": "لا",
+        "hormonalMedication": "أدوية هرمونية (اختياري)",
+        "hormonalMedicationPlaceholder": "مثال: نوع وسيلة منع الحمل، العلاج الهرموني البديل",
+        "notes": "ملاحظات إضافية (اختياري)",
+        "notesPlaceholder": "أي تفاصيل صحية أخرى تودين إخبارنا بها",
+        "pregnancyWarning": "يرجى استشارة طبيبتك قبل اتباع أي خطة تمارين أو نظام غذائي أثناء الحمل."
+      },
       "injuries": "الإصابات الحالية",
       "exerciseHistory": "تاريخ التمارين",
       "basicInfo": "المعلومات الأساسية",

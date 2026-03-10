@@ -377,6 +377,35 @@ function AssessmentCard({
                   </dd>
                 </div>
               )}
+              {/* Female health */}
+              {assessment.femaleHealth != null && (
+                <div>
+                  <dt className="mb-1 text-stone-500">{tA("femaleHealth")}</dt>
+                  <dd className="rounded-lg bg-pink-50 p-2.5 text-xs text-pink-700">
+                    {(() => {
+                      const fh = assessment.femaleHealth as {
+                        menstrualStatus?: string;
+                        isPregnant?: boolean;
+                        isBreastfeeding?: boolean;
+                        hormonalMedication?: string;
+                        notes?: string;
+                      };
+                      const parts: string[] = [];
+                      if (fh.menstrualStatus) {
+                        const statusKey = `menstrualStatus_${fh.menstrualStatus}`;
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        parts.push(`${tA("menstrualStatus")}: ${tA(statusKey as any)}`);
+                      }
+                      if (fh.isPregnant) parts.push(`✓ ${tA("pregnant")}`);
+                      if (fh.isBreastfeeding) parts.push(`✓ ${tA("breastfeeding")}`);
+                      if (fh.hormonalMedication)
+                        parts.push(`${tA("hormonalMedication")}: ${fh.hormonalMedication}`);
+                      if (fh.notes) parts.push(fh.notes);
+                      return parts.join(" · ") || "---";
+                    })()}
+                  </dd>
+                </div>
+              )}
             </dl>
           )}
         </div>

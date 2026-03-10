@@ -86,6 +86,23 @@ export const submitAssessment = mutation({
     ),
     measurementMethod: v.optional(v.union(v.literal("manual"), v.literal("inbody"))),
     inBodyStorageId: v.optional(v.id("_storage")),
+    femaleHealth: v.optional(
+      v.object({
+        menstrualStatus: v.optional(
+          v.union(
+            v.literal("regular"),
+            v.literal("irregular"),
+            v.literal("amenorrhea"),
+            v.literal("postmenopausal"),
+            v.literal("prefer_not_say"),
+          ),
+        ),
+        isPregnant: v.optional(v.boolean()),
+        isBreastfeeding: v.optional(v.boolean()),
+        hormonalMedication: v.optional(v.string()),
+        notes: v.optional(v.string()),
+      }),
+    ),
     // Optional: trigger server-side plan generation after assessment
     generatePlans: v.optional(
       v.object({

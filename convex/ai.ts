@@ -675,20 +675,107 @@ async function generateMealPlanHandler(
   const contextBlock = formatContextForPrompt(clientCtx);
   const isFemale = assessment.gender === "female";
 
-  // Female-specific nutritional guidelines injected when client is female
-  const femaleNutritionBlock = isFemale
-    ? `
-FEMALE-SPECIFIC NUTRITION GUIDELINES (MANDATORY for this client):
-- IRON: Include iron-rich foods daily (red meat 2-3x/week, lentils, spinach, molasses, fortified cereals). Pair with vitamin C sources (lemon, tomato, bell pepper) to boost absorption. Menstrual blood loss increases iron needs to ~18mg/day.
-- CALCIUM & VITAMIN D: Target 1000mg calcium/day — include dairy (yogurt, labneh, white cheese), tahini, sardines, or fortified alternatives. Recommend sun exposure or supplementation note for vitamin D.
-- FOLATE: Include folate-rich foods (dark leafy greens, lentils, chickpeas, fortified grains) — important for women of reproductive age.
-- HORMONAL CYCLE AWARENESS: During luteal phase (days 15-28), women may experience increased appetite and cravings — include slightly more complex carbs and magnesium-rich foods (dark chocolate, nuts, bananas) to manage PMS symptoms.
-- BLOATING & PMS: Include anti-inflammatory foods (ginger, turmeric, omega-3 from fish/flaxseed), limit excess sodium during premenstrual days, and include potassium-rich foods (bananas, sweet potatoes, avocado).
-- BONE HEALTH: Prioritize weight-bearing exercise support nutrition — adequate protein + calcium + vitamin K (leafy greens).
-- NEVER assume pregnancy. Do NOT provide pregnancy-specific dietary advice unless the client's medical conditions explicitly mention pregnancy.
-- If client notes mention pregnancy or breastfeeding in their medical conditions, add a prominent disclaimer: "Consult your OB-GYN before following any diet plan during pregnancy or breastfeeding."
-`
-    : "";
+  // Build dynamic female nutrition block based on actual collected health data
+  const femaleNutritionBlock = (() => {
+    if (!isFemale) return "";
+
+    const fh = (assessment.femaleHealth ?? {}) as {
+      menstrualStatus?: string;
+      isPregnant?: boolean;
+      isBreastfeeding?: boolean;
+      hormonalMedication?: string;
+    };
+    const cyclePhase = (clientCtx.currentCheckIn as any)?.cyclePhase as string | undefined;
+    const lines: string[] = ["\nFEMALE-SPECIFIC NUTRITION GUIDELINES (MANDATORY for this client):"];
+
+    // ── Pregnancy: highest priority, overrides most other advice ──
+    if (fh.isPregnant) {
+      lines.push(
+        "- ⚠️ CLIENT IS PREGNANT — All dietary advice must be pregnancy-safe.",
+        "- Add 300-500 extra calories/day beyond maintenance (do NOT apply deficit).",
+        "- FOLATE: Prioritize folate-rich foods (dark leafy greens, lentils, fortified grains) — critical for fetal development.",
+        "- AVOID: raw fish/sushi, unpasteurized dairy, deli meats, excessive caffeine (limit to 200mg/day), high-mercury fish.",
+        "- IRON: 27mg/day target — include red meat, lentils, spinach + vitamin C pairing.",
+        "- CALCIUM: 1000mg/day — dairy, tahini, sardines.",
+        '- ADD DISCLAIMER at top of plan: "⚠️ You are pregnant. Please consult your OB-GYN before following any diet plan. This plan is a general guide only."',
+      );
+      return lines.join("\n");
+    }
+
+    // ── Breastfeeding ──
+    if (fh.isBreastfeeding) {
+      lines.push(
+        "- CLIENT IS BREASTFEEDING — Add ~500 extra calories/day beyond maintenance.",
+        "- Extra hydration: note to drink 3-4L water daily.",
+        "- CALCIUM: 1000mg/day — dairy, tahini, sardines.",
+        "- Include galactagogue foods where culturally appropriate (oats, fenugreek/helba).",
+        '- ADD NOTE: "Consult your doctor before making major dietary changes while breastfeeding."',
+      );
+    }
+
+    // ── Cycle-aware nutrition (only if menstruating) ──
+    if (fh.menstrualStatus === "regular" || fh.menstrualStatus === "irregular") {
+      lines.push(
+        "- IRON: Include iron-rich foods daily (red meat 2-3x/week, lentils, spinach, molasses). Pair with vitamin C (lemon, tomato, bell pepper). Target ~18mg/day due to menstrual blood loss.",
+      );
+
+      if (cyclePhase === "menstrual") {
+        lines.push(
+          "- CLIENT IS IN MENSTRUAL PHASE: Increase iron-rich foods. Include anti-inflammatory foods (ginger, turmeric, omega-3). Warm, comforting meals preferred. Limit excess sodium to reduce bloating.",
+        );
+      } else if (cyclePhase === "luteal") {
+        lines.push(
+          "- CLIENT IS IN LUTEAL PHASE (pre-menstrual): Include complex carbs and magnesium-rich foods (dark chocolate, nuts, bananas) to manage PMS cravings. Anti-inflammatory foods (ginger, turmeric, omega-3). Potassium-rich foods (bananas, sweet potatoes, avocado) to reduce bloating.",
+        );
+      } else if (cyclePhase === "follicular" || cyclePhase === "ovulatory") {
+        lines.push(
+          "- CLIENT IS IN FOLLICULAR/OVULATORY PHASE: Energy levels are typically higher. Good time for higher-protein, performance-focused meals.",
+        );
+      }
+    }
+
+    // ── Amenorrhea (absent periods) — possible RED-S ──
+    if (fh.menstrualStatus === "amenorrhea") {
+      lines.push(
+        "- ⚠️ CLIENT HAS AMENORRHEA (absent periods) — This may indicate Relative Energy Deficiency in Sport (RED-S).",
+        "- Do NOT apply aggressive caloric deficit. Ensure adequate energy availability.",
+        "- Prioritize calcium (1200mg/day), vitamin D, and healthy fats.",
+        "- Include calorie-dense nutrient foods — don't restrict fat below 25% of total calories.",
+      );
+    }
+
+    // ── Postmenopausal ──
+    if (fh.menstrualStatus === "postmenopausal") {
+      lines.push(
+        "- CLIENT IS POSTMENOPAUSAL — Bone health is priority.",
+        "- CALCIUM: Target 1200mg/day — dairy, tahini, sardines, fortified alternatives.",
+        "- VITAMIN D: Recommend supplementation or sun exposure.",
+        "- Adequate protein (1.2-1.5g/kg) to prevent muscle loss.",
+        "- Include phytoestrogen foods (soy, flaxseed, chickpeas) where appropriate.",
+      );
+    }
+
+    // ── General female baseline (if no specific status or prefer_not_say) ──
+    if (!fh.menstrualStatus || fh.menstrualStatus === "prefer_not_say") {
+      lines.push(
+        "- IRON: Include iron-rich foods regularly (red meat, lentils, spinach). Pair with vitamin C.",
+        "- CALCIUM & VITAMIN D: Target 1000mg calcium/day — dairy, tahini, sardines.",
+        "- FOLATE: Include folate-rich foods (dark leafy greens, lentils, chickpeas).",
+      );
+    }
+
+    // ── Hormonal medication note ──
+    if (fh.hormonalMedication) {
+      lines.push(
+        `- Note: Client is on hormonal medication (${fh.hormonalMedication}). This may affect appetite, water retention, and metabolism.`,
+      );
+    }
+
+    // ── Always include bone health for all female clients ──
+    lines.push("- BONE HEALTH: Ensure adequate protein + calcium + vitamin K (leafy greens).");
+
+    return lines.join("\n");
+  })();
 
   const systemPrompt = `You are an expert sports nutritionist and meal planning AI specializing in ${isArabic ? "Middle Eastern and Egyptian cuisine" : "international cuisine"}. Create personalized meal plans.
 HARD CONSTRAINT: All meals MUST be halal. Never include pork, alcohol, or non-halal meat. This is non-negotiable.
@@ -1018,6 +1105,14 @@ async function generateWorkoutPlanHandler(
       return Array.isArray(eq) ? eq : [eq];
     })(),
     gender: assessment.gender === "female" ? "female" : "male",
+    femaleHealth:
+      assessment.gender === "female" && assessment.femaleHealth
+        ? (assessment.femaleHealth as {
+            menstrualStatus?: string;
+            isPregnant?: boolean;
+            isBreastfeeding?: boolean;
+          })
+        : undefined,
   });
 
   // Create stream and mark it done immediately (backward compat)

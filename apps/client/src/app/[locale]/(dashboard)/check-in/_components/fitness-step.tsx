@@ -6,9 +6,16 @@ import { Dumbbell } from "lucide-react";
 import { SectionCard } from "@fitfast/ui/section-card";
 import { RatingSelector } from "@fitfast/ui/rating-selector";
 import { Textarea } from "@fitfast/ui/textarea";
+import { cn } from "@fitfast/ui/cn";
 import type { CheckInFormData } from "../page";
 
-export function FitnessStep() {
+const CYCLE_PHASES = ["menstrual", "follicular", "ovulatory", "luteal", "not_tracking"] as const;
+
+interface FitnessStepProps {
+  isFemale: boolean;
+}
+
+export function FitnessStep({ isFemale }: FitnessStepProps) {
   const t = useTranslations("checkIn");
   const {
     register,
@@ -19,9 +26,36 @@ export function FitnessStep() {
 
   const energyLevel = watch("energyLevel");
   const sleepQuality = watch("sleepQuality");
+  const cyclePhase = watch("cyclePhase");
 
   return (
     <div className="space-y-4">
+      {/* Cycle phase selector — female clients only */}
+      {isFemale && (
+        <SectionCard title={t("cyclePhase")} description={t("cyclePhaseDescription")}>
+          <div className="flex flex-wrap gap-2">
+            {CYCLE_PHASES.map((phase) => {
+              const translationKey = phase === "not_tracking" ? "notTracking" : phase;
+              return (
+                <button
+                  key={phase}
+                  type="button"
+                  onClick={() => setValue("cyclePhase", cyclePhase === phase ? undefined : phase)}
+                  className={cn(
+                    "rounded-lg border px-3 py-2 text-xs font-medium transition-colors",
+                    cyclePhase === phase
+                      ? "border-fitness/30 bg-fitness/8 text-fitness"
+                      : "border-border bg-card hover:bg-neutral-50",
+                  )}
+                >
+                  {t(`cyclePhaseOptions.${translationKey}`)}
+                </button>
+              );
+            })}
+          </div>
+        </SectionCard>
+      )}
+
       <SectionCard icon={Dumbbell} title={t("performance")} variant="fitness">
         <Textarea
           placeholder={t("placeholders.performance")}

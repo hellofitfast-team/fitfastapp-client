@@ -736,6 +736,16 @@
     "injuries": "الإصابات",
     "lifestyle": "نمط الحياة",
     "equipment": "المعدات",
-    "mealsPerDay": "الوجبات/يوم"
+    "mealsPerDay": "الوجبات/يوم",
+    "femaleHealth": "صحة المرأة",
+    "menstrualStatus": "حالة الدورة",
+    "menstrualStatus_regular": "منتظمة",
+    "menstrualStatus_irregular": "غير منتظمة",
+    "menstrualStatus_amenorrhea": "غائبة",
+    "menstrualStatus_postmenopausal": "بعد سن اليأس",
+    "menstrualStatus_prefer_not_say": "تفضل عدم الإجابة",
+    "pregnant": "حامل",
+    "breastfeeding": "مرضعة",
+    "hormonalMedication": "أدوية هرمونية"
   }
 }
