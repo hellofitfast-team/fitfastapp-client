@@ -232,6 +232,7 @@
     "reps": "تكرارات",
     "rest": "راحة",
     "duration": "المدة",
+    "durationMin": "المدة (د)",
     "warmup": "الإحماء",
     "cooldown": "التهدئة",
     "startWorkout": "بدء التمرين",

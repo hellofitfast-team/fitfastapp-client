@@ -232,6 +232,7 @@
     "reps": "Reps",
     "rest": "Rest",
     "duration": "Duration",
+    "durationMin": "Duration (min)",
     "warmup": "Warm-up",
     "cooldown": "Cool-down",
     "startWorkout": "Start Workout",

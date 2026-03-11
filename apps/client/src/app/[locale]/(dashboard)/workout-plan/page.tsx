@@ -387,23 +387,57 @@ export default function WorkoutPlanPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-5 px-4 py-6 lg:px-6">
-      {/* Header — title + split badge + date range */}
-      <div>
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">{isToday ? t("todaysWorkout") : t("title")}</h1>
-          {planData.splitName && (
-            <span className="bg-fitness/10 text-fitness rounded-full px-2.5 py-0.5 text-xs font-semibold">
-              {planData.splitName}
-            </span>
-          )}
+      {/* Hero header — title, split badge, date range, and workout summary */}
+      <div className="border-border bg-card shadow-card animate-slide-up overflow-hidden rounded-2xl border">
+        {/* Top: title row + split badge */}
+        <div className="border-border border-b p-4 pb-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h1 className="text-xl font-bold">{isToday ? t("todaysWorkout") : t("title")}</h1>
+              <p className="text-muted-foreground mt-0.5 text-xs">
+                {new Date(workoutPlan.startDate).toLocaleDateString(
+                  locale === "ar" ? "ar-EG" : "en",
+                )}{" "}
+                –{" "}
+                {new Date(workoutPlan.endDate).toLocaleDateString(locale === "ar" ? "ar-EG" : "en")}
+              </p>
+            </div>
+            {planData.splitName && (
+              <span className="bg-fitness/10 text-fitness shrink-0 rounded-full px-3 py-1 text-xs font-semibold">
+                {planData.splitName}
+              </span>
+            )}
+          </div>
         </div>
-        <p className="text-muted-foreground mt-0.5 text-sm">
-          {new Date(workoutPlan.startDate).toLocaleDateString(locale === "ar" ? "ar-EG" : "en")} -{" "}
-          {new Date(workoutPlan.endDate).toLocaleDateString(locale === "ar" ? "ar-EG" : "en")}
-        </p>
+
+        {/* Bottom: inline stats row — only when we have a non-rest day */}
+        {dayPlan && !dayPlan.restDay && (
+          <div className="divide-border flex items-center divide-x">
+            <div className="flex-1 py-3 text-center">
+              <p className="text-fitness text-lg font-bold">
+                {toLocalDigits(dayPlan.exercises?.length || 0, locale)}
+              </p>
+              <p className="text-muted-foreground text-[10px]">{t("exercises")}</p>
+            </div>
+            <div className="flex-1 py-3 text-center">
+              <p className="text-fitness text-lg font-bold">
+                {dayPlan.duration ? toLocalDigits(dayPlan.duration, locale) : "–"}
+              </p>
+              <p className="text-muted-foreground text-[10px]">{t("durationMin")}</p>
+            </div>
+            <div className="flex-1 py-3 text-center">
+              <p className="text-xs leading-tight font-semibold">
+                {Array.isArray(dayPlan.targetMuscles)
+                  ? dayPlan.targetMuscles.slice(0, 3).join(", ")
+                  : "–"}
+              </p>
+              <p className="text-muted-foreground text-[10px]">{t("targetMuscles")}</p>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* DayNavigator — compact prev/next */}
+      {/* DayNavigator — compact prev/next (kept as-is, user likes this chip) */}
       <DayNavigator
         totalDays={totalDays}
         selectedDay={selectedDay}
@@ -434,33 +468,7 @@ export default function WorkoutPlanPage() {
             <RestDayView t={t} prevWorkout={findPrevWorkout()} nextWorkout={findNextWorkout()} />
           ) : (
             <>
-              {/* Condensed Summary Card — stats */}
-              <div className="border-border bg-card shadow-card animate-slide-up rounded-xl border p-4">
-                <div className="flex flex-1 items-center">
-                  <div className="flex-1 text-center">
-                    <p className="text-sm font-bold sm:text-base">
-                      {Array.isArray(dayPlan.targetMuscles)
-                        ? dayPlan.targetMuscles.join(", ")
-                        : "-"}
-                    </p>
-                    <p className="text-muted-foreground text-[10px]">{t("targetMuscles")}</p>
-                  </div>
-                  <div className="bg-border h-8 w-px" />
-                  <div className="flex-1 text-center">
-                    <p className="text-sm font-bold sm:text-base">
-                      {toLocalDigits(dayPlan.exercises?.length || 0, locale)}
-                    </p>
-                    <p className="text-muted-foreground text-[10px]">{t("exercises")}</p>
-                  </div>
-                  <div className="bg-border h-8 w-px" />
-                  <div className="flex-1 text-center">
-                    <p className="text-sm font-bold sm:text-base">
-                      {dayPlan.duration ? toLocalDigits(dayPlan.duration, locale) : "-"}
-                    </p>
-                    <p className="text-muted-foreground text-[10px]">{t("duration")}</p>
-                  </div>
-                </div>
-              </div>
+              {/* Stats are now in the hero header — no standalone card needed */}
 
               {/* Warmup (collapsed by default) */}
               {dayPlan.warmup.exercises.length > 0 && (
