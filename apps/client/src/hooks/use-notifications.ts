@@ -62,7 +62,19 @@ export function useNotifications() {
   }, []);
 
   const subscribe = useCallback(async () => {
-    if (!isSupported || !vapidPublicKey || !profile?._id) return;
+    if (!isSupported) {
+      setError("Push notifications are not supported on this device");
+      return;
+    }
+    if (!vapidPublicKey) {
+      setError("Notification service is not configured. Please contact your coach.");
+      return;
+    }
+    if (!profile?._id) {
+      setError("Profile not loaded yet. Please try again.");
+      return;
+    }
+
     setToggling(true);
     setError(null);
 
@@ -72,6 +84,9 @@ export function useNotifications() {
       setPermission(result);
 
       if (result !== "granted") {
+        if (result === "denied") {
+          setError("Notifications were blocked. Please enable them in your browser settings.");
+        }
         setToggling(false);
         return;
       }
