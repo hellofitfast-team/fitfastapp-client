@@ -390,24 +390,19 @@ export default function WorkoutPlanPage() {
       {/* Hero header — title, split badge, date range, and workout summary */}
       <div className="border-border bg-card shadow-card animate-slide-up overflow-hidden rounded-2xl border">
         {/* Top: title row + split badge */}
-        <div className="border-border border-b p-4 pb-3">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h1 className="text-xl font-bold">{isToday ? t("todaysWorkout") : t("title")}</h1>
-              <p className="text-muted-foreground mt-0.5 text-xs">
-                {new Date(workoutPlan.startDate).toLocaleDateString(
-                  locale === "ar" ? "ar-EG" : "en",
-                )}{" "}
-                –{" "}
-                {new Date(workoutPlan.endDate).toLocaleDateString(locale === "ar" ? "ar-EG" : "en")}
-              </p>
-            </div>
-            {planData.splitName && (
-              <span className="bg-fitness/10 text-fitness shrink-0 rounded-full px-3 py-1 text-xs font-semibold">
-                {planData.splitName}
-              </span>
-            )}
+        <div className="border-border flex items-stretch border-b">
+          <div className="flex-1 p-4 pb-3">
+            <h1 className="text-xl font-bold">{isToday ? t("todaysWorkout") : t("title")}</h1>
+            <p className="text-muted-foreground mt-0.5 text-xs">
+              {new Date(workoutPlan.startDate).toLocaleDateString(locale === "ar" ? "ar-EG" : "en")}{" "}
+              – {new Date(workoutPlan.endDate).toLocaleDateString(locale === "ar" ? "ar-EG" : "en")}
+            </p>
           </div>
+          {planData.splitName && (
+            <div className="bg-fitness/8 border-border flex items-center border-s px-4">
+              <span className="text-fitness text-sm font-bold">{planData.splitName}</span>
+            </div>
+          )}
         </div>
 
         {/* Bottom: stats + target muscles — only when we have a non-rest day */}
