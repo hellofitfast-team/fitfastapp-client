@@ -14,7 +14,10 @@ export function useNotifications() {
   const [isSupported, setIsSupported] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission>("default");
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [loading, setLoading] = useState(true);
+  /** True only during initial subscription check on mount */
+  const [initializing, setInitializing] = useState(true);
+  /** True while a subscribe/unsubscribe operation is in progress */
+  const [toggling, setToggling] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const { profile } = useAuth();
@@ -33,7 +36,7 @@ export function useNotifications() {
     setIsSupported(supported);
 
     if (!supported) {
-      setLoading(false);
+      setInitializing(false);
       return;
     }
 
@@ -51,7 +54,7 @@ export function useNotifications() {
           { tags: { feature: "push-notifications", operation: "check-subscription" } },
         );
       } finally {
-        setLoading(false);
+        setInitializing(false);
       }
     }
 
@@ -60,7 +63,7 @@ export function useNotifications() {
 
   const subscribe = useCallback(async () => {
     if (!isSupported || !vapidPublicKey || !profile?._id) return;
-    setLoading(true);
+    setToggling(true);
     setError(null);
 
     try {
@@ -69,7 +72,7 @@ export function useNotifications() {
       setPermission(result);
 
       if (result !== "granted") {
-        setLoading(false);
+        setToggling(false);
         return;
       }
 
@@ -100,13 +103,13 @@ export function useNotifications() {
         tags: { feature: "push-notifications", operation: "subscribe" },
       });
     } finally {
-      setLoading(false);
+      setToggling(false);
     }
   }, [isSupported, vapidPublicKey, profile?._id, saveSubscription]);
 
   const unsubscribe = useCallback(async () => {
     if (!isSupported) return;
-    setLoading(true);
+    setToggling(true);
     setError(null);
 
     try {
@@ -127,7 +130,7 @@ export function useNotifications() {
         tags: { feature: "push-notifications", operation: "unsubscribe" },
       });
     } finally {
-      setLoading(false);
+      setToggling(false);
     }
   }, [isSupported, deactivateSubscription]);
 
@@ -145,7 +148,10 @@ export function useNotifications() {
     isSubscribed,
     requestPermission: subscribe,
     toggleSubscription,
-    loading,
+    /** True only during initial mount check */
+    initializing,
+    /** True while subscribe/unsubscribe is in progress */
+    toggling,
     error,
   };
 }

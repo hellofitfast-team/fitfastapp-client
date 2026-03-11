@@ -64,7 +64,9 @@ export default function SettingsPage() {
     isSubscribed,
     permission,
     toggleSubscription,
-    loading: notifLoading,
+    initializing: notifInitializing,
+    toggling: notifToggling,
+    error: notifError,
   } = useNotifications();
   const updateProfile = useMutation(api.profiles.updateProfile);
 
@@ -300,30 +302,39 @@ export default function SettingsPage() {
                       : t("notificationsUnsupported")}
                   </p>
                 </div>
-                {notifLoading ? (
+                {notifInitializing ? (
                   <Skeleton className="h-7 w-12 rounded-full" />
                 ) : (
                   <button
                     type="button"
                     onClick={() => toggleSubscription()}
-                    disabled={!isSupported || (permission === "denied" && !isSubscribed)}
+                    disabled={
+                      notifToggling || !isSupported || (permission === "denied" && !isSubscribed)
+                    }
                     className={cn(
-                      "focus-visible:ring-ring relative h-7 w-12 rounded-full transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
+                      "focus-visible:ring-ring relative h-7 w-12 shrink-0 rounded-full transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
                       isSubscribed ? "bg-primary" : "bg-neutral-200",
+                      notifToggling && "opacity-60",
                       (!isSupported || permission === "denied") && "cursor-not-allowed opacity-50",
                     )}
                     role="switch"
                     aria-checked={isSubscribed}
+                    aria-busy={notifToggling}
                   >
                     <span
                       className={cn(
-                        "absolute top-0.5 h-6 w-6 rounded-full bg-white shadow-sm transition-transform duration-200",
+                        "absolute top-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-sm transition-transform duration-200",
                         isSubscribed ? "translate-x-5" : "translate-x-0.5",
                       )}
-                    />
+                    >
+                      {notifToggling && (
+                        <Loader2 className="text-muted-foreground h-3 w-3 animate-spin" />
+                      )}
+                    </span>
                   </button>
                 )}
               </div>
+              {notifError && <p className="text-xs text-red-600">{notifError}</p>}
               <div>
                 <label className="mb-1.5 block text-sm font-medium">{t("reminderTime")}</label>
                 <input
