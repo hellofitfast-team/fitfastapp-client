@@ -55,8 +55,11 @@ export const getTrackingData = query({
 });
 
 export const getStreak = query({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    /** Client's local date as YYYY-MM-DD so streaks align with user's midnight */
+    clientToday: v.optional(v.string()),
+  },
+  handler: async (ctx, { clientToday }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return { currentStreak: 0, lastActiveDate: "" };
 
@@ -87,26 +90,36 @@ export const getStreak = query({
     // Sort dates descending
     const sortedDates = [...activeDates].sort().reverse();
 
-    // Count consecutive days from today (UTC-based to avoid timezone issues)
-    const todayStr = new Date().toISOString().split("T")[0];
+    // Use client's local date when provided, otherwise fall back to UTC.
+    // This ensures streaks align with the user's midnight, not the server's.
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    const todayStr =
+      clientToday && dateRegex.test(clientToday)
+        ? clientToday
+        : new Date().toISOString().split("T")[0];
 
-    // Compute yesterday in UTC
-    const yesterdayMs = Date.now() - 86400000;
-    const yesterdayStr = new Date(yesterdayMs).toISOString().split("T")[0];
+    // Compute yesterday by decrementing the date string
+    const todayDate = new Date(todayStr + "T00:00:00Z");
+    todayDate.setUTCDate(todayDate.getUTCDate() - 1);
+    const yesterdayStr = todayDate.toISOString().split("T")[0];
 
     if (!activeDates.has(todayStr) && !activeDates.has(yesterdayStr)) {
       return { currentStreak: 0, lastActiveDate: sortedDates[0] };
     }
 
-    // Start from today if active, otherwise from yesterday
-    let currentDateMs = activeDates.has(todayStr) ? Date.now() : yesterdayMs;
+    // Walk backwards from today (or yesterday) counting consecutive active days
+    const cursor = new Date(todayStr + "T00:00:00Z");
+    if (!activeDates.has(todayStr)) {
+      // Start from yesterday if today isn't active
+      cursor.setUTCDate(cursor.getUTCDate() - 1);
+    }
     let streak = 0;
 
     while (true) {
-      const dateStr = new Date(currentDateMs).toISOString().split("T")[0];
+      const dateStr = cursor.toISOString().split("T")[0];
       if (!activeDates.has(dateStr)) break;
       streak++;
-      currentDateMs -= 86400000;
+      cursor.setUTCDate(cursor.getUTCDate() - 1);
     }
 
     return { currentStreak: streak, lastActiveDate: sortedDates[0] };
