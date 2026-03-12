@@ -79,8 +79,10 @@ testing-instapay-screenshot.png
 .specify/
 
 # Planning & specs (local-only)
+.planning/
 plans/
 specs/
+cost-analysis.md
 
 # Brand assets (large binaries)
 brand-logos/
